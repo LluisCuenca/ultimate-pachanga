@@ -36,6 +36,7 @@ import {
 import { leagueKeys, useLeague } from '@/features/league/useLeague'
 import { playerKeys } from '@/features/players/api'
 import { formatMarketValueExact } from '@/lib/formatting'
+import { cn } from '@/lib/utils'
 
 const settingsSchema = z.object({
   title: z.string().trim().min(1, 'El título es obligatorio').max(120),
@@ -45,6 +46,7 @@ const settingsSchema = z.object({
   // which no longer matches the form's own value type.
   marketConstantGbp: z
     .number({ message: 'Introduce un número' })
+    .int('Introduce un número entero')
     .min(0, 'No puede ser negativo')
     .max(1_000_000_000, 'Demasiado grande'),
 })
@@ -129,22 +131,28 @@ export function AdminSettingsPage() {
               <VisualStep
                 index="1"
                 title="Stats específicas"
-                body="Ataque, Defensa y el resto mezclan 50% media anterior y 50% último partido. Media 6 + último 10 = stat 8."
+                body="Para cada dimensión se hace la media aritmética: 50% valores históricos y 50% último partido. Ataque histórico 6 + último partido 10 = 8."
               />
               <VisualStep
                 index="2"
-                title="Valoración 45-99"
-                body="Usa la puntuación final: estadísticas + Victoria + Atributos. 36 + Victoria + MVP = 40, o sea 10 sobre 10."
+                title="Valoración 0-99"
+                body="Usa la puntuación final de todos los partidos: Estadísticas + Victorias + Atributos. 50% puntuaciones históricas, 50% último partido. Se aplica la distribución de Gauss comparando todos los jugadores entre sí."
               />
               <VisualStep
                 index="3"
                 title="Confianza"
-                body="Mira los últimos 6 partidos de la liga. 1 jugado penaliza más; 4 jugados ya llenan el donut."
+                body="Se tiene en cuenta el % de asistencia en los últimos partidos. Confianzas de menos del 100% penalizan el valor de mercado."
+                note="1"
               />
               <VisualStep
                 index="4"
+                title="Estado de forma"
+                body="Resume si el jugador viene mejorando, empeorando o si su último partido se aleja de su media."
+              />
+              <VisualStep
+                index="5"
                 title="Mercado"
-                body={`Valor final por constante. Con ${formatMarketValueExact(
+                body={`Valor final del jugador. Con ${formatMarketValueExact(
                   league.market_constant_gbp,
                 )}, una valoración 82 vale ${formatMarketValueExact(
                   league.market_constant_gbp * 82,
@@ -161,10 +169,15 @@ export function AdminSettingsPage() {
                   ST
                 </span>
                 <MiniDonut value={100} />
-                <Flame
-                  className="absolute top-11 right-3 size-4 text-red-400"
-                  aria-label="En racha"
-                />
+                <ReferenceNumber className="absolute top-3 left-3">
+                  2
+                </ReferenceNumber>
+                <ReferenceNumber className="absolute top-3 right-10">
+                  3
+                </ReferenceNumber>
+                <ReferenceNumber className="absolute bottom-3 left-3">
+                  5
+                </ReferenceNumber>
                 <div className="absolute right-3 bottom-3 left-3 space-y-2">
                   <div className="h-2 rounded bg-white/65" />
                   <div className="h-2 w-2/3 rounded bg-white/40" />
@@ -173,28 +186,28 @@ export function AdminSettingsPage() {
               <div className="mt-3 grid grid-cols-4 gap-2 text-center">
                 <FormLegend
                   icon={<Flame className="size-4 text-red-400" />}
-                  label="sube 3"
+                  label="3 partidos mejorando"
                 />
                 <FormLegend
                   icon={<Snowflake className="size-4 text-cyan-200" />}
-                  label="baja 3"
+                  label="3 partidos empeorando"
                 />
                 <FormLegend
                   icon={<ArrowUp className="size-4 text-emerald-300" />}
-                  label="+5%"
+                  label="mejor forma"
                 />
                 <FormLegend
                   icon={<ArrowDown className="size-4 text-rose-300" />}
-                  label="-5%"
+                  label="peor forma"
                 />
               </div>
             </div>
           </div>
 
           <p>
-            El ajuste de confianza se aplica después de la distribución: 99 con
-            1 partido de los últimos 6 baja a 90; 77 con 2 partidos baja a 70.
-            Los goles no suman puntos por sí solos.
+            <sup>1</sup> El ajuste de confianza se aplica después de la
+            distribución: 99 con 1 partido de los últimos 6 baja a 90; 77 con 2
+            partidos baja a 70. Los goles no suman puntos por sí solos.
           </p>
         </CardContent>
       </Card>
@@ -206,10 +219,12 @@ function VisualStep({
   index,
   title,
   body,
+  note,
 }: {
   index: string
   title: string
   body: string
+  note?: string
 }) {
   return (
     <div className="flex gap-3">
@@ -217,10 +232,32 @@ function VisualStep({
         {index}
       </span>
       <div>
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <h3 className="text-sm font-semibold text-foreground">
+          {title}
+          {note ? <sup className="ml-1 text-primary">{note}</sup> : null}
+        </h3>
         <p>{body}</p>
       </div>
     </div>
+  )
+}
+
+function ReferenceNumber({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <span
+      className={cn(
+        'numeric flex size-5 items-center justify-center rounded-full bg-black/50 text-[0.625rem] font-bold text-white',
+        className,
+      )}
+    >
+      {children}
+    </span>
   )
 }
 
@@ -320,7 +357,7 @@ function SettingsForm({
           id="league-constant"
           type="number"
           min={0}
-          step={100000}
+          step={1}
           aria-invalid={Boolean(errors.marketConstantGbp)}
           {...register('marketConstantGbp', { valueAsNumber: true })}
         />
