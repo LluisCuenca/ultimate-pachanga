@@ -92,7 +92,7 @@ export function AdminSettingsPage() {
     <div className="flex flex-col gap-5">
       <h1 className="text-2xl font-bold">Ajustes de la liga</h1>
 
-      <Card className="max-w-2xl">
+      <Card>
         <CardHeader>
           <CardTitle>
             <h2>Configuración</h2>
@@ -125,9 +125,9 @@ export function AdminSettingsPage() {
             con victoria y atributos, y al final el valor de mercado.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
-          <div className="grid gap-4 md:grid-cols-[1fr_13rem]">
-            <div className="space-y-3">
+        <CardContent className="space-y-5 text-sm leading-6 text-muted-foreground">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+            <div className="space-y-4">
               <VisualStep
                 index="1"
                 title="Stats específicas"
@@ -160,45 +160,88 @@ export function AdminSettingsPage() {
               />
             </div>
 
-            <div className="rounded-lg border border-border bg-muted/35 p-3 text-foreground">
-              <div className="relative aspect-[4/5] rounded-lg border border-tier-gold/70 bg-gradient-to-b from-tier-gold-face to-tier-gold-face-deep p-3 shadow-inner">
-                <span className="numeric text-3xl font-black text-tier-gold">
-                  90
-                </span>
-                <span className="block text-xs font-bold tracking-wide opacity-80">
-                  ST
-                </span>
-                <MiniDonut value={100} />
-                <ReferenceNumber className="absolute top-3 left-3">
-                  2
-                </ReferenceNumber>
-                <ReferenceNumber className="absolute top-3 right-10">
-                  3
-                </ReferenceNumber>
-                <ReferenceNumber className="absolute bottom-3 left-3">
-                  5
-                </ReferenceNumber>
-                <div className="absolute right-3 bottom-3 left-3 space-y-2">
-                  <div className="h-2 rounded bg-white/65" />
-                  <div className="h-2 w-2/3 rounded bg-white/40" />
+            <div className="rounded-lg border border-border bg-muted/35 p-4 text-foreground">
+              <div className="relative mx-auto aspect-[4/5] max-w-[16rem] overflow-hidden rounded-xl border border-tier-gold/70 bg-gradient-to-b from-tier-gold-face to-tier-gold-face-deep shadow-[inset_0_1px_0_oklch(1_0_0/0.18),0_2px_12px_oklch(0_0_0/0.4)]">
+                <div className="absolute top-5 left-6 z-10 leading-none">
+                  <div className="flex items-start gap-1">
+                    <span className="numeric text-5xl font-black text-tier-gold">
+                      90
+                    </span>
+                    <ReferenceNumber>2</ReferenceNumber>
+                  </div>
+                  <span className="mt-1 block text-sm font-bold tracking-wide opacity-85">
+                    ST
+                  </span>
+                </div>
+
+                <div className="absolute top-5 right-5 z-10 flex flex-col items-center gap-1.5">
+                  <div className="flex items-center gap-1">
+                    <ReferenceNumber>3</ReferenceNumber>
+                    <MiniDonut value={66} />
+                  </div>
+                  <Flame
+                    className="size-5 text-red-400"
+                    aria-label="En racha"
+                  />
+                  <ReferenceNumber>4</ReferenceNumber>
+                </div>
+
+                <div className="flex h-[52%] items-center justify-center pt-7">
+                  <div className="flex size-32 items-center justify-center rounded-full border-4 border-black/35 bg-gradient-to-br from-white/80 via-white/35 to-black/15 text-4xl font-black text-black/50">
+                    UP
+                  </div>
+                </div>
+
+                <div className="border-y border-tier-gold/25 px-4 py-3 text-center">
+                  <h3 className="truncate text-lg font-black tracking-wide">
+                    EL AVESTRUZ
+                  </h3>
+                  <p className="truncate text-sm opacity-70">
+                    Perico Van Nistelroy
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-4 border-b border-tier-gold/25 px-4 py-3 text-center">
+                  {[
+                    ['ATA', '84'],
+                    ['DEF', '66'],
+                    ['TÁC', '72'],
+                    ['FÍS', '94'],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <div className="text-[0.625rem] font-bold opacity-70">
+                        {label}
+                      </div>
+                      <div className="numeric text-xl font-black">{value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between px-5 py-4 text-sm font-bold">
+                  <div className="flex items-center gap-1">
+                    <ReferenceNumber>5</ReferenceNumber>
+                    <span className="numeric text-base">£94 M</span>
+                  </div>
+                  <span className="numeric opacity-70">6 partidos</span>
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+
+              <div className="mt-4 space-y-2.5">
                 <FormLegend
                   icon={<Flame className="size-4 text-red-400" />}
-                  label="3 partidos mejorando"
+                  label="Racha de 3 partidos mejorando puntuación"
                 />
                 <FormLegend
                   icon={<Snowflake className="size-4 text-cyan-200" />}
-                  label="3 partidos empeorando"
+                  label="Racha de 3 partidos empeorando puntuación"
                 />
                 <FormLegend
                   icon={<ArrowUp className="size-4 text-emerald-300" />}
-                  label="mejor forma"
+                  label="Mejor forma que su media histórica"
                 />
                 <FormLegend
                   icon={<ArrowDown className="size-4 text-rose-300" />}
-                  label="peor forma"
+                  label="Peor forma que su media histórica"
                 />
               </div>
             </div>
@@ -263,7 +306,7 @@ function ReferenceNumber({
 
 function MiniDonut({ value }: { value: number }) {
   return (
-    <span className="absolute top-3 right-3 block size-5 rounded-full border border-white/45 bg-black/25 p-[2px]">
+    <span className="block size-6 rounded-full border border-white/45 bg-black/25 p-[2px]">
       <span
         className="block size-full rounded-full"
         style={{
@@ -276,7 +319,7 @@ function MiniDonut({ value }: { value: number }) {
 
 function FormLegend({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-[0.625rem] font-semibold text-muted-foreground">
+    <div className="flex items-center gap-3 rounded-md bg-background/45 px-3 py-2 text-xs font-semibold text-muted-foreground">
       {icon}
       <span>{label}</span>
     </div>
