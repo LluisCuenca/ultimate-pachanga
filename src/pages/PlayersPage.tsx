@@ -97,10 +97,10 @@ export function PlayersPage() {
   }, [players, search, position, sortBy, showInactive, isAdmin])
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-7">
       <div>
-        <h1 className="text-2xl font-bold">Jugadores</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="page-title">Jugadores</h1>
+        <p className="mt-2 text-base text-muted-foreground">
           {isPending
             ? 'Cargando plantilla…'
             : `${visiblePlayers.length} de ${players?.length ?? 0} jugadores`}

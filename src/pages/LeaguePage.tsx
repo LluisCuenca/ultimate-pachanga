@@ -21,6 +21,7 @@ import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import type { MatchRow, PlayerCardData } from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
+const BRAND_NAME = 'Ultimate Pachangas'
 
 function StatTile({
   label,
@@ -30,11 +31,11 @@ function StatTile({
   children: React.ReactNode
 }) {
   return (
-    <Card className="relative gap-1 overflow-hidden p-4 before:absolute before:top-0 before:left-0 before:h-0.5 before:w-8 before:bg-primary">
+    <Card className="relative gap-1 overflow-hidden p-4 before:absolute before:top-0 before:left-0 before:h-0.5 before:w-8 before:bg-primary lg:p-6">
       <p className="technical text-[0.625rem] font-medium text-muted-foreground uppercase">
         {label}
       </p>
-      <p className="numeric text-4xl leading-none font-bold">{children}</p>
+      <p className="numeric text-5xl leading-none font-bold">{children}</p>
     </Card>
   )
 }
@@ -51,10 +52,10 @@ function LeaderboardCard({
   renderValue: (player: PlayerCardData) => React.ReactNode
 }) {
   return (
-    <Card className="border-border/90">
+    <Card className="border-border/90 lg:min-h-72">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-xl leading-none uppercase">
-          <Icon className="size-4 text-primary" aria-hidden="true" />
+        <CardTitle className="flex items-center gap-2 text-2xl leading-none uppercase">
+          <Icon className="size-5 text-primary" aria-hidden="true" />
           <h2>{title}</h2>
         </CardTitle>
       </CardHeader>
@@ -63,7 +64,7 @@ function LeaderboardCard({
           <Link
             key={player.id}
             to={`/players/${player.id}`}
-            className="flex items-center gap-3 border-l-2 border-transparent px-2 py-1.5 transition-colors hover:border-primary hover:bg-accent/50"
+            className="flex min-h-10 items-center gap-3 border-l-2 border-transparent px-2 py-1.5 text-base transition-colors hover:border-primary hover:bg-accent/50"
           >
             <span className="numeric w-4 text-sm text-muted-foreground">
               {index + 1}
@@ -159,12 +160,14 @@ export function LeaguePage() {
     .filter((entry) => entry.holders.length > 0)
 
   return (
-    <div className="flex flex-col gap-7">
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
+    <div className="flex flex-col gap-9 lg:gap-11">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6 lg:pb-8">
         <div>
-          <p className="section-kicker">Competición entre amigos</p>
-          <h1 className="mt-2 text-4xl leading-none font-bold uppercase sm:text-5xl">
-            {league?.title ?? 'Liga'}
+          <p className="section-kicker">
+            {league?.title ?? 'Competición entre amigos'}
+          </p>
+          <h1 className="mt-3 text-6xl leading-none font-bold uppercase">
+            {BRAND_NAME}
           </h1>
         </div>
         {league ? (
@@ -175,12 +178,12 @@ export function LeaguePage() {
       </div>
 
       {areMatchesPending ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Skeleton className="h-40 rounded-xl" />
-          <Skeleton className="h-40 rounded-xl" />
+        <div className="grid gap-4 xl:grid-cols-2">
+          <Skeleton className="h-52 rounded-xl" />
+          <Skeleton className="h-52 rounded-xl" />
         </div>
       ) : latestMatch || nextMatch ? (
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
           {nextMatch ? (
             <section className="flex flex-col gap-2">
               <h2 className="section-kicker text-primary">Próxima jornada</h2>
@@ -196,7 +199,7 @@ export function LeaguePage() {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
         <StatTile label="Jugadores activos">
           <span className="numeric">
             {arePlayersPending ? '—' : activePlayers.length}
@@ -225,7 +228,7 @@ export function LeaguePage() {
       </div>
 
       {arePlayersPending ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-2">
           <Skeleton className="h-56 rounded-xl" />
           <Skeleton className="h-56 rounded-xl" />
         </div>
@@ -249,7 +252,7 @@ export function LeaguePage() {
       ) : (
         <section className="flex flex-col gap-3">
           <h2 className="section-kicker">Clasificación individual</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-5 xl:grid-cols-2">
             <LeaderboardCard
               title="Mayor valor de mercado"
               icon={TrendingUp}

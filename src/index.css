@@ -183,4 +183,13 @@
     content: '';
     background: var(--primary);
   }
+
+  .page-title {
+    font-family: var(--font-heading);
+    font-size: 3.75rem;
+    font-weight: 700;
+    line-height: 0.85;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
 }

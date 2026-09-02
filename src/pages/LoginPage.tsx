@@ -18,7 +18,6 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { signIn, signUp } from '@/features/auth/api'
 import { useAuth } from '@/features/auth/useAuth'
-import { APP_NAME } from '@/lib/env'
 
 const credentialsSchema = z.object({
   email: z.string().min(1, 'Introduce tu correo').email('Correo no válido'),
@@ -26,6 +25,7 @@ const credentialsSchema = z.object({
 })
 
 const LOGO_URL = `${import.meta.env.BASE_URL}ultimate-pachangas-logo.png`
+const BRAND_NAME = 'Ultimate Pachangas'
 
 type CredentialsValues = z.infer<typeof credentialsSchema>
 
@@ -126,16 +126,18 @@ export function LoginPage() {
 
   return (
     <main className="flex min-h-svh items-center justify-center p-4 sm:p-6">
-      <Card className="w-full max-w-md border-primary/30 shadow-[0_20px_55px_rgb(0_0_0/0.55)]">
-        <CardHeader className="items-center border-b border-border pb-5 text-center">
-          <img
-            src={LOGO_URL}
-            alt="Ultimate Pachangas"
-            className="mb-1 h-28 w-28 object-contain"
-          />
-          <CardTitle className="text-4xl leading-none uppercase">
-            <h1>{APP_NAME}</h1>
-          </CardTitle>
+      <Card className="w-full max-w-lg border-primary/30 shadow-[0_24px_64px_rgb(0_0_0/0.6)]">
+        <CardHeader className="flex flex-col items-center border-b border-border pb-6 text-center">
+          <div className="flex flex-col items-center">
+            <img
+              src={LOGO_URL}
+              alt="Ultimate Pachangas"
+              className="h-32 w-32 object-contain"
+            />
+            <CardTitle className="mt-2 text-5xl leading-none uppercase">
+              <h1>{BRAND_NAME}</h1>
+            </CardTitle>
+          </div>
           <CardDescription className="technical text-[0.625rem] uppercase">
             La liga entre amigos
           </CardDescription>

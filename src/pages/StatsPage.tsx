@@ -192,7 +192,7 @@ export function StatsPage() {
   if (error) {
     return (
       <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold">Estadísticas</h1>
+        <h1 className="page-title">Estadísticas</h1>
         <ErrorState error={error} onRetry={() => void refetch()} />
       </div>
     )
@@ -201,7 +201,7 @@ export function StatsPage() {
   if (ranked.length === 0) {
     return (
       <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold">Estadísticas</h1>
+        <h1 className="page-title">Estadísticas</h1>
         <EmptyState
           icon={Trophy}
           title="Todavía no hay partidos puntuados"
@@ -212,10 +212,10 @@ export function StatsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-7">
       <div>
-        <h1 className="text-2xl font-bold">Estadísticas</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="page-title">Estadísticas</h1>
+        <p className="mt-2 text-base text-muted-foreground">
           {ranked.length} jugadores con partidos puntuados
         </p>
       </div>

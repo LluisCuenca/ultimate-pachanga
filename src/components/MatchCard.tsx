@@ -12,7 +12,7 @@ export function MatchCard({ match }: { match: MatchRow }) {
       to={`/matches/${match.id}`}
       className="rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
     >
-      <Card className="grid min-h-36 grid-cols-[38%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] sm:grid-cols-[42%_1fr]">
+      <Card className="grid min-h-36 grid-cols-[38%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] sm:grid-cols-[42%_1fr] lg:min-h-48">
         <VenuePhoto match={match} />
 
         <div className="flex min-w-0 flex-col gap-1.5 py-3.5 pr-4 pl-3">
@@ -23,7 +23,7 @@ export function MatchCard({ match }: { match: MatchRow }) {
             <MatchStatusBadge status={match.status} />
           </div>
 
-          <p className="flex min-w-0 flex-col font-heading text-lg leading-[0.9] font-bold uppercase">
+          <p className="flex min-w-0 flex-col font-heading text-2xl leading-[0.9] font-bold uppercase">
             <span className="truncate">{match.home_team_name}</span>
             <span className="truncate">
               <span className="font-normal text-muted-foreground">vs </span>
