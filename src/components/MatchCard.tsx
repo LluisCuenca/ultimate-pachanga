@@ -16,18 +16,17 @@ export function MatchCard({
   return (
     <Link
       to={`/matches/${match.id}`}
-      className="rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="block rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <Card
         className={
           featured
-            ? 'grid min-h-80 grid-cols-[46%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80'
-            : 'grid min-h-36 grid-cols-[38%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] sm:grid-cols-[42%_1fr] lg:min-h-48'
+            ? 'grid aspect-[2/1] min-h-72 grid-cols-[46%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 lg:min-h-96'
+            : 'grid aspect-[4/3] min-h-64 grid-cols-[42%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-72'
         }
       >
         <VenuePhoto
           match={match}
-          showPlaceholderWhenMissing={featured}
           overlayClassName={
             featured
               ? 'bg-gradient-to-r from-transparent via-card/25 to-card'

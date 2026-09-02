@@ -67,18 +67,15 @@ export function MatchHero({ match }: { match: MatchRow }) {
       <div className="flex flex-col gap-4 px-6 py-7 sm:px-9 sm:py-9">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="technical text-xs font-semibold text-primary uppercase">
-            Jornada oficial
+            {match.title}
           </p>
           <MatchStatusBadge status={match.status} />
         </div>
-        <h1 className="font-heading text-5xl leading-[0.84] font-bold uppercase">
-          {match.title}
-        </h1>
-        <p className="flex min-w-0 flex-col font-heading text-5xl leading-[0.84] font-bold uppercase">
+        <h1 className="flex min-w-0 flex-col font-heading text-5xl leading-[0.84] font-bold uppercase">
           <span className="truncate">{match.home_team_name}</span>
           <span className="truncate text-muted-foreground">vs</span>
           <span className="truncate">{match.away_team_name}</span>
-        </p>
+        </h1>
         <dl className="mt-auto flex flex-col gap-2 border-t border-primary/20 pt-5 text-base text-muted-foreground">
           <div className="flex items-center gap-2">
             <dt className="sr-only">Fecha</dt>

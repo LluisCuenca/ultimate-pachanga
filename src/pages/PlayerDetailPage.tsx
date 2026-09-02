@@ -38,16 +38,30 @@ import {
 function SummaryRow({
   label,
   children,
+  featured = false,
 }: {
   label: string
   children: React.ReactNode
+  featured?: boolean
 }) {
   return (
-    <div className="flex min-h-14 items-baseline justify-between gap-4 border-b border-border/70 py-3 last:border-b-0">
+    <div
+      className={
+        featured
+          ? 'flex min-h-28 flex-col justify-between border-b border-primary/30 py-4'
+          : 'flex min-h-14 items-baseline justify-between gap-4 border-b border-border/70 py-3 last:border-b-0'
+      }
+    >
       <dt className="technical text-[0.6875rem] font-medium text-muted-foreground uppercase">
         {label}
       </dt>
-      <dd className="text-right text-lg font-semibold">{children}</dd>
+      <dd
+        className={
+          featured ? 'text-left' : 'text-right text-base font-semibold'
+        }
+      >
+        {children}
+      </dd>
     </div>
   )
 }
@@ -84,8 +98,8 @@ export function PlayerDetailPage() {
       <div className="flex flex-col gap-6">
         <Skeleton className="h-9 w-40" />
         <div className="grid gap-6 lg:grid-cols-2">
-          <Skeleton className="h-[34rem] rounded-xl" />
-          <Skeleton className="h-[34rem] rounded-xl" />
+          <Skeleton className="h-[28rem] rounded-xl lg:h-[34rem]" />
+          <Skeleton className="h-[28rem] rounded-xl lg:h-[34rem]" />
         </div>
       </div>
     )
@@ -126,7 +140,7 @@ export function PlayerDetailPage() {
         <PlayerCard
           player={player}
           metrics={metrics}
-          className="h-full min-h-[34rem]"
+          className="h-full min-h-[28rem] lg:min-h-[34rem]"
         />
 
         <Card className="h-full border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0e0e0e_100%)]">
@@ -142,19 +156,23 @@ export function PlayerDetailPage() {
           </CardHeader>
           <CardContent className="pt-4">
             <dl className="grid gap-x-8 md:grid-cols-2">
-              <SummaryRow label="Valor de mercado">
-                <MarketValue value={player.marketValueGbp} exact />
+              <SummaryRow label="Valor de mercado" featured>
+                <MarketValue
+                  value={player.marketValueGbp}
+                  exact
+                  className="text-5xl leading-none text-primary"
+                />
               </SummaryRow>
-              <SummaryRow label="Valoración">
-                <span className="numeric text-3xl text-primary">
+              <SummaryRow label="Valoración" featured>
+                <span className="numeric text-5xl leading-none text-primary">
                   {player.cardRating}
                 </span>
               </SummaryRow>
               <SummaryRow label="Partidos jugados">
-                <span className="numeric">{player.matchesPlayed}</span>
+                <span className="numeric text-xl">{player.matchesPlayed}</span>
               </SummaryRow>
               <SummaryRow label="Victorias">
-                <span className="numeric">
+                <span className="numeric text-xl">
                   {formatWinRate(player.totalVictories, player.matchesPlayed)}
                   <span className="ml-2 text-sm font-normal text-muted-foreground">
                     {formatVictories(player.totalVictories)}/
@@ -163,20 +181,20 @@ export function PlayerDetailPage() {
                 </span>
               </SummaryRow>
               <SummaryRow label="Goles">
-                <span className="numeric">{player.totalGoals}</span>
+                <span className="numeric text-xl">{player.totalGoals}</span>
               </SummaryRow>
               <SummaryRow label="Media histórica">
-                <span className="numeric">
+                <span className="numeric text-xl">
                   {formatScore(player.careerAverage)}
                 </span>
               </SummaryRow>
               <SummaryRow label="Última puntuación">
-                <span className="numeric">
+                <span className="numeric text-xl">
                   {formatScore(player.latestScore)}
                 </span>
               </SummaryRow>
               <SummaryRow label="Confianza">
-                <span className="numeric">
+                <span className="numeric text-xl">
                   {Math.round(player.confidencePct)}%
                 </span>
               </SummaryRow>
@@ -184,47 +202,6 @@ export function PlayerDetailPage() {
           </CardContent>
         </Card>
       </section>
-
-      <Card className="border-primary/20 bg-[linear-gradient(135deg,#131313_0%,#0c0c0c_100%)]">
-        <CardHeader className="border-b border-border">
-          <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
-            <Radar className="size-7 text-primary" aria-hidden="true" />
-            <h2>Rendimiento</h2>
-          </CardTitle>
-          <p className="mt-2 text-base text-muted-foreground">
-            Medias por métrica, lectura de juego y atributos obtenidos.
-          </p>
-        </CardHeader>
-        <CardContent className="grid gap-8 pt-7 xl:grid-cols-[1.25fr_0.75fr]">
-          <MetricRadarChart
-            player={player}
-            metrics={metrics}
-            className="h-[30rem]"
-          />
-          <div className="flex flex-col justify-center border-l-0 border-primary/20 xl:border-l xl:pl-8">
-            <p className="section-kicker text-primary">Distinciones</p>
-            <h3 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
-              Atributos
-            </h3>
-            {earnedAttributes.length > 0 ? (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {earnedAttributes.map((attribute) => (
-                  <AttributeBadge
-                    key={attribute.code}
-                    label={attribute.label}
-                    points={attribute.points}
-                    count={player.attributeCounts[attribute.code]}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="mt-4 text-base text-muted-foreground">
-                Todavía no tiene atributos registrados.
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader className="border-b border-border">
@@ -314,6 +291,49 @@ export function PlayerDetailPage() {
               </Table>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-primary/20 bg-[linear-gradient(135deg,#131313_0%,#0c0c0c_100%)]">
+        <CardHeader className="border-b border-border">
+          <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
+            <Radar className="size-7 text-primary" aria-hidden="true" />
+            <h2>Rendimiento</h2>
+          </CardTitle>
+          <p className="body-copy mt-2 text-muted-foreground">
+            Medias por métrica y reconocimientos obtenidos en la competición.
+          </p>
+        </CardHeader>
+        <CardContent className="grid gap-8 pt-7 xl:grid-cols-[1.25fr_0.75fr]">
+          <MetricRadarChart
+            player={player}
+            metrics={metrics}
+            className="h-[24rem] lg:h-[30rem]"
+          />
+          <div className="flex flex-col justify-center border-l-0 border-primary/20 xl:border-l xl:pl-8">
+            <p className="section-kicker text-primary">Extras</p>
+            {earnedAttributes.length > 0 ? (
+              <ol className="mt-6 flex flex-col divide-y divide-primary/20 border-y border-primary/20">
+                {earnedAttributes.map((attribute) => (
+                  <li
+                    key={attribute.code}
+                    className="flex items-center justify-between gap-4 py-4"
+                  >
+                    <span className="font-heading text-3xl leading-none font-bold uppercase">
+                      {attribute.label}
+                    </span>
+                    <span className="numeric text-4xl leading-none text-primary">
+                      ×{player.attributeCounts[attribute.code]}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="body-copy mt-4 text-muted-foreground">
+                Todavía no hay reconocimientos registrados.
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

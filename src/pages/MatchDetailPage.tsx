@@ -668,8 +668,8 @@ export function MatchDetailPage() {
       ) : null}
 
       <Card>
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-          <CardTitle>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
+          <CardTitle className="text-4xl leading-none uppercase">
             <h2>Alineaciones</h2>
           </CardTitle>
           {isUpcoming ? (
@@ -719,8 +719,8 @@ export function MatchDetailPage() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>
+        <CardHeader className="border-b border-border">
+          <CardTitle className="text-4xl leading-none uppercase">
             <h2>Convocados ({squad.length})</h2>
           </CardTitle>
         </CardHeader>

@@ -48,10 +48,10 @@ function PodiumCard({
   return (
     <Card className="overflow-hidden border-border bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)]">
       <CardHeader className="border-b border-border/80">
-        <CardTitle className="text-3xl leading-none uppercase">
+        <CardTitle className="card-title">
           <h2>{title}</h2>
         </CardTitle>
-        <p className="text-base text-muted-foreground">{description}</p>
+        <p className="body-copy text-muted-foreground">{description}</p>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

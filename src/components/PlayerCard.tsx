@@ -443,7 +443,7 @@ function PlayerPhoto({
   return (
     <Avatar
       className={cn(
-        'aspect-square border border-black/25 bg-black/20 shadow-[0_0_18px_rgb(255_255_255/0.08)]',
+        'aspect-square border border-black/25 bg-black/20 shadow-[0_0_20px_rgb(234_175_53/0.22)]',
         className,
       )}
     >

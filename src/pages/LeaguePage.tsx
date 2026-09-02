@@ -9,7 +9,6 @@ import {
   Users,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AttributeBadge } from '@/components/AttributeBadge'
@@ -19,11 +18,7 @@ import { MarketValue } from '@/components/MarketValue'
 import { MatchCard } from '@/components/MatchCard'
 import { fetchPlayerCards, playerKeys } from '@/features/players/api'
 import { fetchMatches, matchKeys } from '@/features/matches/api'
-import {
-  useLeague,
-  useLeagueAttributes,
-  useMembership,
-} from '@/features/league/useLeague'
+import { useLeagueAttributes, useMembership } from '@/features/league/useLeague'
 import { formatVictories, formatWinRate, toInitials } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import { getAvatarUrl } from '@/lib/supabase'
@@ -34,7 +29,6 @@ import type {
 } from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
-const BRAND_NAME = 'Ultimate Pachangas'
 
 interface AwardEntry {
   attribute: LeagueAttributeRow
@@ -63,21 +57,36 @@ function LeaderboardCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-1 pt-4">
-        {players.map((player, index) => (
-          <Link
-            key={player.id}
-            to={`/players/${player.id}`}
-            className="flex min-h-12 items-center gap-4 border-l-2 border-transparent px-3 py-2 text-base transition-all hover:border-primary hover:bg-primary/8"
-          >
-            <span className="numeric w-5 text-2xl leading-none text-primary">
-              {index + 1}
-            </span>
-            <span className="flex-1 truncate text-lg font-medium">
-              {player.displayName}
-            </span>
-            {renderValue(player)}
-          </Link>
-        ))}
+        {players.map((player, index) => {
+          const avatarUrl = getAvatarUrl(player.avatarPath)
+          const initials = toInitials(
+            player.firstName,
+            player.lastName,
+            player.displayName,
+          )
+
+          return (
+            <Link
+              key={player.id}
+              to={`/players/${player.id}`}
+              className="group flex min-h-15 items-center gap-4 border-l-2 border-transparent px-3 py-2 text-base transition-all hover:border-primary hover:bg-primary/10"
+            >
+              <span className="numeric w-5 text-2xl leading-none text-primary">
+                {index + 1}
+              </span>
+              <Avatar className="size-10 shrink-0 border border-primary/55 shadow-[0_0_18px_rgb(234_175_53/0.2)] transition-transform group-hover:scale-105">
+                {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
+                <AvatarFallback className="bg-primary/15 font-heading text-base text-primary">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="flex-1 truncate text-lg font-medium">
+                {player.displayName}
+              </span>
+              {renderValue(player)}
+            </Link>
+          )
+        })}
       </CardContent>
     </Card>
   )
@@ -188,7 +197,6 @@ function HonoursRoll({ awards }: { awards: readonly AwardEntry[] }) {
 
 export function LeaguePage() {
   const { data: membership } = useMembership()
-  const { data: league } = useLeague()
   const { data: attributes = [] } = useLeagueAttributes()
 
   const {
@@ -248,33 +256,16 @@ export function LeaguePage() {
 
   return (
     <div className="flex flex-col gap-12">
-      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <p className="section-kicker">
-            {league?.title ?? 'Competición entre amigos'}
-          </p>
-          <h1 className="mt-3 font-heading text-5xl leading-none font-bold uppercase">
-            {BRAND_NAME}
-          </h1>
-        </div>
-        {league ? (
-          <Badge variant={league.status === 'active' ? 'default' : 'secondary'}>
-            {league.status === 'active' ? 'Activa' : 'Inactiva'}
-          </Badge>
-        ) : null}
-      </header>
+      <h1 className="sr-only">Ultimate Pachangas</h1>
 
       {areMatchesPending ? (
         <Skeleton className="h-96 rounded-xl" />
       ) : nextMatch ? (
         <section className="flex flex-col gap-4">
-          <div>
-            <p className="section-kicker text-primary">Siguiente cita</p>
-            <h2 className="mt-3 font-heading text-6xl leading-none font-bold uppercase">
-              Próxima jornada
-            </h2>
+          <h2 className="page-title text-primary">Próxima jornada</h2>
+          <div className="w-full max-w-[1280px]">
+            <MatchCard match={nextMatch} featured />
           </div>
-          <MatchCard match={nextMatch} featured />
         </section>
       ) : null}
 
@@ -283,9 +274,7 @@ export function LeaguePage() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="section-kicker">Archivo reciente</p>
-              <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
-                Últimos partidos
-              </h2>
+              <h2 className="section-title mt-3">Últimos partidos</h2>
             </div>
             <Link
               to="/matches"
@@ -328,9 +317,7 @@ export function LeaguePage() {
         <section className="flex flex-col gap-5">
           <div>
             <p className="section-kicker">La élite</p>
-            <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
-              Clasificación individual
-            </h2>
+            <h2 className="section-title mt-3">Clasificación individual</h2>
           </div>
           <div className="grid gap-5 xl:grid-cols-2">
             <LeaderboardCard
@@ -367,9 +354,7 @@ export function LeaguePage() {
           <section className="flex flex-col gap-5">
             <div>
               <p className="section-kicker">La vitrina</p>
-              <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
-                Reconocimientos
-              </h2>
+              <h2 className="section-title mt-3">Reconocimientos</h2>
             </div>
             <div className="grid gap-5 xl:grid-cols-3">
               {awardHolders.slice(0, 3).map((entry, index) => (

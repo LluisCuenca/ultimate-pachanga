@@ -192,4 +192,37 @@
     letter-spacing: 0;
     text-transform: uppercase;
   }
+
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .card-title {
+    font-family: var(--font-heading);
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .body-lead {
+    font-size: 1.125rem;
+    line-height: 1.55;
+  }
+
+  .body-copy {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .body-meta {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
 }

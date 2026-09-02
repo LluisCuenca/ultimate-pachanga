@@ -104,8 +104,8 @@ export function ProfilePage() {
   if (isPending || !player) {
     return (
       <div className="grid gap-6 lg:grid-cols-2">
-        <Skeleton className="h-[34rem] rounded-xl" />
-        <Skeleton className="h-[34rem] rounded-xl" />
+        <Skeleton className="h-[28rem] rounded-xl lg:h-[34rem]" />
+        <Skeleton className="h-[28rem] rounded-xl lg:h-[34rem]" />
       </div>
     )
   }
@@ -124,10 +124,10 @@ export function ProfilePage() {
         <PlayerCard
           player={player}
           metrics={metrics}
-          className="h-full min-h-[34rem]"
+          className="h-full min-h-[28rem] lg:min-h-[34rem]"
         />
 
-        <Card className="min-h-[34rem] border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)]">
+        <Card className="min-h-[28rem] border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] lg:min-h-[34rem]">
           <CardHeader className="border-b border-primary/20">
             <p className="section-kicker text-primary">Tu ficha</p>
             <CardTitle className="mt-3 text-5xl leading-none uppercase">
