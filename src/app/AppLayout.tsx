@@ -54,12 +54,14 @@ const ADMIN_NAVIGATION: NavigationItem[] = [
   { to: '/admin/settings', label: 'Ajustes de la liga', icon: Settings },
 ]
 
+const LOGO_URL = `${import.meta.env.BASE_URL}ultimate-pachangas-logo.png`
+
 function navigationLinkClasses({ isActive }: { isActive: boolean }): string {
   return cn(
-    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+    'flex items-center gap-2 border-l-2 border-transparent px-3 py-2 text-sm font-semibold transition-colors',
     isActive
-      ? 'bg-accent text-accent-foreground'
-      : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+      ? 'border-primary bg-primary text-primary-foreground'
+      : 'text-muted-foreground hover:border-primary/50 hover:bg-accent/70 hover:text-foreground',
   )
 }
 
@@ -140,8 +142,8 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-2 px-4">
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
               <Button
@@ -173,16 +175,18 @@ export function AppLayout() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/league" className="flex min-w-0 items-center gap-2">
-            <span className="grid size-7 shrink-0 place-items-center rounded-md bg-primary/15 font-black text-primary">
-              R
-            </span>
-            <span className="truncate font-bold">
+          <Link to="/league" className="flex min-w-0 items-center gap-2.5">
+            <img
+              src={LOGO_URL}
+              alt=""
+              className="size-10 shrink-0 object-contain"
+            />
+            <span className="truncate font-heading text-lg font-bold uppercase">
               {league?.title ?? APP_NAME}
             </span>
           </Link>
 
-          <nav className="ml-4 hidden items-center gap-1 md:flex">
+          <nav className="ml-5 hidden items-center gap-1 md:flex">
             <NavigationLinks items={NAVIGATION} />
             <AdminMenu />
           </nav>
@@ -199,7 +203,7 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         <Outlet />
       </main>
     </div>

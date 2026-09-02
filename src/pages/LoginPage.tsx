@@ -25,6 +25,8 @@ const credentialsSchema = z.object({
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 })
 
+const LOGO_URL = `${import.meta.env.BASE_URL}ultimate-pachangas-logo.png`
+
 type CredentialsValues = z.infer<typeof credentialsSchema>
 
 type Mode = 'signin' | 'signup'
@@ -123,13 +125,20 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-xl">
+    <main className="flex min-h-svh items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-md border-primary/30 shadow-[0_20px_55px_rgb(0_0_0/0.55)]">
+        <CardHeader className="items-center border-b border-border pb-5 text-center">
+          <img
+            src={LOGO_URL}
+            alt="Ultimate Pachangas"
+            className="mb-1 h-28 w-28 object-contain"
+          />
+          <CardTitle className="text-4xl leading-none uppercase">
             <h1>{APP_NAME}</h1>
           </CardTitle>
-          <CardDescription>Liga de verano roco · Fútbol 7</CardDescription>
+          <CardDescription className="technical text-[0.625rem] uppercase">
+            La liga entre amigos
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={mode} onValueChange={(value) => setMode(value as Mode)}>

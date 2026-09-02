@@ -30,9 +30,11 @@ function StatTile({
   children: React.ReactNode
 }) {
   return (
-    <Card className="gap-1 p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-2xl font-bold">{children}</p>
+    <Card className="relative gap-1 overflow-hidden p-4 before:absolute before:top-0 before:left-0 before:h-0.5 before:w-8 before:bg-primary">
+      <p className="technical text-[0.625rem] font-medium text-muted-foreground uppercase">
+        {label}
+      </p>
+      <p className="numeric text-4xl leading-none font-bold">{children}</p>
     </Card>
   )
 }
@@ -49,9 +51,9 @@ function LeaderboardCard({
   renderValue: (player: PlayerCardData) => React.ReactNode
 }) {
   return (
-    <Card>
+    <Card className="border-border/90">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="flex items-center gap-2 text-xl leading-none uppercase">
           <Icon className="size-4 text-primary" aria-hidden="true" />
           <h2>{title}</h2>
         </CardTitle>
@@ -61,7 +63,7 @@ function LeaderboardCard({
           <Link
             key={player.id}
             to={`/players/${player.id}`}
-            className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent/50"
+            className="flex items-center gap-3 border-l-2 border-transparent px-2 py-1.5 transition-colors hover:border-primary hover:bg-accent/50"
           >
             <span className="numeric w-4 text-sm text-muted-foreground">
               {index + 1}
@@ -157,15 +159,42 @@ export function LeaguePage() {
     .filter((entry) => entry.holders.length > 0)
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">{league?.title ?? 'Liga'}</h1>
+    <div className="flex flex-col gap-7">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
+        <div>
+          <p className="section-kicker">Competición entre amigos</p>
+          <h1 className="mt-2 text-4xl leading-none font-bold uppercase sm:text-5xl">
+            {league?.title ?? 'Liga'}
+          </h1>
+        </div>
         {league ? (
           <Badge variant={league.status === 'active' ? 'default' : 'secondary'}>
             {league.status === 'active' ? 'Activa' : 'Inactiva'}
           </Badge>
         ) : null}
       </div>
+
+      {areMatchesPending ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-40 rounded-xl" />
+        </div>
+      ) : latestMatch || nextMatch ? (
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          {nextMatch ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="section-kicker text-primary">Próxima jornada</h2>
+              <MatchCard match={nextMatch} />
+            </section>
+          ) : null}
+          {latestMatch ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="section-kicker">Último resultado</h2>
+              <MatchCard match={latestMatch} />
+            </section>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label="Jugadores activos">
@@ -195,32 +224,6 @@ export function LeaguePage() {
         </StatTile>
       </div>
 
-      {areMatchesPending ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Skeleton className="h-40 rounded-xl" />
-          <Skeleton className="h-40 rounded-xl" />
-        </div>
-      ) : latestMatch || nextMatch ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {latestMatch ? (
-            <section className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-                Último partido
-              </h2>
-              <MatchCard match={latestMatch} />
-            </section>
-          ) : null}
-          {nextMatch ? (
-            <section className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-                Próximo partido
-              </h2>
-              <MatchCard match={nextMatch} />
-            </section>
-          ) : null}
-        </div>
-      ) : null}
-
       {arePlayersPending ? (
         <div className="grid gap-4 md:grid-cols-2">
           <Skeleton className="h-56 rounded-xl" />
@@ -244,38 +247,42 @@ export function LeaguePage() {
           description="Las estadísticas y los valores de mercado aparecerán tras el primer partido."
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          <LeaderboardCard
-            title="Mayor valor de mercado"
-            icon={TrendingUp}
-            players={topByValue}
-            renderValue={(player) => (
-              <MarketValue value={player.marketValueGbp} className="text-sm" />
-            )}
-          />
-          <LeaderboardCard
-            title="Más victoriosos"
-            icon={Trophy}
-            players={topByVictories}
-            renderValue={(player) => (
-              <span className="numeric text-sm font-semibold">
-                {formatWinRate(player.totalVictories, player.matchesPlayed)}
-                {/* The rate alone would rank one lucky afternoon above a
-                    season of them. */}
-                <span className="ml-2 font-normal text-muted-foreground">
-                  {formatVictories(player.totalVictories)}/
-                  {player.matchesPlayed}
+        <section className="flex flex-col gap-3">
+          <h2 className="section-kicker">Clasificación individual</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <LeaderboardCard
+              title="Mayor valor de mercado"
+              icon={TrendingUp}
+              players={topByValue}
+              renderValue={(player) => (
+                <MarketValue
+                  value={player.marketValueGbp}
+                  className="text-sm"
+                />
+              )}
+            />
+            <LeaderboardCard
+              title="Más victoriosos"
+              icon={Trophy}
+              players={topByVictories}
+              renderValue={(player) => (
+                <span className="numeric text-sm font-semibold">
+                  {formatWinRate(player.totalVictories, player.matchesPlayed)}
+                  <span className="ml-2 font-normal text-muted-foreground">
+                    {formatVictories(player.totalVictories)}/
+                    {player.matchesPlayed}
+                  </span>
                 </span>
-              </span>
-            )}
-          />
-        </div>
+              )}
+            />
+          </div>
+        </section>
       )}
 
       {awardHolders.length > 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-xl leading-none uppercase">
               <Award className="size-4 text-primary" aria-hidden="true" />
               <h2>Palmarés</h2>
             </CardTitle>

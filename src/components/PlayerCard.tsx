@@ -374,7 +374,7 @@ function ConfidenceDonut({
         aria-hidden="true"
         className="block size-full rounded-full"
         style={{
-          background: `conic-gradient(#38bdf8 ${bounded}%, rgb(15 23 42 / 0.72) 0)`,
+          background: `conic-gradient(var(--primary) ${bounded}%, rgb(0 0 0 / 0.72) 0)`,
         }}
       />
     </span>

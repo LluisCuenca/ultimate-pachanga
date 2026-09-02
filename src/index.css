@@ -1,20 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/geist';
 
 @custom-variant dark (&:is(.dark *));
 
-/* ---------------------------------------------------------------------------
-   Roco Summer League design tokens.
-
-   Dark is the default interface (<html class="dark">); the light palette is
-   kept so the app stays legible if the class is ever removed.
-   --------------------------------------------------------------------------- */
-
+/* Ultimate Pachangas: premium street-football identity. */
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-heading: 'Barlow Condensed', Impact, sans-serif;
+  --font-sans: 'Inter', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,30 +44,21 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-
-  /* Card tiers — selected from card_rating */
   --color-tier-gold: var(--tier-gold);
   --color-tier-gold-dim: var(--tier-gold-dim);
   --color-tier-silver: var(--tier-silver);
   --color-tier-silver-dim: var(--tier-silver-dim);
   --color-tier-bronze: var(--tier-bronze);
   --color-tier-bronze-dim: var(--tier-bronze-dim);
-
-  /* Opaque card faces. A player card must never let the page — or the pitch
-     photograph behind it — show through, or the rating becomes unreadable. */
   --color-tier-gold-face: var(--tier-gold-face);
   --color-tier-gold-face-deep: var(--tier-gold-face-deep);
   --color-tier-silver-face: var(--tier-silver-face);
   --color-tier-silver-face-deep: var(--tier-silver-face-deep);
   --color-tier-bronze-face: var(--tier-bronze-face);
   --color-tier-bronze-face-deep: var(--tier-bronze-face-deep);
-
-  /* Attribute badges — sign of league_attributes.points */
   --color-attribute-positive: var(--attribute-positive);
   --color-attribute-negative: var(--attribute-negative);
-
   --color-pitch: var(--pitch);
-
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -82,130 +68,58 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(0.99 0.003 150);
-  --foreground: oklch(0.16 0.012 155);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.012 155);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.012 155);
-  --primary: oklch(0.5 0.15 148);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.008 150);
-  --secondary-foreground: oklch(0.21 0.015 155);
-  --muted: oklch(0.96 0.008 150);
-  --muted-foreground: oklch(0.5 0.015 155);
-  --accent: oklch(0.94 0.03 148);
-  --accent-foreground: oklch(0.21 0.015 155);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.008 150);
-  --input: oklch(0.9 0.008 150);
-  --ring: oklch(0.5 0.15 148);
-  /* Chart series, in slot order.
-
-     Eight hues rather than five, because the evolution chart plots up to eight
-     players at once, and in a fixed order rather than cycled: the order is what
-     makes adjacent series distinguishable under protanopia and deuteranopia.
-     Kept as hex — these are the exact values a colour-vision validator was run
-     against, and rewriting them in oklch would lose that audit trail.
-
-     Three of the light steps (aqua, yellow, magenta) sit below 3:1 against a
-     white surface, so every chart that uses them labels its series in the
-     legend rather than relying on the colour alone. */
-  --chart-1: #2a78d6;
-  --chart-2: #eb6834;
-  --chart-3: #1baf7a;
-  --chart-4: #eda100;
-  --chart-5: #e87ba4;
-  --chart-6: #008300;
-  --chart-7: #4a3aa7;
-  --chart-8: #e34948;
-  --radius: 0.625rem;
-  --sidebar: oklch(0.98 0.005 150);
-  --sidebar-foreground: oklch(0.16 0.012 155);
-  --sidebar-primary: oklch(0.5 0.15 148);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.94 0.03 148);
-  --sidebar-accent-foreground: oklch(0.21 0.015 155);
-  --sidebar-border: oklch(0.9 0.008 150);
-  --sidebar-ring: oklch(0.5 0.15 148);
-
-  --pitch: oklch(0.45 0.13 148);
-  --tier-gold: oklch(0.82 0.15 88);
-  --tier-gold-dim: oklch(0.6 0.12 78);
-  --tier-silver: oklch(0.8 0.012 250);
-  --tier-silver-dim: oklch(0.58 0.012 250);
-  --tier-bronze: oklch(0.66 0.11 55);
-  --tier-bronze-dim: oklch(0.46 0.09 48);
-
-  /* Light theme keeps the metal bright, so the face is a pale tint and the
-     text on it stays dark. */
-  --tier-gold-face: oklch(0.93 0.07 90);
-  --tier-gold-face-deep: oklch(0.83 0.11 82);
-  --tier-silver-face: oklch(0.94 0.008 250);
-  --tier-silver-face-deep: oklch(0.85 0.012 250);
-  --tier-bronze-face: oklch(0.9 0.05 58);
-  --tier-bronze-face-deep: oklch(0.78 0.09 50);
-  --attribute-positive: oklch(0.55 0.15 148);
-  --attribute-negative: oklch(0.55 0.19 25);
-}
-
+:root,
 .dark {
-  --background: oklch(0.16 0.014 158);
-  --foreground: oklch(0.96 0.004 150);
-  --card: oklch(0.21 0.018 158);
-  --card-foreground: oklch(0.96 0.004 150);
-  --popover: oklch(0.21 0.018 158);
-  --popover-foreground: oklch(0.96 0.004 150);
-  --primary: oklch(0.74 0.19 148);
-  --primary-foreground: oklch(0.17 0.03 155);
-  --secondary: oklch(0.27 0.02 158);
-  --secondary-foreground: oklch(0.96 0.004 150);
-  --muted: oklch(0.27 0.02 158);
-  --muted-foreground: oklch(0.7 0.015 152);
-  --accent: oklch(0.31 0.04 152);
-  --accent-foreground: oklch(0.96 0.004 150);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.74 0.19 148);
-  /* The same eight hues, stepped for the dark surface rather than flipped:
-     every slot clears 3:1 against it, so no series needs relief here. */
-  --chart-1: #3987e5;
-  --chart-2: #d95926;
-  --chart-3: #199e70;
-  --chart-4: #c98500;
-  --chart-5: #d55181;
-  --chart-6: #008300;
-  --chart-7: #9085e9;
-  --chart-8: #e66767;
-  --sidebar: oklch(0.19 0.017 158);
-  --sidebar-foreground: oklch(0.96 0.004 150);
-  --sidebar-primary: oklch(0.74 0.19 148);
-  --sidebar-primary-foreground: oklch(0.17 0.03 155);
-  --sidebar-accent: oklch(0.31 0.04 152);
-  --sidebar-accent-foreground: oklch(0.96 0.004 150);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.74 0.19 148);
-
-  --pitch: oklch(0.42 0.12 148);
-  --tier-gold: oklch(0.85 0.16 88);
-  --tier-gold-dim: oklch(0.53 0.13 76);
-  --tier-silver: oklch(0.85 0.012 250);
-  --tier-silver-dim: oklch(0.5 0.012 250);
-  --tier-bronze: oklch(0.72 0.12 55);
-  --tier-bronze-dim: oklch(0.4 0.09 46);
-
-  /* Dark theme: a deep metallic face, light enough to read white text on and
-     opaque enough to sit over the pitch photograph. */
-  --tier-gold-face: oklch(0.42 0.085 84);
-  --tier-gold-face-deep: oklch(0.25 0.055 72);
-  --tier-silver-face: oklch(0.4 0.012 250);
-  --tier-silver-face-deep: oklch(0.24 0.01 250);
-  --tier-bronze-face: oklch(0.38 0.07 52);
-  --tier-bronze-face-deep: oklch(0.23 0.05 44);
-  --attribute-positive: oklch(0.78 0.17 148);
-  --attribute-negative: oklch(0.7 0.2 25);
+  --background: #000000;
+  --foreground: #f5f5f5;
+  --card: #151515;
+  --card-foreground: #f5f5f5;
+  --popover: #1c1c1c;
+  --popover-foreground: #f5f5f5;
+  --primary: #eaaf35;
+  --primary-foreground: #000000;
+  --secondary: #1c1c1c;
+  --secondary-foreground: #f5f5f5;
+  --muted: #1c1c1c;
+  --muted-foreground: #a3a3a3;
+  --accent: #2b2b2b;
+  --accent-foreground: #f5f5f5;
+  --destructive: #ff6b6b;
+  --border: #2b2b2b;
+  --input: #2b2b2b;
+  --ring: #eaaf35;
+  --chart-1: #eaaf35;
+  --chart-2: #f5f5f5;
+  --chart-3: #9c9c9c;
+  --chart-4: #c97538;
+  --chart-5: #d76d72;
+  --chart-6: #6d9c78;
+  --chart-7: #9f8ac7;
+  --chart-8: #6d9db8;
+  --radius: 0.375rem;
+  --sidebar: #000000;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #eaaf35;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #2b2b2b;
+  --sidebar-accent-foreground: #f5f5f5;
+  --sidebar-border: #2b2b2b;
+  --sidebar-ring: #eaaf35;
+  --pitch: #1d3427;
+  --tier-gold: #eaaf35;
+  --tier-gold-dim: #9d6d19;
+  --tier-silver: #d5d5d5;
+  --tier-silver-dim: #7f7f7f;
+  --tier-bronze: #c27b3b;
+  --tier-bronze-dim: #75431f;
+  --tier-gold-face: #3e2d11;
+  --tier-gold-face-deep: #18120a;
+  --tier-silver-face: #333333;
+  --tier-silver-face-deep: #171717;
+  --tier-bronze-face: #3c2417;
+  --tier-bronze-face-deep: #1b120d;
+  --attribute-positive: #eaaf35;
+  --attribute-negative: #ff6b6b;
 }
 
 @layer base {
@@ -213,19 +127,60 @@
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
-
   html {
     @apply font-sans;
+    background: var(--background);
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-width: 320px;
+    background-image: linear-gradient(
+      135deg,
+      transparent 0 48%,
+      rgb(234 175 53 / 0.035) 48% 48.12%,
+      transparent 48.12% 100%
+    );
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: 0;
   }
 }
 
 @layer utilities {
-  /* Ratings and market values are read column-wise down a list; tabular
-     figures stop digits shifting between rows. */
   .numeric {
+    font-family: var(--font-heading);
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+  }
+
+  .technical {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .section-kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .section-kicker::before {
+    width: 1.75rem;
+    height: 2px;
+    content: '';
+    background: var(--primary);
   }
 }
