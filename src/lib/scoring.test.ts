@@ -237,6 +237,10 @@ describe('applyConfidenceAdjustment', () => {
   it('matches the two-match example', () => {
     expect(applyConfidenceAdjustment(77, (2 / 6) * 100)).toBe(70)
   })
+
+  it('keeps confidence-adjusted ratings on the 45-99 card range', () => {
+    expect(applyConfidenceAdjustment(45, 0)).toBe(45)
+  })
 })
 
 describe('calculateMean and calculateSpread', () => {

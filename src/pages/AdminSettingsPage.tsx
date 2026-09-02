@@ -217,7 +217,7 @@ export function AdminSettingsPage() {
               <VisualStep
                 index="3"
                 title="Confianza"
-                body="Se tiene en cuenta el % de asistencia en los últimos partidos. Confianzas de menos del 100% penalizan el valor de mercado."
+                body="Se tiene en cuenta el % de asistencia en los últimos partidos. Confianzas de menos del 100% penalizan la valoración 0-99."
                 note="1"
               />
               <VisualStep

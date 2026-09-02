@@ -182,7 +182,7 @@ export function applyConfidenceAdjustment(
 ): number {
   return clamp(
     Math.floor(cardRating - 10 * ((100 - rawConfidencePct) / 100)),
-    0,
+    CARD_RATING_MIN,
     CARD_RATING_MAX,
   )
 }
