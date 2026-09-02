@@ -185,9 +185,8 @@ interface FaceProps {
 /**
  * The pitch card: four pieces of type and a face, nothing overlapping.
  *
- * The rating and the position share a header row instead of stacking in the
- * corner, which is what used to sit on top of the photograph, and the name band
- * carries the alias in bold over the registered name.
+ * The rating and position stack on the left, while confidence and form stack on
+ * the right so match cards keep their status signals in one corner.
  */
 function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
   const fullName = formatFullName(player.firstName, player.lastName)
@@ -201,6 +200,10 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
           COMPACT_SIZES.confidence,
         )}
       />
+      <FormStateIcon
+        state={player.formState}
+        className={cn('absolute top-[17cqi] right-[5cqi]', COMPACT_SIZES.form)}
+      />
 
       <div className="flex flex-col items-start gap-[1cqi] px-[6cqi] pt-[4cqi] leading-none">
         <span
@@ -212,20 +215,14 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
         >
           {player.cardRating}
         </span>
-        <div className="flex items-center gap-[1.5cqi]">
-          <span
-            className={cn(
-              'font-bold tracking-wide opacity-80',
-              COMPACT_SIZES.position,
-            )}
-          >
-            {player.preferredPosition}
-          </span>
-          <FormStateIcon
-            state={player.formState}
-            className={COMPACT_SIZES.form}
-          />
-        </div>
+        <span
+          className={cn(
+            'font-bold tracking-wide opacity-80',
+            COMPACT_SIZES.position,
+          )}
+        >
+          {player.preferredPosition}
+        </span>
       </div>
 
       {/* Centred in whatever the two bands leave, and never taller than that. */}
