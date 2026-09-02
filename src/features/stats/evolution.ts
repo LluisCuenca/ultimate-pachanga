@@ -1,4 +1,10 @@
-import { calculateMean, calculateSpread, toCardRating } from '@/lib/scoring'
+import {
+  calculateMean,
+  calculateMatchRatingScore,
+  calculateSpread,
+  calculateWeightedMetricScore,
+  toCardRating,
+} from '@/lib/scoring'
 import type { ScoreTimeline, TimelineScore } from '@/features/stats/api'
 
 /**
@@ -56,10 +62,10 @@ export function listTimelinePlayerIds(timeline: ScoreTimeline): string[] {
  * `seriesCode` is either RATING_SERIES_CODE or a metric code. The rating is
  * recomputed jornada by jornada — it is relative, so it cannot be read off the
  * stored score — from the same distribution the database uses: the mean and
- * population spread of every player's *latest* score at that point. A player
- * who did not play keeps their previous rating even though the distribution
- * around them moved; the line is a record of what each player did, and nobody
- * expects their number to change on a weekend they sat out.
+ * population spread of every player's weighted match valuation at that point.
+ * A player who did not play keeps their previous rating even though the
+ * distribution around them moved; the line is a record of what each player did,
+ * and nobody expects their number to change on a weekend they sat out.
  */
 export function buildEvolutionRows(
   timeline: ScoreTimeline,
@@ -68,28 +74,46 @@ export function buildEvolutionRows(
   const scoresByMatch = groupByMatch(timeline.scores)
   const playerIds = listTimelinePlayerIds(timeline)
 
-  /** Each player's most recent final score — the rating's population. */
-  const latestScores = new Map<string, number>()
+  const ratingScoreHistories = new Map<string, number[]>()
   /** Each player's value as last plotted, carried across missed jornadas. */
   const plotted = new Map<string, number>()
 
   return timeline.matches.map((match, index) => {
     const played = scoresByMatch.get(match.id) ?? []
 
-    for (const score of played) {
-      latestScores.set(score.playerId, score.finalScore)
-    }
-
     if (seriesCode === RATING_SERIES_CODE) {
-      const population = [...latestScores.values()]
+      for (const score of played) {
+        const ratingScore = calculateMatchRatingScore(score.finalScore)
+        if (ratingScore === null) continue
+
+        const history = ratingScoreHistories.get(score.playerId) ?? []
+        history.push(ratingScore)
+        ratingScoreHistories.set(score.playerId, history)
+      }
+
+      const weightedRatingScores = new Map<string, number>()
+
+      for (const [playerId, history] of ratingScoreHistories) {
+        const latest = history.at(-1)
+        const previous = history.slice(0, -1)
+        const previousAverage = calculateMean(previous)
+        const weightedScore = calculateWeightedMetricScore(
+          previousAverage,
+          latest,
+        )
+
+        if (weightedScore !== null) {
+          weightedRatingScores.set(playerId, weightedScore)
+        }
+      }
+
+      const population = [...weightedRatingScores.values()]
       const mean = calculateMean(population)
       const spread = calculateSpread(population)
 
       for (const score of played) {
-        plotted.set(
-          score.playerId,
-          toCardRating(score.finalScore, mean, spread),
-        )
+        const weightedScore = weightedRatingScores.get(score.playerId)
+        plotted.set(score.playerId, toCardRating(weightedScore, mean, spread))
       }
     } else {
       for (const score of played) {

@@ -111,6 +111,52 @@ export function AdminSettingsPage() {
           />
         </CardContent>
       </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle>
+            <h2>Cómo se calculan las estadísticas</h2>
+          </CardTitle>
+          <CardDescription>
+            Primero se calcula cada estadística, después la valoración de carta
+            con victoria y atributos, y al final el valor de mercado.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
+          <p>
+            Cada estadística específica, como Ataque o Defensa, mezcla el
+            histórico del jugador con su último partido: 50% media anterior y
+            50% último partido. Si alguien tenía 6 de media en Ataque y en el
+            último partido hizo 10, su Ataque actual pasa a 8.
+          </p>
+          <p>
+            La valoración de carta sí cuenta la Victoria y los Atributos. Para
+            cada partido toma la puntuación final y la divide entre los 40
+            puntos base de las estadísticas. Por ejemplo: 36 de estadísticas + 2
+            por Victoria + 2 por MVP son 40; eso equivale a un 10 sobre 10 para
+            ese partido.
+          </p>
+          <p>
+            Si además tuvo Puskas, serían 42 sobre 40: cuenta como un 10,5 para
+            la valoración. Después se mezcla su histórico con el último partido
+            al 50/50 y se compara con el resto de la liga en una distribución de
+            45 a 99.
+          </p>
+          <p>
+            Ejemplo fácil: si Ana queda muy por encima de la media puede acabar
+            con 90 de valoración; si Bruno queda justo en la media estará cerca
+            de 72; si Carlos queda muy por debajo puede bajar hacia 45. Los
+            goles no suman puntos por sí solos.
+          </p>
+          <p>
+            El valor de mercado sale de multiplicar la valoración por la
+            constante de mercado. Con una constante de{' '}
+            {formatMarketValueExact(league.market_constant_gbp)}, una valoración
+            de 82 vale {formatMarketValueExact(league.market_constant_gbp * 82)}
+            .
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -197,8 +243,8 @@ function SettingsForm({
           <FieldError>{errors.marketConstantGbp.message}</FieldError>
         ) : (
           <FieldDescription>
-            Multiplica la puntuación ponderada. Una puntuación de 8,25 valdría{' '}
-            {formatMarketValueExact(Number(constant) * 8.25 || 0)}.
+            Multiplica la valoración de carta. Una valoración de 82 valdría{' '}
+            {formatMarketValueExact(Number(constant) * 82 || 0)}.
           </FieldDescription>
         )}
       </Field>

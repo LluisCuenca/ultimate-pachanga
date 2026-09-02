@@ -56,7 +56,7 @@ values
    'GST-0001', 'Ya', 'Jugado', 'CM', false, null),
   ('77777777-7777-4777-8777-00000000000b',
    '66666666-6666-4666-8666-000000000002',
-   'GST-0002', 'Tasado', 'Sin Jugar', 'ST', false, 9500000),
+   'GST-0002', 'Tasado', 'Sin Jugar', 'ST', false, 95000000),
   ('77777777-7777-4777-8777-00000000000c',
    '66666666-6666-4666-8666-000000000002',
    'GST-0003', 'Sin', 'Tasar', 'GK', false, null),
@@ -88,38 +88,39 @@ values (
 );
 
 -- ---------------------------------------------------------------------------
--- The estimate stands in for a career nobody has yet
+-- The estimate stands in for a rating nobody has earned yet
 -- ---------------------------------------------------------------------------
 
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  9500000.00::numeric,
+  95000000.00::numeric,
   'a player with no matches is worth exactly what the administrator said'
 );
 
--- The estimate is stored in pounds but read as a score, so the two derived
--- columns have to still agree: 9,500,000 / 1,000,000.
+-- The estimate is stored in pounds but read as a rating, so it no longer
+-- invents a metric score before the player has played.
 select is(
   (select weighted_performance_score from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  9.5::numeric,
-  'and carries the matching performance score, not a figure of its own'
+  0::numeric,
+  'and does not invent a weighted rating score of its own'
 );
 
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000c'),
-  6000000.00::numeric,
-  'a player with no matches and no estimate still falls back to the league mean'
+  72000000.00::numeric,
+  'a player with no matches and no estimate sits at the centre rating'
 );
 
--- Nothing about an estimate is a result, so the rating has nothing to place.
+-- Nothing about an estimate is a result, but it can be converted into a
+-- provisional rating for balancing before the first match.
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  70,
-  'an estimate does not earn a card rating: that is a standing, not a price'
+  95,
+  'an estimate becomes a provisional rating while there is no match history'
 );
 
 -- ---------------------------------------------------------------------------
@@ -142,14 +143,14 @@ values (
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  2000000.00::numeric,
+  54000000.00::numeric,
   'one match played and the estimate is gone, however wrong it turned out'
 );
 
 select is(
   (select estimated_market_value_gbp from public.players
    where id = '77777777-7777-4777-8777-00000000000b'),
-  9500000.00::numeric,
+  95000000.00::numeric,
   'though the estimate itself is kept, as the record of what was thought'
 );
 
@@ -184,17 +185,17 @@ values (
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000d'),
-  10000000.00::numeric,
+  94000000.00::numeric,
   'a guest is valued like anybody else'
 );
 
--- Latest scores are now 6.0, 2.0 and 10.0: mean 6.0, population spread 3.266.
--- The guest is in that population, so the player on 6.0 sits exactly at the
--- centre. Drop the guest and the mean would be 4.0 and this would not be 70.
+-- Weighted rating scores are now 3.0, 1.0 and 5.0: mean 3.0, population spread
+-- 1.633. The guest is in that population, so the player on 3.0 sits exactly at
+-- the centre. Drop the guest and the mean would be 4.0 and this would not be 72.
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000a'),
-  70,
+  72,
   'and still counts towards the spread everybody else is rated against'
 );
 
@@ -212,7 +213,7 @@ select is(
 select is(
   (select estimated_market_value_gbp from public.player_cards
    where id = '77777777-7777-4777-8777-00000000000b'),
-  9500000.00::numeric,
+  95000000.00::numeric,
   'and the estimate, so the edit dialog can show what was entered'
 );
 

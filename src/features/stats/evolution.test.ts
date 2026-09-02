@@ -78,26 +78,33 @@ describe('buildEvolutionRows', () => {
   describe('the rating series', () => {
     it('centres everyone when a single jornada has no spread to place them in', () => {
       const rows = buildEvolutionRows(
-        buildTimeline([score('match-1', ADA, 30), score('match-1', BEA, 30)]),
+        buildTimeline([
+          score('match-1', ADA, 30, { attack: 7 }),
+          score('match-1', BEA, 30, { attack: 7 }),
+        ]),
         RATING_SERIES_CODE,
       )
 
-      expect(rows[0].values[ADA]).toBe(70)
-      expect(rows[0].values[BEA]).toBe(70)
+      expect(rows[0].values[ADA]).toBe(72)
+      expect(rows[0].values[BEA]).toBe(72)
     })
 
     /**
-     * Two players 10 points apart: the mean is 25, the population spread 5, so
-     * each sits one standard deviation — twelve points — off the centre.
+     * Two players two metric points apart: the mean is 7, the population
+     * spread is 1, so each sits one standard deviation — eighteen points — off
+     * the centre.
      */
-    it('places a score on the distribution of the jornada it was scored in', () => {
+    it('places the final-score rating basis on the distribution of the jornada', () => {
       const rows = buildEvolutionRows(
-        buildTimeline([score('match-1', ADA, 30), score('match-1', BEA, 20)]),
+        buildTimeline([
+          score('match-1', ADA, 30, { attack: 8 }),
+          score('match-1', BEA, 20, { attack: 6 }),
+        ]),
         RATING_SERIES_CODE,
       )
 
-      expect(rows[0].values[ADA]).toBe(82)
-      expect(rows[0].values[BEA]).toBe(58)
+      expect(rows[0].values[ADA]).toBe(90)
+      expect(rows[0].values[BEA]).toBe(54)
     })
 
     it('holds a rating steady over a jornada the player missed', () => {
@@ -116,7 +123,9 @@ describe('buildEvolutionRows', () => {
       const rows = buildEvolutionRows(
         buildTimeline(
           [40, 0, 0, 0, 0, 0, 0].map((finalScore, index) =>
-            score('match-1', `player-${index}`, finalScore),
+            score('match-1', `player-${index}`, finalScore, {
+              attack: index === 0 ? 10 : 0,
+            }),
           ),
         ),
         RATING_SERIES_CODE,
@@ -129,7 +138,9 @@ describe('buildEvolutionRows', () => {
       const rows = buildEvolutionRows(
         buildTimeline(
           [0, 40, 40, 40, 40, 40, 40].map((finalScore, index) =>
-            score('match-1', `player-${index}`, finalScore),
+            score('match-1', `player-${index}`, finalScore, {
+              attack: index === 0 ? 0 : 10,
+            }),
           ),
         ),
         RATING_SERIES_CODE,

@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateAttributePoints,
   calculateBaseScore,
+  calculateMatchRatingScore,
   calculateMean,
   calculateScoreBreakdown,
   calculateSpread,
+  calculateWeightedMetricMean,
+  calculateWeightedMetricScore,
   toCardRating,
   isGoalCountValid,
   isMetricScoreInRange,
@@ -175,6 +178,44 @@ describe('toCardTier', () => {
   })
 })
 
+describe('calculateWeightedMetricScore', () => {
+  it('uses the latest match directly when there is no history', () => {
+    expect(calculateWeightedMetricScore(null, 8)).toBe(8)
+  })
+
+  it('gives history and the latest match the same weight', () => {
+    expect(calculateWeightedMetricScore(6, 10)).toBe(8)
+  })
+
+  it('has no value without a latest match', () => {
+    expect(calculateWeightedMetricScore(6, null)).toBeNull()
+  })
+})
+
+describe('calculateWeightedMetricMean', () => {
+  it('averages the available weighted metric scores', () => {
+    expect(calculateWeightedMetricMean([8, 6, null, undefined])).toBe(7)
+  })
+
+  it('has no mean when no metric has a value', () => {
+    expect(calculateWeightedMetricMean([null, undefined])).toBeNull()
+  })
+})
+
+describe('calculateMatchRatingScore', () => {
+  it('normalizes the final score over the default 40 metric points', () => {
+    expect(calculateMatchRatingScore(34)).toBe(8.5)
+  })
+
+  it('keeps bonuses above the metric ceiling in the rating input', () => {
+    expect(calculateMatchRatingScore(46)).toBe(11.5)
+  })
+
+  it('supports another metric capacity when a league changes metrics', () => {
+    expect(calculateMatchRatingScore(30, 50)).toBe(6)
+  })
+})
+
 describe('calculateMean and calculateSpread', () => {
   it('has no mean for an empty population', () => {
     expect(calculateMean([])).toBeNull()
@@ -194,20 +235,20 @@ describe('calculateMean and calculateSpread', () => {
 
 describe('toCardRating', () => {
   it('centres a player when there is no spread to place them in', () => {
-    expect(toCardRating(30, 30, 0)).toBe(70)
-    expect(toCardRating(null, 25, 5)).toBe(70)
-    expect(toCardRating(30, null, 5)).toBe(70)
+    expect(toCardRating(8, 8, 0)).toBe(72)
+    expect(toCardRating(null, 7, 1)).toBe(72)
+    expect(toCardRating(8, null, 1)).toBe(72)
   })
 
-  it('moves twelve points per standard deviation', () => {
-    expect(toCardRating(30, 25, 5)).toBe(82)
-    expect(toCardRating(20, 25, 5)).toBe(58)
-    expect(toCardRating(25, 25, 5)).toBe(70)
+  it('moves eighteen points per standard deviation', () => {
+    expect(toCardRating(8, 7, 1)).toBe(90)
+    expect(toCardRating(6, 7, 1)).toBe(54)
+    expect(toCardRating(7, 7, 1)).toBe(72)
   })
 
   it('bounds the scale at 45 and 99', () => {
-    expect(toCardRating(100, 25, 5)).toBe(99)
-    expect(toCardRating(0, 25, 5)).toBe(45)
+    expect(toCardRating(10, 7, 1)).toBe(99)
+    expect(toCardRating(4, 7, 1)).toBe(45)
   })
 })
 
