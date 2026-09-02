@@ -286,7 +286,7 @@ export function PlayerFormDialog({
                   <FieldDescription>
                     {estimatedValuePreview
                       ? `${estimatedValuePreview}. Solo se usa hasta que dispute su primer partido; después manda su rendimiento.`
-                      : 'Sin indicar, un jugador sin partidos parte de una valoración 72.'}
+                      : 'Sin indicar, un jugador sin partidos parte de valoración 72 antes del ajuste de confianza.'}
                   </FieldDescription>
                 )}
               </Field>

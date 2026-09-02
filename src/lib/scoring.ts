@@ -28,6 +28,7 @@ const CARD_RATING_MAX = 99
  */
 export const VICTORY_POINTS = 2
 export const DEFAULT_RATING_SCORE_DENOMINATOR = 40
+export const CONFIDENCE_WINDOW_MATCHES = 6
 
 export interface MetricDefinition {
   code: string
@@ -167,6 +168,23 @@ export function calculateMatchRatingScore(
   }
 
   return (finalScore / denominator) * 10
+}
+
+export function calculateConfidencePct(matchesPlayedInWindow: number): number {
+  const raw = (matchesPlayedInWindow / CONFIDENCE_WINDOW_MATCHES) * 100
+
+  return raw > 60 ? 100 : raw
+}
+
+export function applyConfidenceAdjustment(
+  cardRating: number,
+  rawConfidencePct: number,
+): number {
+  return clamp(
+    Math.floor(cardRating - 10 * ((100 - rawConfidencePct) / 100)),
+    0,
+    CARD_RATING_MAX,
+  )
 }
 
 /**

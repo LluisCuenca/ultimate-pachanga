@@ -154,7 +154,7 @@ mismo con una sola fila. Cualquiera de las dos vías marca el partido como
 
 De aquí en adelante nada se guarda: son vistas. Solo cuentan los partidos con
 estado `scored`, así que un partido programado que nadie ha jugado nunca arrastra
-a nadie hacia abajo. La sección 12 detalla qué estados cuentan y desde cuándo.
+a nadie hacia abajo. La sección 13 detalla qué estados cuentan y desde cuándo.
 
 | Cifra                        | Cómo se calcula                                     |
 | ---------------------------- | --------------------------------------------------- |
@@ -206,7 +206,49 @@ valoración de ese partido es `40 / 40 × 10 = 10`. Si además tuvo Puskas, ser�
 Los goles no puntúan por sí solos; solo cuentan si llegan como un atributo, por
 ejemplo Pichichi.
 
-## 4. Valor de mercado
+## 4. Confianza y ajuste
+
+La confianza mira la disponibilidad reciente: de los **últimos 6 partidos
+puntuados de la liga**, cuántos ha jugado ese jugador.
+
+```text
+participación real = partidos jugados de esos 6 / 6 × 100
+confianza visual   = 100 si participación real > 60; si no, participación real
+```
+
+La carta enseña esa confianza como un donut azul pequeño, sin número. Cuatro de
+seis partidos ya llenan el donut, porque es más de 60%.
+
+Después de calcular la valoración 45-99 por distribución se aplica el ajuste:
+
+```text
+valoración final = suelo(valoración − 10 × (100 − participación real) / 100)
+```
+
+Ejemplos:
+
+```text
+99 con 1 partido de 6  →  99 − 10 × 83,333% = 90
+77 con 2 partidos de 6 →  77 − 10 × 66,667% = 70
+```
+
+Esta valoración final es la que ve la aplicación y la que se usa para el valor
+de mercado.
+
+### Estado de forma
+
+El estado de forma se decide por prioridad, usando la valoración de partido
+normalizada (`final_score / 40 × 10`):
+
+1. Fuego: los últimos 3 partidos suben progresivamente.
+2. Hielo: los últimos 3 partidos bajan progresivamente.
+3. Flecha abajo: el último partido está al menos 5% por debajo de su media
+   histórica anterior.
+4. Flecha arriba: el último partido está al menos 5% por encima de su media
+   histórica anterior.
+5. Sin icono: nada de lo anterior.
+
+## 5. Valor de mercado
 
 ```text
 valor = valoración de carta × market_constant_gbp
@@ -246,7 +288,7 @@ cuando deja de usarse — queda en la ficha como registro de lo que se pensó.
 El valor se muestra abreviado (`£96 M`, `£750 K`) en listas y cartas, y exacto en
 la ficha del jugador.
 
-## 5. Valoración de la carta (45-99)
+## 6. Valoración de la carta (45-99)
 
 **No es una medida, es una posición.** Responde a "dónde está la última
 actuación de este jugador dentro de lo que ha hecho la liga", no a "qué nota
@@ -284,7 +326,7 @@ Dos consecuencias que son parte del diseño y conviene entender:
 Puramente visual, y lo decide el frontend (`src/lib/scoring.ts`), no la base de
 datos: **oro** desde 75, **plata** desde 60, **bronce** por debajo.
 
-## 6. Equilibrar equipos
+## 7. Equilibrar equipos
 
 Un botón en la página del partido, solo para el administrador y solo mientras el
 partido no se haya jugado. Reparte la convocatoria en dos equipos y los coloca
@@ -353,7 +395,7 @@ de los dos equipos muy parecidas de todas formas.
 Un detalle que importa: **un debutante no vale cero.** La vista
 `player_market_values` lo coloca en 72, o en la aproximación del administrador
 si existe, así que entra al reparto como un jugador razonable y no como lastre
-(ver el apartado 4).
+(ver el apartado 5).
 
 ### Cómo se busca el reparto
 
@@ -429,7 +471,7 @@ camino que mover las cartas a mano (`saveLineup`). Lo único autoritativo que us
 aparte, incluido un caso en el que el reparto codicioso se queda en una
 diferencia de 5 y el óptimo es 1.
 
-## 7. Las estadísticas por métrica de la carta (0-99)
+## 8. Las estadísticas por métrica de la carta (0-99)
 
 ```text
 stat = recortar( redondear( media de la métrica × 10 ), 0, 99)
@@ -442,7 +484,7 @@ Si una métrica se añade después de que se jugaran partidos, esos partidos
 antiguos no tienen valor para ella y se **excluyen** de la media en lugar de
 contar como cero.
 
-## 8. Recuentos y porcentajes
+## 9. Recuentos y porcentajes
 
 | Dónde                            | Cálculo                                                         |
 | -------------------------------- | --------------------------------------------------------------- |
@@ -455,7 +497,7 @@ El porcentaje de victorias nunca va solo: un 100 % de un partido no es lo mismo
 que un 80 % de diez, así que la interfaz siempre muestra `victorias/partidos` al
 lado.
 
-## 9. La pantalla de Estadísticas
+## 10. La pantalla de Estadísticas
 
 Solo entran jugadores **activos, no invitados y con al menos un partido
 puntuado**. Incluir a quien no ha jugado sería listar sobre un valor de relleno
@@ -529,14 +571,14 @@ Y tres salvedades honestas sobre lo que esa reconstrucción significa:
 3. Es un cálculo del cliente. Si algún día hace falta un histórico auditable,
    habría que guardar una foto por jornada al importar.
 
-## 10. El radar de la ficha del jugador
+## 11. El radar de la ficha del jugador
 
 Un vértice por métrica activa de la liga (hoy cuatro), todos en la misma escala
 0-99 de la carta, y cada vértice etiquetado con su número: un radar enseña bien
 la forma y mal la magnitud, así que las cifras se quedan en el gráfico. El tooltip
 añade la media cruda sobre 10.
 
-## 11. Redondeo y precisión
+## 12. Redondeo y precisión
 
 | Cifra                                           | Precisión          |
 | ----------------------------------------------- | ------------------ |
@@ -555,7 +597,7 @@ negativos.
 En pantalla, las puntuaciones se muestran con uno o dos decimales y con coma
 decimal, y los valores de mercado abreviados.
 
-## 12. Cuándo empieza a contar un partido
+## 13. Cuándo empieza a contar un partido
 
 ### El estado del partido es lo único que lo decide
 
@@ -591,7 +633,7 @@ Lo que pasa a partir de ese momento:
   puntúen 0: es que no tienen fila. Su media y su valor no se mueven.
 - La **valoración de toda la liga sí se mueve**, porque es relativa a la media y
   la desviación de las últimas puntuaciones de todos, y una de ellas acaba de
-  cambiar. Es el mismo efecto descrito en la sección 13, pero disparado a mitad
+  cambiar. Es el mismo efecto descrito en la sección 14, pero disparado a mitad
   de un partido a medio puntuar.
 
 Es decir: los resultados de un partido en curso afectan a las cifras **en cuanto
@@ -647,7 +689,7 @@ select title, status, results_imported_at, played_at
  order by played_at;
 ```
 
-## 13. Qué pasa exactamente cuando editas un resultado
+## 14. Qué pasa exactamente cuando editas un resultado
 
 Al guardar un cambio en un jugador (métrica, gol, resultado o atributo) se
 reescriben su `base_score`, `attribute_points` y `final_score`, y sus enlaces de
@@ -673,7 +715,7 @@ Y dos cosas que **no** se recalculan solas:
 - Lo mismo con las métricas: cambiar rangos o añadir métricas no reescribe
   `base_score` ni `final_score` de lo ya importado.
 
-## 14. Dónde vive cada fórmula
+## 15. Dónde vive cada fórmula
 
 La base de datos es la fuente de la verdad. El frontend solo tiene un espejo,
 para poder previsualizar antes de escribir.

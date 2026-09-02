@@ -36,6 +36,9 @@ describe('toPlayerCardData', () => {
       buildRow({
         is_guest: undefined,
         estimated_market_value_gbp: undefined,
+        confidence_pct: undefined,
+        confidence_adjustment_pct: undefined,
+        form_state: undefined,
       } as Partial<PlayerCardRow>),
     )
 
@@ -46,15 +49,30 @@ describe('toPlayerCardData', () => {
     it('reads a missing guest flag as not a guest', () => {
       expect(stale?.isGuest).toBe(false)
     })
+
+    it('reads missing confidence and form as empty defaults', () => {
+      expect(stale?.confidencePct).toBe(0)
+      expect(stale?.confidenceAdjustmentPct).toBe(0)
+      expect(stale?.formState).toBeNull()
+    })
   })
 
-  it('carries both through when the columns are there', () => {
+  it('carries optional player metadata through when the columns are there', () => {
     const card = toPlayerCardData(
-      buildRow({ is_guest: true, estimated_market_value_gbp: 8_000_000 }),
+      buildRow({
+        is_guest: true,
+        estimated_market_value_gbp: 8_000_000,
+        confidence_pct: 83.333,
+        confidence_adjustment_pct: 50,
+        form_state: 'up',
+      }),
     )
 
     expect(card?.isGuest).toBe(true)
     expect(card?.estimatedMarketValueGbp).toBe(8_000_000)
+    expect(card?.confidencePct).toBe(83.333)
+    expect(card?.confidenceAdjustmentPct).toBe(50)
+    expect(card?.formState).toBe('up')
   })
 
   it('keeps a real null distinct from zero', () => {

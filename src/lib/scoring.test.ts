@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateAttributePoints,
   calculateBaseScore,
+  applyConfidenceAdjustment,
+  calculateConfidencePct,
   calculateMatchRatingScore,
   calculateMean,
   calculateScoreBreakdown,
@@ -213,6 +215,27 @@ describe('calculateMatchRatingScore', () => {
 
   it('supports another metric capacity when a league changes metrics', () => {
     expect(calculateMatchRatingScore(30, 50)).toBe(6)
+  })
+})
+
+describe('calculateConfidencePct', () => {
+  it('uses the played share of the last six league matches', () => {
+    expect(calculateConfidencePct(1)).toBeCloseTo(16.666)
+    expect(calculateConfidencePct(2)).toBeCloseTo(33.333)
+  })
+
+  it('caps confidence at 100 once participation is above 60%', () => {
+    expect(calculateConfidencePct(4)).toBe(100)
+  })
+})
+
+describe('applyConfidenceAdjustment', () => {
+  it('matches the one-match example', () => {
+    expect(applyConfidenceAdjustment(99, (1 / 6) * 100)).toBe(90)
+  })
+
+  it('matches the two-match example', () => {
+    expect(applyConfidenceAdjustment(77, (2 / 6) * 100)).toBe(70)
   })
 })
 

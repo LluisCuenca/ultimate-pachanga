@@ -94,7 +94,7 @@ values (
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  95000000.00::numeric,
+  85000000.00::numeric,
   'a player with no matches is worth exactly what the administrator said'
 );
 
@@ -110,7 +110,7 @@ select is(
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000c'),
-  72000000.00::numeric,
+  62000000.00::numeric,
   'a player with no matches and no estimate sits at the centre rating'
 );
 
@@ -119,7 +119,7 @@ select is(
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  95,
+  85,
   'an estimate becomes a provisional rating while there is no match history'
 );
 
@@ -143,7 +143,7 @@ values (
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000b'),
-  54000000.00::numeric,
+  45000000.00::numeric,
   'one match played and the estimate is gone, however wrong it turned out'
 );
 
@@ -185,7 +185,7 @@ values (
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000d'),
-  94000000.00::numeric,
+  85000000.00::numeric,
   'a guest is valued like anybody else'
 );
 
@@ -195,7 +195,7 @@ select is(
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-00000000000a'),
-  72,
+  63,
   'and still counts towards the spread everybody else is rated against'
 );
 

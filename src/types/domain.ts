@@ -14,6 +14,7 @@ export type MatchStatus = Database['public']['Enums']['match_status']
 export type MemberRole = Database['public']['Enums']['member_role']
 export type LeagueStatus = Database['public']['Enums']['league_status']
 export type TeamSide = Database['public']['Enums']['team_side']
+export type PlayerFormState = 'fire' | 'ice' | 'down' | 'up'
 
 export type PlayerRow = Database['public']['Tables']['players']['Row']
 export type MatchRow = Database['public']['Tables']['matches']['Row']
@@ -71,6 +72,9 @@ export interface PlayerCardData {
   weightedPerformanceScore: number
   marketValueGbp: number
   cardRating: number
+  confidencePct: number
+  confidenceAdjustmentPct: number
+  formState: PlayerFormState | null
   /** Keyed by metric code, values on the 0–99 scale. */
   metricCardStats: Record<string, number>
   /** Keyed by metric code, values on the raw 0–10 scale. */
@@ -132,6 +136,9 @@ export function toPlayerCardData(row: PlayerCardRow): PlayerCardData | null {
     weightedPerformanceScore: row.weighted_performance_score ?? 0,
     marketValueGbp: row.market_value_gbp ?? 0,
     cardRating: row.card_rating ?? 0,
+    confidencePct: row.confidence_pct ?? 0,
+    confidenceAdjustmentPct: row.confidence_adjustment_pct ?? 0,
+    formState: isPlayerFormState(row.form_state) ? row.form_state : null,
     metricCardStats: toNumberRecord(row.metric_card_stats),
     metricAverages: toNumberRecord(row.metric_averages),
     attributeCounts: toNumberRecord(row.attribute_counts),
@@ -139,4 +146,10 @@ export function toPlayerCardData(row: PlayerCardRow): PlayerCardData | null {
     totalGoals: row.total_goals ?? 0,
     totalVictories: Number(row.total_victories ?? 0),
   }
+}
+
+function isPlayerFormState(value: unknown): value is PlayerFormState {
+  return (
+    value === 'fire' || value === 'ice' || value === 'down' || value === 'up'
+  )
 }

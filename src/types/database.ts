@@ -485,9 +485,12 @@ export type Database = {
           avatar_path: string | null
           card_rating: number | null
           career_average: number | null
+          confidence_adjustment_pct: number | null
+          confidence_pct: number | null
           created_at: string | null
           display_name: string | null
           estimated_market_value_gbp: number | null
+          form_state: string | null
           first_name: string | null
           id: string | null
           is_active: boolean | null
@@ -524,6 +527,9 @@ export type Database = {
         Row: {
           card_rating: number | null
           career_average: number | null
+          confidence_adjustment_pct: number | null
+          confidence_pct: number | null
+          form_state: string | null
           latest_score: number | null
           league_id: string | null
           market_value_gbp: number | null
@@ -850,4 +856,3 @@ export const Constants = {
     },
   },
 } as const
-

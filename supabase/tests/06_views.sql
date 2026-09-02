@@ -7,7 +7,7 @@
 -- ============================================================================
 
 begin;
-select plan(17);
+select plan(20);
 
 -- Cleared so the new-user trigger makes this account an administrator
 -- regardless of who already exists in this database.
@@ -26,8 +26,9 @@ values (
 --   attack:  previous 7, 8, 6 -> previous average 7.0; latest 10 -> 8.5
 --   defence: previous 7, 8, 6 -> previous average 7.0; latest 9  -> 8.0
 --   rating score = weighted(final_score / 20 * 10) = 4.125
---   rating = one standard deviation above the league = 90
---   market value = 90 x 1,000,000 = 90,000,000
+--   base rating = one standard deviation above the league = 90
+--   confidence adjustment = 4 of 6 recent league matches -> final rating 86
+--   market value = 86 x 1,000,000 = 86,000,000
 --
 -- Note this differs from the career average of 7.625, and includes any points
 -- already stored in final_score.
@@ -142,7 +143,7 @@ select is(
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000001'),
-  90000000.00::numeric,
+  86000000.00::numeric,
   'market value is the card rating times the league constant'
 );
 
@@ -153,23 +154,44 @@ select is(
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000001'),
-  90,
-  'a player one standard deviation above the league rates 72 + 18'
+  86,
+  'a player one standard deviation above the league is adjusted by confidence'
 );
 
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000002'),
-  54,
-  'and one standard deviation below rates 72 - 18'
+  45,
+  'and one standard deviation below is also adjusted by confidence'
 );
 
 -- Nobody to compare against yet, so the centre is the only honest answer.
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000003'),
-  72,
-  'a player who has never been scored sits at the centre'
+  62,
+  'a player who has never been scored sits at the centre before confidence'
+);
+
+select is(
+  (select confidence_pct from public.player_market_values
+   where player_id = '77777777-7777-4777-8777-000000000001'),
+  100::numeric,
+  'four of the last six league matches fills the confidence donut'
+);
+
+select is(
+  (select confidence_adjustment_pct from public.player_market_values
+   where player_id = '77777777-7777-4777-8777-000000000002'),
+  16.667::numeric,
+  'one of the last six league matches keeps the raw confidence share'
+);
+
+select is(
+  (select form_state from public.player_market_values
+   where player_id = '77777777-7777-4777-8777-000000000001'),
+  'up',
+  'a latest rating score 5% above history shows an upward arrow'
 );
 
 -- ---------------------------------------------------------------------------
@@ -186,7 +208,7 @@ select is(
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000002'),
-  54000000.00::numeric,
+  45000000.00::numeric,
   'with one match the market value is the rating times the constant'
 );
 

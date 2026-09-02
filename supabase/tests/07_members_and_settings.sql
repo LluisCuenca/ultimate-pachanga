@@ -119,13 +119,12 @@ select is(
 );
 
 -- Market values are derived, so a new constant applies immediately with
--- nothing to re-import. PERICO carries a 99 card rating under the final-score
--- distribution.
+-- nothing to re-import. PERICO carries a 95 confidence-adjusted card rating.
 select is(
   (select market_value_gbp from public.player_market_values mv
    join public.players p on p.id = mv.player_id
    where p.player_code = 'PERICO'),
-  594000000.00::numeric,
+  570000000.00::numeric,
   'doubling the market constant doubles every valuation at once'
 );
 
