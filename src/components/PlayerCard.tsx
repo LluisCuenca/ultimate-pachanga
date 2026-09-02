@@ -67,7 +67,7 @@ const TIER_RULES: Record<CardTier, string> = {
  * treatment for each.
  */
 const CARD_EDGE =
-  'border bg-gradient-to-b shadow-[inset_0_1px_0_oklch(1_0_0/0.22),inset_0_-1px_0_oklch(0_0_0/0.25),0_2px_10px_oklch(0_0_0/0.45)]'
+  'border bg-gradient-to-b shadow-[inset_0_1px_0_oklch(1_0_0/0.22),inset_0_-1px_0_oklch(0_0_0/0.25),0_10px_24px_oklch(0_0_0/0.4)]'
 
 /** Short labels: a card has no room for "Mediocentro defensivo". */
 function toShortMetricLabel(metric: LeagueMetricRow): string {
@@ -132,13 +132,14 @@ export function PlayerCard({
         CARD_EDGE,
         TIER_FACES[tier],
         TIER_EDGES[tier],
+        "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-[62%] before:bg-[radial-gradient(circle_at_50%_22%,rgb(234_175_53/0.24),transparent_64%)] before:content-['']",
         // Portrait, like a printed card. The pitch card is sized by its slot,
         // so it needs the ratio declared and becomes the query container its
         // own type is measured against; the grid card gets its height from the
         // metric and value bands below.
         compact ? '@container aspect-[4/5] rounded-lg' : 'rounded-xl',
         !compact &&
-          'transition-transform duration-200 motion-safe:hover:-translate-y-1',
+          'transition-all duration-200 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_20px_36px_rgb(0_0_0/0.48),0_0_26px_rgb(234_175_53/0.16)]',
         !player.isActive && 'opacity-60 saturate-50',
         className,
       )}
@@ -294,11 +295,11 @@ function FullFace({
         <FormStateIcon state={player.formState} className="size-4" />
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-3 pt-3 pb-1">
+      <div className="relative z-1 flex flex-1 items-center justify-center px-3 pt-3 pb-1">
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
-          className="h-auto w-[64%] border-2"
+          className="h-auto w-[66%] border-2 shadow-[0_0_28px_rgb(234_175_53/0.2)]"
           fallbackClassName="text-2xl"
         />
       </div>
@@ -440,7 +441,12 @@ function PlayerPhoto({
   fallbackClassName,
 }: PlayerPhotoProps) {
   return (
-    <Avatar className={cn('aspect-square border border-black/25', className)}>
+    <Avatar
+      className={cn(
+        'aspect-square border border-black/25 bg-black/20 shadow-[0_0_18px_rgb(255_255_255/0.08)]',
+        className,
+      )}
+    >
       {avatarUrl ? (
         <AvatarImage
           src={avatarUrl}

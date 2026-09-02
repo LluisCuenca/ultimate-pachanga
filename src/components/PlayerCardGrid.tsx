@@ -13,7 +13,7 @@ interface PlayerCardGridProps {
  */
 export function PlayerCardGrid({ players, metrics }: PlayerCardGridProps) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-5">
       {players.map((player) => (
         <PlayerCard
           key={player.id}
@@ -28,7 +28,7 @@ export function PlayerCardGrid({ players, metrics }: PlayerCardGridProps) {
 
 export function PlayerCardGridSkeleton({ count = 10 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-5">
       {Array.from({ length: count }, (_, index) => (
         <Skeleton key={index} className="h-64 rounded-xl" />
       ))}

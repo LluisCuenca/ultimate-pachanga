@@ -69,7 +69,7 @@ export function TeamPitch({
           share the one request, and deferring it leaves the line-up floating
           over a blank rectangle. */}
       <img
-        src="/pitch.webp"
+        src={`${import.meta.env.BASE_URL}pitch.webp`}
         alt=""
         className="absolute inset-0 size-full object-cover"
         draggable={false}

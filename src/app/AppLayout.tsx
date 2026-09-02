@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
+import { useQuery } from '@tanstack/react-query'
 import {
   BarChart3,
   CalendarDays,
@@ -12,6 +13,7 @@ import {
   Users,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -21,7 +23,10 @@ import {
 } from '@/components/ui/sheet'
 import { AdminOnly } from '@/components/AdminOnly'
 import { signOut } from '@/features/auth/api'
+import { fetchPlayerCard, playerKeys } from '@/features/players/api'
+import { useMyPlayerId } from '@/features/players/useMyPlayer'
 import { useLeague } from '@/features/league/useLeague'
+import { getAvatarUrl } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
 interface NavigationItem {
@@ -49,10 +54,29 @@ const ADMIN_NAVIGATION: NavigationItem[] = [
 
 function navigationLinkClasses({ isActive }: { isActive: boolean }): string {
   return cn(
-    'group flex min-h-11 items-center gap-3 border border-transparent px-3 text-sm font-semibold transition-all',
+    'group flex min-h-13 items-center gap-3 border border-transparent px-3.5 py-2 font-heading text-xl leading-none font-semibold uppercase transition-all',
     isActive
-      ? 'border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_rgb(234_175_53/0.14)]'
-      : 'text-muted-foreground hover:border-border hover:bg-accent/70 hover:text-foreground',
+      ? 'border-primary/70 bg-primary text-primary-foreground shadow-[0_12px_26px_rgb(234_175_53/0.18)]'
+      : 'text-muted-foreground hover:border-primary/35 hover:bg-accent/70 hover:text-foreground',
+  )
+}
+
+function ProfileNavigationAvatar() {
+  const { data: myPlayerId } = useMyPlayerId()
+  const { data: player } = useQuery({
+    queryKey: playerKeys.card(myPlayerId ?? ''),
+    enabled: Boolean(myPlayerId),
+    queryFn: () => fetchPlayerCard(myPlayerId!),
+  })
+  const avatarUrl = getAvatarUrl(player?.avatarPath)
+
+  return (
+    <Avatar className="size-7 border border-primary/60 shadow-[0_0_16px_rgb(234_175_53/0.24)]">
+      {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
+      <AvatarFallback className="bg-primary/15 text-primary">
+        <UserRound className="size-4" aria-hidden="true" />
+      </AvatarFallback>
+    </Avatar>
   )
 }
 
@@ -72,7 +96,11 @@ function NavigationLinks({
           onClick={onNavigate}
           className={navigationLinkClasses}
         >
-          <Icon className="size-4" aria-hidden="true" />
+          {to === '/profile' ? (
+            <ProfileNavigationAvatar />
+          ) : (
+            <Icon className="size-5 shrink-0" aria-hidden="true" />
+          )}
           <span>{label}</span>
         </NavLink>
       ))}
@@ -85,26 +113,23 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
     <Link
       to="/league"
       className={cn(
-        'flex min-w-0 items-center gap-3',
-        compact ? 'gap-2.5' : 'px-1',
+        'flex min-w-0 items-center',
+        compact ? 'gap-2.5' : 'w-full justify-center',
       )}
     >
       <img
         src={LOGO_URL}
-        alt=""
+        alt={BRAND_NAME}
         className={cn(
-          'shrink-0 object-contain',
-          compact ? 'size-9' : 'size-14',
+          'object-contain',
+          compact ? 'size-10 shrink-0' : 'h-auto w-full max-w-60',
         )}
       />
-      <span
-        className={cn(
-          'truncate font-heading font-bold uppercase',
-          compact ? 'text-xl leading-none' : 'text-2xl leading-[0.85]',
-        )}
-      >
-        {BRAND_NAME}
-      </span>
+      {compact ? (
+        <span className="truncate font-heading text-xl leading-none font-bold uppercase">
+          {BRAND_NAME}
+        </span>
+      ) : null}
     </Link>
   )
 }
@@ -113,14 +138,14 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
   const { data: league } = useLeague()
 
   return (
-    <aside className="sticky top-0 hidden h-svh w-72 shrink-0 flex-col border-r border-border bg-[#0b0b0b] px-4 py-6 lg:flex">
+    <aside className="sticky top-0 hidden h-svh w-72 shrink-0 flex-col border-r border-border bg-[#090909] px-4 py-5 lg:flex">
       <BrandLockup />
 
-      <div className="mt-10">
+      <div className="mt-7 border-t border-primary/35 pt-6">
         <p className="technical mb-3 px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
           Competición
         </p>
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-1.5">
           <NavigationLinks items={NAVIGATION} />
         </nav>
       </div>
@@ -130,7 +155,7 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
           <p className="technical mb-3 px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
             Administración
           </p>
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col gap-1.5">
             <NavigationLinks items={ADMIN_NAVIGATION} />
           </nav>
         </div>
@@ -140,7 +165,7 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
         <p className="technical px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
           Liga activa
         </p>
-        <p className="mt-1 truncate px-3 font-heading text-xl leading-none font-bold uppercase">
+        <p className="mt-1 truncate px-3 font-heading text-2xl leading-none font-bold uppercase">
           {league?.title ?? BRAND_NAME}
         </p>
         <Button
@@ -156,10 +181,7 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
   )
 }
 
-/**
- * Shell for every signed-in page: an information-rich sidebar on desktop and
- * a compact header with a slide-over navigation on phones.
- */
+/** Shell for every signed-in page. */
 export function AppLayout() {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -189,8 +211,8 @@ export function AppLayout() {
             </SheetTrigger>
             <SheetContent side="left" className="w-72 overflow-y-auto p-4">
               <SheetTitle className="sr-only">Navegación</SheetTitle>
-              <BrandLockup />
-              <nav className="mt-8 flex flex-col gap-1">
+              <BrandLockup compact />
+              <nav className="mt-8 flex flex-col gap-1.5">
                 <NavigationLinks
                   items={NAVIGATION}
                   onNavigate={() => setIsMenuOpen(false)}
@@ -222,7 +244,7 @@ export function AppLayout() {
           <div className="size-8" aria-hidden="true" />
         </header>
 
-        <main className="mx-auto w-full max-w-[1600px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10 xl:px-14">
+        <main className="mx-auto w-full max-w-[1680px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10 xl:px-14">
           <Outlet />
         </main>
       </div>

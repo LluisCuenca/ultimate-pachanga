@@ -46,12 +46,12 @@ function PodiumCard({
   children: React.ReactNode
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
+    <Card className="overflow-hidden border-border bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)]">
+      <CardHeader className="border-b border-border/80">
+        <CardTitle className="text-3xl leading-none uppercase">
           <h2>{title}</h2>
         </CardTitle>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-base text-muted-foreground">{description}</p>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
@@ -84,7 +84,7 @@ function GeneralTab({
   )
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-6 xl:grid-cols-2">
       <PodiumCard
         title="Jugadores más valorados"
         description="Valor de mercado calculado a partir de las puntuaciones"
@@ -212,34 +212,36 @@ export function StatsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-7">
+    <div className="flex flex-col gap-9">
       <div>
         <h1 className="page-title">Estadísticas</h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-3 text-lg text-muted-foreground">
           {ranked.length} jugadores con partidos puntuados
         </p>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
         {/* Scrolls sideways on a phone rather than wrapping into a tall block. */}
-        <TabsList className="flex w-full justify-start overflow-x-auto">
+        <TabsList className="flex h-12 w-full justify-start overflow-x-auto text-base">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="palmares">Palmarés</TabsTrigger>
           <TabsTrigger value="evolution">Evolución</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="mt-4">
+        <TabsContent value="general" className="mt-6">
           <GeneralTab players={ranked} metrics={metrics} />
         </TabsContent>
 
-        <TabsContent value="palmares" className="mt-4">
-          <div className="flex flex-col gap-6">
+        <TabsContent value="palmares" className="mt-6">
+          <div className="flex flex-col gap-9">
             {attributes.map((attribute) => {
               const holders = byAttribute(attribute.code)
 
               return (
                 <section key={attribute.code} className="flex flex-col gap-2">
-                  <h2 className="text-sm font-semibold">{attribute.label}</h2>
+                  <h2 className="font-heading text-3xl leading-none font-semibold uppercase">
+                    {attribute.label}
+                  </h2>
                   {holders.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       Nadie lo ha recibido todavía.
@@ -259,7 +261,7 @@ export function StatsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="evolution" className="mt-4">
+        <TabsContent value="evolution" className="mt-6">
           {membership ? (
             <EvolutionSection
               leagueId={membership.leagueId}

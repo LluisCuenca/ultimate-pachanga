@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, History } from 'lucide-react'
+import { ArrowLeft, History, Radar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -43,9 +43,11 @@ function SummaryRow({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 py-2">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="font-semibold">{children}</dd>
+    <div className="flex min-h-14 items-baseline justify-between gap-4 border-b border-border/70 py-3 last:border-b-0">
+      <dt className="technical text-[0.6875rem] font-medium text-muted-foreground uppercase">
+        {label}
+      </dt>
+      <dd className="text-right text-lg font-semibold">{children}</dd>
     </div>
   )
 }
@@ -79,18 +81,16 @@ export function PlayerDetailPage() {
 
   if (isPending) {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-8 w-40" />
-        <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
-          <Skeleton className="h-72 rounded-xl" />
-          <Skeleton className="h-72 rounded-xl" />
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-9 w-40" />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Skeleton className="h-[34rem] rounded-xl" />
+          <Skeleton className="h-[34rem] rounded-xl" />
         </div>
       </div>
     )
   }
 
-  // A failed read and a missing player are different answers: one is worth
-  // retrying and one is worth going back from.
   if (error) {
     return <ErrorState error={error} onRetry={() => void refetch()} />
   }
@@ -114,93 +114,100 @@ export function PlayerDetailPage() {
   )
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/players">
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Jugadores
-          </Link>
-        </Button>
-      </div>
+    <div className="flex flex-col gap-8">
+      <Button asChild variant="ghost" size="sm" className="w-fit">
+        <Link to="/players">
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Jugadores
+        </Link>
+      </Button>
 
-      <h1 className="text-2xl font-bold">{player.displayName}</h1>
+      <section className="grid items-stretch gap-6 lg:grid-cols-2">
+        <PlayerCard
+          player={player}
+          metrics={metrics}
+          className="h-full min-h-[34rem]"
+        />
 
-      <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
-        <PlayerCard player={player} metrics={metrics} className="h-fit" />
-
-        <div className="flex flex-col gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h2>Resumen</h2>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <dl className="divide-y divide-border/50">
-                <SummaryRow label="Valor de mercado">
-                  <MarketValue value={player.marketValueGbp} exact />
-                </SummaryRow>
-                <SummaryRow label="Valoración">
-                  <span className="numeric">{player.cardRating}</span>
-                </SummaryRow>
-                <SummaryRow label="Posición">
-                  {player.preferredPosition} ·{' '}
-                  {formatPosition(player.preferredPosition)}
-                </SummaryRow>
-                <SummaryRow label="Partidos jugados">
-                  <span className="numeric">{player.matchesPlayed}</span>
-                </SummaryRow>
-                <SummaryRow label="Victorias">
-                  <span className="numeric">
-                    {formatWinRate(player.totalVictories, player.matchesPlayed)}
-                    <span className="ml-2 font-normal text-muted-foreground">
-                      {formatVictories(player.totalVictories)}/
-                      {player.matchesPlayed}
-                    </span>
+        <Card className="h-full border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0e0e0e_100%)]">
+          <CardHeader className="border-b border-primary/20">
+            <p className="section-kicker text-primary">Ficha de jugador</p>
+            <CardTitle className="mt-3 text-5xl leading-none uppercase">
+              <h2>Datos de competición</h2>
+            </CardTitle>
+            <p className="technical text-xs text-muted-foreground uppercase">
+              {player.playerCode} · {player.preferredPosition} ·{' '}
+              {formatPosition(player.preferredPosition)}
+            </p>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <dl className="grid gap-x-8 md:grid-cols-2">
+              <SummaryRow label="Valor de mercado">
+                <MarketValue value={player.marketValueGbp} exact />
+              </SummaryRow>
+              <SummaryRow label="Valoración">
+                <span className="numeric text-3xl text-primary">
+                  {player.cardRating}
+                </span>
+              </SummaryRow>
+              <SummaryRow label="Partidos jugados">
+                <span className="numeric">{player.matchesPlayed}</span>
+              </SummaryRow>
+              <SummaryRow label="Victorias">
+                <span className="numeric">
+                  {formatWinRate(player.totalVictories, player.matchesPlayed)}
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    {formatVictories(player.totalVictories)}/
+                    {player.matchesPlayed}
                   </span>
-                </SummaryRow>
-                <SummaryRow label="Goles">
-                  <span className="numeric">{player.totalGoals}</span>
-                </SummaryRow>
-                <SummaryRow label="Media histórica">
-                  <span className="numeric">
-                    {formatScore(player.careerAverage)}
-                  </span>
-                </SummaryRow>
-                <SummaryRow label="Última puntuación">
-                  <span className="numeric">
-                    {formatScore(player.latestScore)}
-                  </span>
-                </SummaryRow>
-                <SummaryRow label="Código">
-                  <span className="numeric text-sm text-muted-foreground">
-                    {player.playerCode}
-                  </span>
-                </SummaryRow>
-              </dl>
-            </CardContent>
-          </Card>
+                </span>
+              </SummaryRow>
+              <SummaryRow label="Goles">
+                <span className="numeric">{player.totalGoals}</span>
+              </SummaryRow>
+              <SummaryRow label="Media histórica">
+                <span className="numeric">
+                  {formatScore(player.careerAverage)}
+                </span>
+              </SummaryRow>
+              <SummaryRow label="Última puntuación">
+                <span className="numeric">
+                  {formatScore(player.latestScore)}
+                </span>
+              </SummaryRow>
+              <SummaryRow label="Confianza">
+                <span className="numeric">
+                  {Math.round(player.confidencePct)}%
+                </span>
+              </SummaryRow>
+            </dl>
+          </CardContent>
+        </Card>
+      </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <h2>Medias por métrica</h2>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MetricRadarChart player={player} metrics={metrics} />
-            </CardContent>
-          </Card>
-
-          {earnedAttributes.length > 0 ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <h2>Atributos</h2>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
+      <Card className="border-primary/20 bg-[linear-gradient(135deg,#131313_0%,#0c0c0c_100%)]">
+        <CardHeader className="border-b border-border">
+          <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
+            <Radar className="size-7 text-primary" aria-hidden="true" />
+            <h2>Rendimiento</h2>
+          </CardTitle>
+          <p className="mt-2 text-base text-muted-foreground">
+            Medias por métrica, lectura de juego y atributos obtenidos.
+          </p>
+        </CardHeader>
+        <CardContent className="grid gap-8 pt-7 xl:grid-cols-[1.25fr_0.75fr]">
+          <MetricRadarChart
+            player={player}
+            metrics={metrics}
+            className="h-[30rem]"
+          />
+          <div className="flex flex-col justify-center border-l-0 border-primary/20 xl:border-l xl:pl-8">
+            <p className="section-kicker text-primary">Distinciones</p>
+            <h3 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
+              Atributos
+            </h3>
+            {earnedAttributes.length > 0 ? (
+              <div className="mt-6 flex flex-wrap gap-3">
                 {earnedAttributes.map((attribute) => (
                   <AttributeBadge
                     key={attribute.code}
@@ -209,19 +216,24 @@ export function PlayerDetailPage() {
                     count={player.attributeCounts[attribute.code]}
                   />
                 ))}
-              </CardContent>
-            </Card>
-          ) : null}
-        </div>
-      </div>
+              </div>
+            ) : (
+              <p className="mt-4 text-base text-muted-foreground">
+                Todavía no tiene atributos registrados.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>
+        <CardHeader className="border-b border-border">
+          <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
+            <History className="size-7 text-primary" aria-hidden="true" />
             <h2>Historial de partidos</h2>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {isHistoryPending ? (
             <Skeleton className="h-24" />
           ) : historyError ? (
@@ -293,7 +305,7 @@ export function PlayerDetailPage() {
                           ))}
                         </div>
                       </TableCell>
-                      <TableCell className="numeric text-right font-bold">
+                      <TableCell className="numeric text-right text-lg font-bold text-primary">
                         {formatScore(entry.finalScore)}
                       </TableCell>
                     </TableRow>

@@ -100,14 +100,14 @@ export function PlayersPage() {
     <div className="flex flex-col gap-7">
       <div>
         <h1 className="page-title">Jugadores</h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-3 text-lg text-muted-foreground">
           {isPending
             ? 'Cargando plantilla…'
-            : `${visiblePlayers.length} de ${players?.length ?? 0} jugadores`}
+            : `${visiblePlayers.length} jugadores en total`}
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div className="flex flex-col gap-4 border-y border-border py-5 sm:flex-row sm:items-end">
         <div className="flex-1">
           <Label htmlFor="player-search" className="sr-only">
             Buscar jugador
@@ -122,7 +122,7 @@ export function PlayersPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar por nombre, apodo o código"
-              className="pl-9"
+              className="h-12 pl-10 text-base"
             />
           </div>
         </div>
@@ -133,7 +133,10 @@ export function PlayersPage() {
               Filtrar por posición
             </Label>
             <Select value={position} onValueChange={setPosition}>
-              <SelectTrigger id="position-filter" className="w-full">
+              <SelectTrigger
+                id="position-filter"
+                className="h-12 w-full text-base"
+              >
                 <SelectValue placeholder="Posición" />
               </SelectTrigger>
               <SelectContent>
@@ -155,7 +158,7 @@ export function PlayersPage() {
               value={sortBy}
               onValueChange={(value) => setSortBy(value as SortKey)}
             >
-              <SelectTrigger id="sort-by" className="w-full">
+              <SelectTrigger id="sort-by" className="h-12 w-full text-base">
                 <SelectValue placeholder="Ordenar" />
               </SelectTrigger>
               <SelectContent>

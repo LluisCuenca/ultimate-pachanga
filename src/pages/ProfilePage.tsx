@@ -103,9 +103,9 @@ export function ProfilePage() {
 
   if (isPending || !player) {
     return (
-      <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
-        <Skeleton className="h-96 rounded-xl" />
-        <Skeleton className="h-48 rounded-xl" />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Skeleton className="h-[34rem] rounded-xl" />
+        <Skeleton className="h-[34rem] rounded-xl" />
       </div>
     )
   }
@@ -113,25 +113,32 @@ export function ProfilePage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-bold">Mi perfil</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="page-title">Mi perfil</h1>
+        <p className="mt-3 text-lg text-muted-foreground">
           Tu cuenta juega como {player.displayName}. Tus puntuaciones y tu valor
           de mercado los calcula la liga; el resto lo decides tú.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
-        <PlayerCard player={player} metrics={metrics} />
+      <div className="grid items-stretch gap-6 lg:grid-cols-2">
+        <PlayerCard
+          player={player}
+          metrics={metrics}
+          className="h-full min-h-[34rem]"
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tus datos</CardTitle>
+        <Card className="min-h-[34rem] border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)]">
+          <CardHeader className="border-b border-primary/20">
+            <p className="section-kicker text-primary">Tu ficha</p>
+            <CardTitle className="mt-3 text-5xl leading-none uppercase">
+              Tus datos
+            </CardTitle>
             <CardDescription>
               Código de importación {player.playerCode} · posición{' '}
               {formatPosition(player.preferredPosition)}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-start gap-3">
+          <CardContent className="flex h-full flex-col items-start gap-6 pt-6">
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => setIsFormOpen(true)}>
                 <Pencil className="size-4" aria-hidden="true" />
@@ -147,13 +154,36 @@ export function ProfilePage() {
               </Button>
             </div>
 
-            <p className="text-sm text-muted-foreground">
+            <div className="grid w-full gap-4 border-y border-border py-5 sm:grid-cols-2">
+              <div>
+                <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                  Valoración actual
+                </p>
+                <p className="numeric mt-1 text-4xl leading-none text-primary">
+                  {player.cardRating}
+                </p>
+              </div>
+              <div>
+                <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                  Partidos jugados
+                </p>
+                <p className="numeric mt-1 text-4xl leading-none">
+                  {player.matchesPlayed}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-base leading-relaxed text-muted-foreground">
               Puedes cambiar tu nombre, apellidos, apodo, posición preferida y
               foto. Para cualquier otra cosa —tu código, las convocatorias o las
               puntuaciones— habla con un administrador.
             </p>
 
-            <Button variant="link" className="px-0" asChild>
+            <Button
+              variant="link"
+              className="mt-auto px-0 text-primary"
+              asChild
+            >
               <Link to={`/players/${player.id}`}>
                 Ver mi historial de partidos
               </Link>

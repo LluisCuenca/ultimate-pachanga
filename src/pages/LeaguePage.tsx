@@ -1,6 +1,14 @@
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Award, CalendarDays, TrendingUp, Trophy, Users } from 'lucide-react'
+import {
+  Award,
+  CalendarDays,
+  Crown,
+  TrendingUp,
+  Trophy,
+  Users,
+} from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -16,28 +24,21 @@ import {
   useLeagueAttributes,
   useMembership,
 } from '@/features/league/useLeague'
-import { formatVictories, formatWinRate } from '@/lib/formatting'
+import { formatVictories, formatWinRate, toInitials } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
-import type { MatchRow, PlayerCardData } from '@/types/domain'
+import { getAvatarUrl } from '@/lib/supabase'
+import type {
+  LeagueAttributeRow,
+  MatchRow,
+  PlayerCardData,
+} from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
 const BRAND_NAME = 'Ultimate Pachangas'
 
-function StatTile({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <Card className="relative gap-1 overflow-hidden p-4 before:absolute before:top-0 before:left-0 before:h-0.5 before:w-8 before:bg-primary lg:p-6">
-      <p className="technical text-[0.625rem] font-medium text-muted-foreground uppercase">
-        {label}
-      </p>
-      <p className="numeric text-5xl leading-none font-bold">{children}</p>
-    </Card>
-  )
+interface AwardEntry {
+  attribute: LeagueAttributeRow
+  holders: PlayerCardData[]
 }
 
 function LeaderboardCard({
@@ -52,28 +53,133 @@ function LeaderboardCard({
   renderValue: (player: PlayerCardData) => React.ReactNode
 }) {
   return (
-    <Card className="border-border/90 lg:min-h-72">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl leading-none uppercase">
-          <Icon className="size-5 text-primary" aria-hidden="true" />
+    <Card className="overflow-hidden border-border/90 bg-[linear-gradient(145deg,#171717_0%,#0d0d0d_100%)]">
+      <CardHeader className="border-b border-border/80 pb-4">
+        <CardTitle className="flex items-center gap-3 text-3xl leading-none uppercase">
+          <span className="flex size-10 items-center justify-center border border-primary/40 bg-primary/10 text-primary">
+            <Icon className="size-5" aria-hidden="true" />
+          </span>
           <h2>{title}</h2>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-1">
+      <CardContent className="flex flex-col gap-1 pt-4">
         {players.map((player, index) => (
           <Link
             key={player.id}
             to={`/players/${player.id}`}
-            className="flex min-h-10 items-center gap-3 border-l-2 border-transparent px-2 py-1.5 text-base transition-colors hover:border-primary hover:bg-accent/50"
+            className="flex min-h-12 items-center gap-4 border-l-2 border-transparent px-3 py-2 text-base transition-all hover:border-primary hover:bg-primary/8"
           >
-            <span className="numeric w-4 text-sm text-muted-foreground">
+            <span className="numeric w-5 text-2xl leading-none text-primary">
               {index + 1}
             </span>
-            <span className="flex-1 truncate text-sm font-medium">
+            <span className="flex-1 truncate text-lg font-medium">
               {player.displayName}
             </span>
             {renderValue(player)}
           </Link>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function AwardSpotlight({
+  entry,
+  index,
+}: {
+  entry: AwardEntry
+  index: number
+}) {
+  const player = entry.holders[0]
+  const avatarUrl = getAvatarUrl(player.avatarPath)
+  const initials = toInitials(
+    player.firstName,
+    player.lastName,
+    player.displayName,
+  )
+
+  return (
+    <Link
+      to={`/players/${player.id}`}
+      className="group relative min-h-96 overflow-hidden border border-border bg-[linear-gradient(145deg,#191919_0%,#0a0a0a_78%)] p-6 transition-all hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_22px_44px_rgb(0_0_0/0.42),0_0_32px_rgb(234_175_53/0.12)]"
+    >
+      <span className="absolute top-0 right-0 h-20 w-20 border-t border-r border-primary/55" />
+      <span className="technical text-[0.6875rem] font-semibold text-primary uppercase">
+        Reconocimiento {String(index + 1).padStart(2, '0')}
+      </span>
+      <div className="mt-5 flex items-center justify-between gap-4">
+        <div>
+          <p className="font-heading text-3xl leading-none font-bold uppercase">
+            {entry.attribute.label}
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Titular actual del reconocimiento
+          </p>
+        </div>
+        <Award className="size-8 shrink-0 text-primary" aria-hidden="true" />
+      </div>
+      <div className="absolute right-7 bottom-7 left-7 flex items-end gap-5 border-t border-primary/25 pt-6">
+        <Avatar className="size-24 border-2 border-primary/75 shadow-[0_0_28px_rgb(234_175_53/0.28)] transition-transform duration-200 group-hover:scale-105">
+          {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
+          <AvatarFallback className="bg-primary/15 font-heading text-3xl text-primary">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 pb-1">
+          <p className="truncate font-heading text-3xl leading-none font-bold uppercase">
+            {player.displayName}
+          </p>
+          <p className="technical mt-2 text-xs text-muted-foreground uppercase">
+            {player.attributeCounts[entry.attribute.code]} distinciones
+          </p>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function HonoursRoll({ awards }: { awards: readonly AwardEntry[] }) {
+  return (
+    <Card className="border-primary/20 bg-[linear-gradient(135deg,#17120a_0%,#111111_42%,#0c0c0c_100%)]">
+      <CardHeader className="border-b border-primary/20">
+        <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
+          <Crown className="size-7 text-primary" aria-hidden="true" />
+          <h2>Palmarés</h2>
+        </CardTitle>
+        <p className="mt-2 text-base text-muted-foreground">
+          Todos los reconocimientos que han dejado huella en la liga.
+        </p>
+      </CardHeader>
+      <CardContent className="grid gap-x-10 gap-y-8 pt-7 xl:grid-cols-2">
+        {awards.map(({ attribute, holders }) => (
+          <section
+            key={attribute.code}
+            className="border-l-2 border-primary/65 pl-5"
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <AttributeBadge
+                label={attribute.label}
+                points={attribute.points}
+              />
+              <p className="font-heading text-2xl leading-none font-bold uppercase">
+                {attribute.label}
+              </p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+              {holders.map((player) => (
+                <Link
+                  key={player.id}
+                  to={`/players/${player.id}`}
+                  className="text-lg font-medium transition-colors hover:text-primary"
+                >
+                  {player.displayName}
+                  <span className="numeric ml-2 text-primary">
+                    ×{player.attributeCounts[attribute.code]}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
         ))}
       </CardContent>
     </Card>
@@ -102,23 +208,15 @@ export function LeaguePage() {
     queryFn: () => fetchMatches(membership!.leagueId),
   })
 
-  // Guests play the matches but are not in the league, so nothing on this page
-  // counts them: not the tiles, not the leaderboards, not the palmarés. One
-  // filter covers all three because everything below hangs off it.
   const activePlayers = (players ?? []).filter(
     (player) => player.isActive && !player.isGuest,
   )
   const rankedPlayers = activePlayers.filter(
     (player) => player.matchesPlayed > 0,
   )
-
   const topByValue = [...rankedPlayers]
     .sort((left, right) => right.marketValueGbp - left.marketValueGbp)
     .slice(0, LEADERBOARD_SIZE)
-
-  // Ranked by the rate that is on show, not by the raw total — a board that
-  // sorts by one number and prints another is a bug waiting to be reported.
-  // Matches played breaks ties, so a perfect record over more games wins.
   const topByVictories = [...rankedPlayers]
     .sort(
       (left, right) =>
@@ -127,24 +225,13 @@ export function LeaguePage() {
         right.matchesPlayed - left.matchesPlayed,
     )
     .slice(0, LEADERBOARD_SIZE)
-
-  // `matches` arrives newest-first, so the latest scored match is the first
-  // scored entry and the next fixture is the last upcoming one.
-  const latestMatch: MatchRow | undefined = (matches ?? []).find(
-    (match) => match.status === 'scored',
-  )
-
   const nextMatch: MatchRow | undefined = (matches ?? [])
     .filter((match) => isUpcomingMatch(match.status))
     .at(-1)
-
-  const scoredMatchCount = (matches ?? []).filter(
-    (match) => match.status === 'scored',
-  ).length
-
-  // Award holders, most-decorated first, so the dashboard shows who is actually
-  // collecting them rather than an arbitrary slice of the roster.
-  const awardHolders = attributes
+  const recentMatches = (matches ?? [])
+    .filter((match) => match.status === 'scored')
+    .slice(0, 3)
+  const awardHolders: AwardEntry[] = attributes
     .filter((attribute) => attribute.points > 0)
     .map((attribute) => ({
       attribute,
@@ -160,13 +247,13 @@ export function LeaguePage() {
     .filter((entry) => entry.holders.length > 0)
 
   return (
-    <div className="flex flex-col gap-9 lg:gap-11">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6 lg:pb-8">
+    <div className="flex flex-col gap-12">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
         <div>
           <p className="section-kicker">
             {league?.title ?? 'Competición entre amigos'}
           </p>
-          <h1 className="mt-3 text-6xl leading-none font-bold uppercase">
+          <h1 className="mt-3 font-heading text-5xl leading-none font-bold uppercase">
             {BRAND_NAME}
           </h1>
         </div>
@@ -175,62 +262,50 @@ export function LeaguePage() {
             {league.status === 'active' ? 'Activa' : 'Inactiva'}
           </Badge>
         ) : null}
-      </div>
+      </header>
 
       {areMatchesPending ? (
-        <div className="grid gap-4 xl:grid-cols-2">
-          <Skeleton className="h-52 rounded-xl" />
-          <Skeleton className="h-52 rounded-xl" />
-        </div>
-      ) : latestMatch || nextMatch ? (
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-          {nextMatch ? (
-            <section className="flex flex-col gap-2">
-              <h2 className="section-kicker text-primary">Próxima jornada</h2>
-              <MatchCard match={nextMatch} />
-            </section>
-          ) : null}
-          {latestMatch ? (
-            <section className="flex flex-col gap-2">
-              <h2 className="section-kicker">Último resultado</h2>
-              <MatchCard match={latestMatch} />
-            </section>
-          ) : null}
-        </div>
+        <Skeleton className="h-96 rounded-xl" />
+      ) : nextMatch ? (
+        <section className="flex flex-col gap-4">
+          <div>
+            <p className="section-kicker text-primary">Siguiente cita</p>
+            <h2 className="mt-3 font-heading text-6xl leading-none font-bold uppercase">
+              Próxima jornada
+            </h2>
+          </div>
+          <MatchCard match={nextMatch} featured />
+        </section>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
-        <StatTile label="Jugadores activos">
-          <span className="numeric">
-            {arePlayersPending ? '—' : activePlayers.length}
-          </span>
-        </StatTile>
-        <StatTile label="Partidos puntuados">
-          <span className="numeric">
-            {areMatchesPending ? '—' : scoredMatchCount}
-          </span>
-        </StatTile>
-        <StatTile label="Valor total">
-          {arePlayersPending ? (
-            '—'
-          ) : (
-            <MarketValue
-              value={activePlayers.reduce(
-                (total, player) => total + player.marketValueGbp,
-                0,
-              )}
-            />
-          )}
-        </StatTile>
-        <StatTile label="Tu rol">
-          {membership?.role === 'admin' ? 'Admin' : 'Miembro'}
-        </StatTile>
-      </div>
+      {recentMatches.length > 0 ? (
+        <section className="flex flex-col gap-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="section-kicker">Archivo reciente</p>
+              <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
+                Últimos partidos
+              </h2>
+            </div>
+            <Link
+              to="/matches"
+              className="technical text-xs font-semibold text-primary uppercase hover:underline"
+            >
+              Ver calendario
+            </Link>
+          </div>
+          <div className="grid gap-5 xl:grid-cols-3">
+            {recentMatches.map((match) => (
+              <MatchCard key={match.id} match={match} />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {arePlayersPending ? (
         <div className="grid gap-5 xl:grid-cols-2">
-          <Skeleton className="h-56 rounded-xl" />
-          <Skeleton className="h-56 rounded-xl" />
+          <Skeleton className="h-72 rounded-xl" />
+          <Skeleton className="h-72 rounded-xl" />
         </div>
       ) : playersError ? (
         <ErrorState
@@ -250,17 +325,22 @@ export function LeaguePage() {
           description="Las estadísticas y los valores de mercado aparecerán tras el primer partido."
         />
       ) : (
-        <section className="flex flex-col gap-3">
-          <h2 className="section-kicker">Clasificación individual</h2>
+        <section className="flex flex-col gap-5">
+          <div>
+            <p className="section-kicker">La élite</p>
+            <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
+              Clasificación individual
+            </h2>
+          </div>
           <div className="grid gap-5 xl:grid-cols-2">
             <LeaderboardCard
-              title="Mayor valor de mercado"
+              title="Valor de mercado"
               icon={TrendingUp}
               players={topByValue}
               renderValue={(player) => (
                 <MarketValue
                   value={player.marketValueGbp}
-                  className="text-sm"
+                  className="text-lg"
                 />
               )}
             />
@@ -269,7 +349,7 @@ export function LeaguePage() {
               icon={Trophy}
               players={topByVictories}
               renderValue={(player) => (
-                <span className="numeric text-sm font-semibold">
+                <span className="numeric text-lg font-semibold">
                   {formatWinRate(player.totalVictories, player.matchesPlayed)}
                   <span className="ml-2 font-normal text-muted-foreground">
                     {formatVictories(player.totalVictories)}/
@@ -283,40 +363,26 @@ export function LeaguePage() {
       )}
 
       {awardHolders.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl leading-none uppercase">
-              <Award className="size-4 text-primary" aria-hidden="true" />
-              <h2>Palmarés</h2>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {awardHolders.map(({ attribute, holders }) => (
-              <div
-                key={attribute.code}
-                className="flex flex-wrap items-center gap-2"
-              >
-                <AttributeBadge
-                  label={attribute.label}
-                  points={attribute.points}
+        <>
+          <section className="flex flex-col gap-5">
+            <div>
+              <p className="section-kicker">La vitrina</p>
+              <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
+                Reconocimientos
+              </h2>
+            </div>
+            <div className="grid gap-5 xl:grid-cols-3">
+              {awardHolders.slice(0, 3).map((entry, index) => (
+                <AwardSpotlight
+                  key={entry.attribute.code}
+                  entry={entry}
+                  index={index}
                 />
-                {holders.map((player) => (
-                  <Link
-                    key={player.id}
-                    to={`/players/${player.id}`}
-                    className="text-sm hover:underline"
-                  >
-                    {player.displayName}
-                    <span className="numeric text-muted-foreground">
-                      {' '}
-                      ×{player.attributeCounts[attribute.code]}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </div>
+          </section>
+          <HonoursRoll awards={awardHolders} />
+        </>
       ) : null}
     </div>
   )

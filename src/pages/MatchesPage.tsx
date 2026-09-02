@@ -22,10 +22,13 @@ function MatchSection({
   if (matches.length === 0) return null
 
   return (
-    <section className="flex flex-col gap-4">
-      <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-        {title}
-      </h2>
+    <section className="flex flex-col gap-5">
+      <div>
+        <p className="section-kicker">Calendario</p>
+        <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
+          {title}
+        </h2>
+      </div>
       {/* Two columns at most: the cards are wide so the venue photograph reads
           as a place rather than a texture. */}
       <div className="grid gap-4 xl:grid-cols-2 xl:gap-6">
@@ -63,11 +66,11 @@ export function MatchesPage() {
   const past = (matches ?? []).filter((match) => !isUpcomingMatch(match.status))
 
   return (
-    <div className="flex flex-col gap-9">
+    <div className="flex flex-col gap-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="page-title">Partidos</h1>
-          <p className="mt-2 text-base text-muted-foreground">
+          <p className="mt-3 text-lg text-muted-foreground">
             {isPending
               ? 'Cargando partidos…'
               : `${upcoming.length} próximos · ${past.length} jugados`}
