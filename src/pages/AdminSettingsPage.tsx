@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorState } from '@/components/ErrorState'
+import { PlayerCard } from '@/components/PlayerCard'
 import {
   updateLeagueSettings,
   type LeagueSettingsInput,
@@ -37,6 +38,7 @@ import { leagueKeys, useLeague } from '@/features/league/useLeague'
 import { playerKeys } from '@/features/players/api'
 import { formatMarketValueExact } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
+import type { LeagueMetricRow, PlayerCardData } from '@/types/domain'
 
 const settingsSchema = z.object({
   title: z.string().trim().min(1, 'El título es obligatorio').max(120),
@@ -52,6 +54,80 @@ const settingsSchema = z.object({
 })
 
 type SettingsValues = z.infer<typeof settingsSchema>
+
+const EXAMPLE_METRICS: LeagueMetricRow[] = [
+  {
+    id: 'example-attack',
+    league_id: 'example-league',
+    code: 'attack',
+    label: 'Ataque',
+    display_order: 1,
+    minimum_score: 0,
+    maximum_score: 10,
+    is_active: true,
+  },
+  {
+    id: 'example-defence',
+    league_id: 'example-league',
+    code: 'defence',
+    label: 'Defensa',
+    display_order: 2,
+    minimum_score: 0,
+    maximum_score: 10,
+    is_active: true,
+  },
+  {
+    id: 'example-tactics',
+    league_id: 'example-league',
+    code: 'tactics',
+    label: 'Táctica',
+    display_order: 3,
+    minimum_score: 0,
+    maximum_score: 10,
+    is_active: true,
+  },
+  {
+    id: 'example-physical',
+    league_id: 'example-league',
+    code: 'physical',
+    label: 'Físico',
+    display_order: 4,
+    minimum_score: 0,
+    maximum_score: 10,
+    is_active: true,
+  },
+]
+
+const EXAMPLE_PLAYER: PlayerCardData = {
+  id: 'example-player',
+  leagueId: 'example-league',
+  playerCode: 'EXAMPLE',
+  firstName: 'Perico',
+  lastName: 'Van Nistelroy',
+  nickname: 'EL AVESTRUZ',
+  displayName: 'EL AVESTRUZ',
+  preferredPosition: 'RW',
+  avatarPath: null,
+  isActive: true,
+  isGuest: false,
+  estimatedMarketValueGbp: null,
+  userId: null,
+  matchesPlayed: 6,
+  careerAverage: 8.5,
+  latestScore: 9.4,
+  weightedPerformanceScore: 8.5,
+  marketValueGbp: 94_000_000,
+  cardRating: 85,
+  confidencePct: 66,
+  confidenceAdjustmentPct: 50,
+  formState: 'fire',
+  metricCardStats: { attack: 84, defence: 66, tactics: 72, physical: 94 },
+  metricAverages: { attack: 8.4, defence: 6.6, tactics: 7.2, physical: 9.4 },
+  attributeCounts: {},
+  attributeTotal: 0,
+  totalGoals: 0,
+  totalVictories: 0,
+}
 
 export function AdminSettingsPage() {
   const { data: league, isPending, error, refetch } = useLeague()
@@ -115,7 +191,7 @@ export function AdminSettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="max-w-2xl">
+      <Card>
         <CardHeader>
           <CardTitle>
             <h2>Cómo se calculan las estadísticas</h2>
@@ -125,9 +201,9 @@ export function AdminSettingsPage() {
             con victoria y atributos, y al final el valor de mercado.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-5 text-sm leading-6 text-muted-foreground">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-            <div className="space-y-4">
+        <CardContent className="space-y-6 text-sm leading-6 text-muted-foreground">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+            <div className="space-y-5">
               <VisualStep
                 index="1"
                 title="Stats específicas"
@@ -152,7 +228,7 @@ export function AdminSettingsPage() {
               <VisualStep
                 index="5"
                 title="Mercado"
-                body={`Valor final del jugador. Con ${formatMarketValueExact(
+                body={`Valor final del jugador. Se aplica la constante de mercado a la valoración final del jugador teniendo en cuenta la confianza. Con ${formatMarketValueExact(
                   league.market_constant_gbp,
                 )}, una valoración 82 vale ${formatMarketValueExact(
                   league.market_constant_gbp * 82,
@@ -160,73 +236,31 @@ export function AdminSettingsPage() {
               />
             </div>
 
-            <div className="rounded-lg border border-border bg-muted/35 p-4 text-foreground">
-              <div className="relative mx-auto aspect-[4/5] max-w-[16rem] overflow-hidden rounded-xl border border-tier-gold/70 bg-gradient-to-b from-tier-gold-face to-tier-gold-face-deep shadow-[inset_0_1px_0_oklch(1_0_0/0.18),0_2px_12px_oklch(0_0_0/0.4)]">
-                <div className="absolute top-5 left-6 z-10 leading-none">
-                  <div className="flex items-start gap-1">
-                    <span className="numeric text-5xl font-black text-tier-gold">
-                      90
-                    </span>
-                    <ReferenceNumber>2</ReferenceNumber>
-                  </div>
-                  <span className="mt-1 block text-sm font-bold tracking-wide opacity-85">
-                    ST
-                  </span>
-                </div>
-
-                <div className="absolute top-5 right-5 z-10 flex flex-col items-center gap-1.5">
-                  <div className="flex items-center gap-1">
-                    <ReferenceNumber>3</ReferenceNumber>
-                    <MiniDonut value={66} />
-                  </div>
-                  <Flame
-                    className="size-5 text-red-400"
-                    aria-label="En racha"
-                  />
-                  <ReferenceNumber>4</ReferenceNumber>
-                </div>
-
-                <div className="flex h-[52%] items-center justify-center pt-7">
-                  <div className="flex size-32 items-center justify-center rounded-full border-4 border-black/35 bg-gradient-to-br from-white/80 via-white/35 to-black/15 text-4xl font-black text-black/50">
-                    UP
-                  </div>
-                </div>
-
-                <div className="border-y border-tier-gold/25 px-4 py-3 text-center">
-                  <h3 className="truncate text-lg font-black tracking-wide">
-                    EL AVESTRUZ
-                  </h3>
-                  <p className="truncate text-sm opacity-70">
-                    Perico Van Nistelroy
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-4 border-b border-tier-gold/25 px-4 py-3 text-center">
-                  {[
-                    ['ATA', '84'],
-                    ['DEF', '66'],
-                    ['TÁC', '72'],
-                    ['FÍS', '94'],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <div className="text-[0.625rem] font-bold opacity-70">
-                        {label}
-                      </div>
-                      <div className="numeric text-xl font-black">{value}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between px-5 py-4 text-sm font-bold">
-                  <div className="flex items-center gap-1">
-                    <ReferenceNumber>5</ReferenceNumber>
-                    <span className="numeric text-base">£94 M</span>
-                  </div>
-                  <span className="numeric opacity-70">6 partidos</span>
-                </div>
+            <div className="flex min-h-full flex-col items-center rounded-lg border border-border bg-muted/35 p-5 text-foreground">
+              <div className="relative w-full max-w-[18rem]">
+                <PlayerCard
+                  player={EXAMPLE_PLAYER}
+                  metrics={EXAMPLE_METRICS}
+                  className="pointer-events-none"
+                />
+                <ReferenceNumber className="absolute top-5 left-[4.4rem]">
+                  2
+                </ReferenceNumber>
+                <ReferenceNumber className="absolute bottom-[4.65rem] left-4">
+                  1
+                </ReferenceNumber>
+                <ReferenceNumber className="absolute top-2 right-11">
+                  3
+                </ReferenceNumber>
+                <ReferenceNumber className="absolute top-8 right-11">
+                  4
+                </ReferenceNumber>
+                <ReferenceNumber className="absolute bottom-3 left-[4.6rem]">
+                  5
+                </ReferenceNumber>
               </div>
 
-              <div className="mt-4 space-y-2.5">
+              <div className="mt-5 w-full max-w-[32rem] space-y-3">
                 <FormLegend
                   icon={<Flame className="size-4 text-red-400" />}
                   label="Racha de 3 partidos mejorando puntuación"
@@ -250,7 +284,7 @@ export function AdminSettingsPage() {
           <p>
             <sup>1</sup> El ajuste de confianza se aplica después de la
             distribución: 99 con 1 partido de los últimos 6 baja a 90; 77 con 2
-            partidos baja a 70. Los goles no suman puntos por sí solos.
+            partidos baja a 70.
           </p>
         </CardContent>
       </Card>
@@ -300,19 +334,6 @@ function ReferenceNumber({
       )}
     >
       {children}
-    </span>
-  )
-}
-
-function MiniDonut({ value }: { value: number }) {
-  return (
-    <span className="block size-6 rounded-full border border-white/45 bg-black/25 p-[2px]">
-      <span
-        className="block size-full rounded-full"
-        style={{
-          background: `conic-gradient(#38bdf8 ${value}%, rgb(15 23 42 / 0.72) 0)`,
-        }}
-      />
     </span>
   )
 }
