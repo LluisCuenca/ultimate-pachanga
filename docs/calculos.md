@@ -75,7 +75,7 @@ flowchart TD
 | Puntuación final   | sin topes | base + atributos + victoria × 2                              |
 | Valoración (carta) | 45 a 99   | posición relativa en la liga                                 |
 | Stat de métrica    | 0 a 99    | media de la métrica × 10                                     |
-| Valor de mercado   | libras    | puntuación ponderada × constante de la liga                  |
+| Valor de mercado   | libras    | valoración × constante de la liga                            |
 
 Las métricas por defecto de la liga son **Ataque, Defensa, Táctica y Físico**,
 de 0 a 10 cada una. Son datos de referencia por liga: si un día se añade una
@@ -154,60 +154,125 @@ mismo con una sola fila. Cualquiera de las dos vías marca el partido como
 
 De aquí en adelante nada se guarda: son vistas. Solo cuentan los partidos con
 estado `scored`, así que un partido programado que nadie ha jugado nunca arrastra
-a nadie hacia abajo. La sección 12 detalla qué estados cuentan y desde cuándo.
+a nadie hacia abajo. La sección 13 detalla qué estados cuentan y desde cuándo.
 
-| Cifra                        | Cómo se calcula                                      |
-| ---------------------------- | ---------------------------------------------------- |
-| `matches_played`             | cuántos partidos puntuados tiene                     |
-| `career_average`             | media de sus `final_score`                           |
-| `latest_score`               | la final de su partido más reciente                  |
-| `previous_average`           | media de todas sus finales **menos** la más reciente |
-| `weighted_performance_score` | ver abajo                                            |
-| `total_goals`                | suma de goles                                        |
-| `total_victories`            | suma de fracciones de victoria (un empate suma 0,5)  |
+| Cifra                        | Cómo se calcula                                     |
+| ---------------------------- | --------------------------------------------------- |
+| `matches_played`             | cuántos partidos puntuados tiene                    |
+| `career_average`             | media de sus `final_score`                          |
+| `latest_score`               | la final de su partido más reciente                 |
+| `weighted_performance_score` | ver abajo                                           |
+| `total_goals`                | suma de goles                                       |
+| `total_victories`            | suma de fracciones de victoria (un empate suma 0,5) |
 
 "El más reciente" se decide por `played_at` descendente y, si dos partidos
 comparten hora, por orden de creación — así "el último" nunca es ambiguo.
 
-### Puntuación ponderada
+### Estadísticas específicas ponderadas
 
 ```text
-1 partido       → ponderada = última final
-2 o más         → ponderada = 0,5 × media de las anteriores + 0,5 × última final
+1 partido       → estadística = nota de ese partido
+2 o más         → estadística = 0,5 × media anterior + 0,5 × último partido
 ```
 
-La última jornada pesa lo mismo que toda la carrera anterior junta. Es
-deliberado: así el estado de forma mueve la valoración deprisa.
+Esto se calcula por separado para cada estadística específica: Ataque, Defensa,
+Táctica, Físico, o las que configure la liga. Si alguien tenía 6 de media en
+Ataque y en el último partido hizo 10, su Ataque actual es 8.
 
-## 4. Valor de mercado
+### Puntuación ponderada para la valoración
+
+La valoración general usa la puntuación final del partido, porque ahí ya están
+sumadas la Victoria y los Atributos. Primero se normaliza sobre la capacidad de
+las métricas:
 
 ```text
-valor = ponderada × market_constant_gbp
+valoración de partido = final_score / 40 × 10
+```
+
+Con las cuatro métricas por defecto, 40 es el máximo de estadísticas base. Si la
+liga cambia las métricas, la base es la suma de sus máximos activos.
+
+Después se pondera igual:
+
+```text
+1 partido       → ponderada = valoración de ese partido
+2 o más         → ponderada = 0,5 × media anterior + 0,5 × último partido
+```
+
+Ejemplo: 36 puntos de estadísticas + 2 de Victoria + 2 de MVP = 40. La
+valoración de ese partido es `40 / 40 × 10 = 10`. Si además tuvo Puskas, serían
+42 y contaría como `10,5` para la valoración.
+
+Los goles no puntúan por sí solos; solo cuentan si llegan como un atributo, por
+ejemplo Pichichi.
+
+## 4. Confianza y ajuste
+
+La confianza mira la disponibilidad reciente: de los **últimos 6 partidos
+puntuados de la liga**, cuántos ha jugado ese jugador.
+
+```text
+participación real = partidos jugados de esos 6 / 6 × 100
+confianza visual   = 100 si participación real > 60; si no, participación real
+```
+
+La carta enseña esa confianza como un donut azul pequeño, sin número. Cuatro de
+seis partidos ya llenan el donut, porque es más de 60%.
+
+Después de calcular la valoración 45-99 por distribución se aplica el ajuste:
+
+```text
+valoración final = suelo(valoración − 10 × (100 − participación real) / 100)
+```
+
+Ejemplos:
+
+```text
+99 con 1 partido de 6  →  99 − 10 × 83,333% = 90
+77 con 2 partidos de 6 →  77 − 10 × 66,667% = 70
+```
+
+Esta valoración final es la que ve la aplicación y la que se usa para el valor
+de mercado.
+
+### Estado de forma
+
+El estado de forma se decide por prioridad, usando la valoración de partido
+normalizada (`final_score / 40 × 10`):
+
+1. Fuego: los últimos 3 partidos suben progresivamente.
+2. Hielo: los últimos 3 partidos bajan progresivamente.
+3. Flecha abajo: el último partido está al menos 5% por debajo de su media
+   histórica anterior.
+4. Flecha arriba: el último partido está al menos 5% por encima de su media
+   histórica anterior.
+5. Sin icono: nada de lo anterior.
+
+## 5. Valor de mercado
+
+```text
+valor = valoración de carta × market_constant_gbp
 ```
 
 `market_constant_gbp` es un ajuste por liga (editable en **Ajustes de la liga**),
-3.000.000 por defecto. Con la escala 0-40 de la puntuación final, eso pone a un
-jugador medio en las decenas de millones, que es como se leen los fichajes de
-verdad.
+3.000.000 por defecto.
 
 ```text
-ponderada 32  →  32 × 3.000.000  =  £96.000.000  →  se muestra «£96 M»
+valoración 82  →  82 × 3.000.000  =  £246.000.000  →  se muestra «£246 M»
 ```
 
-Un jugador **sin partidos puntuados** no tiene ponderada, así que recibe la
-**media del valor de los que sí han jugado** en su liga. Es un marcador de
-posición para que su carta no valga cero, y por eso los rankings excluyen a
-quien no ha jugado: si no, media liga aparecería empatada en un valor inventado.
-Si nadie ha jugado todavía, el valor es 0.
+Un jugador **sin partidos puntuados** no tiene valoración ganada todavía, así
+que se coloca en el centro, 72, salvo que el administrador haya indicado una
+aproximación de valor.
 
 ### La aproximación del administrador
 
 Al crear o editar un jugador, un administrador puede indicar una **aproximación
-de valor de mercado**. Sustituye a esa media mientras el jugador no tenga
+de valor de mercado**. Sustituye al centro mientras el jugador no tenga
 partidos, y a nada más:
 
 ```text
-sin partidos  →  aproximación, si la hay; si no, la media de la liga
+sin partidos  →  aproximación, si la hay; si no, valoración 72
 1 partido o más  →  la fórmula de arriba, sin cambios
 ```
 
@@ -216,43 +281,37 @@ mercado, así que un fichaje al que se le presupone nivel deja de contar como
 uno del montón desde el primer partido, que es justo cuando el reparto no tiene
 otro dato en el que apoyarse.
 
-La cifra se escribe en libras y se guarda en libras, pero se lee como
-puntuación: la vista la divide entre `market_constant_gbp` para que la ponderada
-y el valor sigan diciendo lo mismo. Y no se borra cuando deja de usarse — queda
-en la ficha como registro de lo que se pensó.
-
-La aproximación **no da valoración de carta**. Esa es una posición dentro de la
-liga y hace falta haber jugado para tenerla, así que un jugador sin partidos
-sigue en 70 valga lo que valga.
+La cifra se escribe en libras y se guarda en libras, pero se lee como valoración
+provisional: la vista la divide entre `market_constant_gbp`. Y no se borra
+cuando deja de usarse — queda en la ficha como registro de lo que se pensó.
 
 El valor se muestra abreviado (`£96 M`, `£750 K`) en listas y cartas, y exacto en
 la ficha del jugador.
 
-## 5. Valoración de la carta (45-99)
+## 6. Valoración de la carta (45-99)
 
 **No es una medida, es una posición.** Responde a "dónde está la última
 actuación de este jugador dentro de lo que ha hecho la liga", no a "qué nota
 tiene".
 
 ```text
-valoración = recortar(  redondear( 70 + 12 × (última − media) / desviación ),  45, 99)
+valoración = recortar(  redondear( 72 + 18 × (ponderada − media) / desviación ),  45, 99)
 ```
 
-- **media** y **desviación**: de la **última** puntuación de cada jugador de la
-  liga que haya jugado alguna vez. Desviación de población, no de muestra,
-  porque la liga entera es la población y no una estimación sacada de ella.
-- Centro en 70, doce puntos por desviación típica, y topes duros en 45 y 99. Una
-  liga normal deja a casi todos entre 55 y 85, y solo un caso extremo toca los
-  bordes: hacen falta más de dos desviaciones típicas para llegar a ellos, lo que
-  con una plantilla de este tamaño casi nunca pasa.
+- **media** y **desviación**: de la puntuación ponderada de valoración de cada
+  jugador de la liga que haya jugado alguna vez. Desviación de población, no de
+  muestra, porque la liga entera es la población y no una estimación sacada de
+  ella.
+- Centro en 72, dieciocho puntos por desviación típica, y topes duros en 45 y 99. Es agresiva a propósito: separa claramente jugadores flojos, medios y
+  fuertes.
 - Si nadie ha jugado, o si todos tienen exactamente la misma última puntuación,
-  no hay reparto en el que colocar a nadie: **todos valen 70**.
+  no hay reparto en el que colocar a nadie: **todos valen 72**.
 
-Ejemplo: la liga tiene una media de 30 en su última jornada, con desviación 4. Un
-jugador que firmó un 36:
+Ejemplo: la liga tiene una media de 8 en puntuación ponderada, con desviación 1.
+Un jugador que está en 9:
 
 ```text
-70 + 12 × (36 − 30) / 4 = 70 + 18 = 88
+72 + 18 × (9 − 8) / 1 = 90
 ```
 
 Dos consecuencias que son parte del diseño y conviene entender:
@@ -260,15 +319,14 @@ Dos consecuencias que son parte del diseño y conviene entender:
 1. **La valoración de un jugador se mueve cuando juegan otros.** Es una
    posición: si la liga entera mejora, quedarse igual es bajar.
 2. **Todas las valoraciones cambian después de cada partido.** La carta es una
-   foto del momento; el histórico está en la media de carrera y en el valor de
-   mercado.
+   foto del momento; el histórico sigue estando en las cifras de carrera.
 
 ### Colores de la carta
 
 Puramente visual, y lo decide el frontend (`src/lib/scoring.ts`), no la base de
 datos: **oro** desde 75, **plata** desde 60, **bronce** por debajo.
 
-## 6. Equilibrar equipos
+## 7. Equilibrar equipos
 
 Un botón en la página del partido, solo para el administrador y solo mientras el
 partido no se haya jugado. Reparte la convocatoria en dos equipos y los coloca
@@ -321,23 +379,23 @@ De las dos cifras grandes de una carta, el valor de mercado es la que se puede
 
 | Cifra                | Qué es                                          | ¿Sumable? |
 | -------------------- | ----------------------------------------------- | --------- |
-| Valor de mercado (£) | ponderada × constante — una **cantidad**        | sí        |
+| Valor de mercado (£) | valoración × constante — una **cantidad**       | sí        |
 | Valoración 45-99     | posición relativa en la liga — un **percentil** | no        |
 
-La valoración está centrada en 70 y recortada entre 45 y 99, así que comprime
+La valoración está centrada en 72 y recortada entre 45 y 99, así que comprime
 justo lo que aquí interesa: dos jugadores separados por una diferencia real de
 juego pueden acabar en 88 y 84, y sumar percentiles recortados reparte peor que
-sumar cantidades. El valor de mercado, además, viene de la **ponderada** (media
-de la carrera y último partido a partes iguales), así que ya lleva dentro tanto
-el histórico como el estado de forma; la valoración solo mira el último partido.
+sumar cantidades. El valor de mercado escala esa valoración para convertirla en
+una cantidad sumable.
 
 Son cifras hermanas, no independientes: las dos salen del mismo
 `player_match_scores`, así que equilibrar por valor deja las valoraciones medias
 de los dos equipos muy parecidas de todas formas.
 
 Un detalle que importa: **un debutante no vale cero.** La vista
-`player_market_values` le da la media de la liga, así que entra al reparto como
-un jugador medio y no como lastre (ver el apartado 4).
+`player_market_values` lo coloca en 72, o en la aproximación del administrador
+si existe, así que entra al reparto como un jugador razonable y no como lastre
+(ver el apartado 5).
 
 ### Cómo se busca el reparto
 
@@ -413,7 +471,7 @@ camino que mover las cartas a mano (`saveLineup`). Lo único autoritativo que us
 aparte, incluido un caso en el que el reparto codicioso se queda en una
 diferencia de 5 y el óptimo es 1.
 
-## 7. Las estadísticas por métrica de la carta (0-99)
+## 8. Las estadísticas por métrica de la carta (0-99)
 
 ```text
 stat = recortar( redondear( media de la métrica × 10 ), 0, 99)
@@ -426,7 +484,7 @@ Si una métrica se añade después de que se jugaran partidos, esos partidos
 antiguos no tienen valor para ella y se **excluyen** de la media en lugar de
 contar como cero.
 
-## 8. Recuentos y porcentajes
+## 9. Recuentos y porcentajes
 
 | Dónde                            | Cálculo                                                         |
 | -------------------------------- | --------------------------------------------------------------- |
@@ -439,7 +497,7 @@ El porcentaje de victorias nunca va solo: un 100 % de un partido no es lo mismo
 que un 80 % de diez, así que la interfaz siempre muestra `victorias/partidos` al
 lado.
 
-## 9. La pantalla de Estadísticas
+## 10. La pantalla de Estadísticas
 
 Solo entran jugadores **activos, no invitados y con al menos un partido
 puntuado**. Incluir a quien no ha jugado sería listar sobre un valor de relleno
@@ -513,14 +571,14 @@ Y tres salvedades honestas sobre lo que esa reconstrucción significa:
 3. Es un cálculo del cliente. Si algún día hace falta un histórico auditable,
    habría que guardar una foto por jornada al importar.
 
-## 10. El radar de la ficha del jugador
+## 11. El radar de la ficha del jugador
 
 Un vértice por métrica activa de la liga (hoy cuatro), todos en la misma escala
 0-99 de la carta, y cada vértice etiquetado con su número: un radar enseña bien
 la forma y mal la magnitud, así que las cifras se quedan en el gráfico. El tooltip
 añade la media cruda sobre 10.
 
-## 11. Redondeo y precisión
+## 12. Redondeo y precisión
 
 | Cifra                                           | Precisión          |
 | ----------------------------------------------- | ------------------ |
@@ -539,7 +597,7 @@ negativos.
 En pantalla, las puntuaciones se muestran con uno o dos decimales y con coma
 decimal, y los valores de mercado abreviados.
 
-## 12. Cuándo empieza a contar un partido
+## 13. Cuándo empieza a contar un partido
 
 ### El estado del partido es lo único que lo decide
 
@@ -575,7 +633,7 @@ Lo que pasa a partir de ese momento:
   puntúen 0: es que no tienen fila. Su media y su valor no se mueven.
 - La **valoración de toda la liga sí se mueve**, porque es relativa a la media y
   la desviación de las últimas puntuaciones de todos, y una de ellas acaba de
-  cambiar. Es el mismo efecto descrito en la sección 13, pero disparado a mitad
+  cambiar. Es el mismo efecto descrito en la sección 14, pero disparado a mitad
   de un partido a medio puntuar.
 
 Es decir: los resultados de un partido en curso afectan a las cifras **en cuanto
@@ -631,7 +689,7 @@ select title, status, results_imported_at, played_at
  order by played_at;
 ```
 
-## 13. Qué pasa exactamente cuando editas un resultado
+## 14. Qué pasa exactamente cuando editas un resultado
 
 Al guardar un cambio en un jugador (métrica, gol, resultado o atributo) se
 reescriben su `base_score`, `attribute_points` y `final_score`, y sus enlaces de
@@ -657,7 +715,7 @@ Y dos cosas que **no** se recalculan solas:
 - Lo mismo con las métricas: cambiar rangos o añadir métricas no reescribe
   `base_score` ni `final_score` de lo ya importado.
 
-## 14. Dónde vive cada fórmula
+## 15. Dónde vive cada fórmula
 
 La base de datos es la fuente de la verdad. El frontend solo tiene un espejo,
 para poder previsualizar antes de escribir.

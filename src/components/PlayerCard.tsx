@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import { ArrowDown, ArrowUp, Flame, Snowflake } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { MarketValue } from '@/components/MarketValue'
 import { MetricBadge } from '@/components/MetricBadge'
@@ -6,7 +7,11 @@ import { cn } from '@/lib/utils'
 import { getAvatarUrl } from '@/lib/supabase'
 import { formatFullName, toInitials } from '@/lib/formatting'
 import { toCardTier, type CardTier } from '@/lib/scoring'
-import type { LeagueMetricRow, PlayerCardData } from '@/types/domain'
+import type {
+  LeagueMetricRow,
+  PlayerCardData,
+  PlayerFormState,
+} from '@/types/domain'
 
 /**
  * The player card, in two sizes.
@@ -82,6 +87,8 @@ function toShortMetricLabel(metric: LeagueMetricRow): string {
 const COMPACT_SIZES = {
   rating: 'text-[clamp(0.5625rem,22cqi,1.125rem)]',
   position: 'text-[clamp(0.375rem,12cqi,0.625rem)]',
+  form: 'size-[clamp(0.4375rem,10cqi,0.75rem)]',
+  confidence: 'size-[clamp(0.5rem,11cqi,0.8125rem)]',
   alias: 'text-[clamp(0.5rem,14cqi,0.8125rem)]',
   fullName: 'text-[clamp(0.4375rem,11cqi,0.6875rem)]',
   initials: 'text-[clamp(0.5rem,18cqi,1.125rem)]',
@@ -178,16 +185,27 @@ interface FaceProps {
 /**
  * The pitch card: four pieces of type and a face, nothing overlapping.
  *
- * The rating and the position share a header row instead of stacking in the
- * corner, which is what used to sit on top of the photograph, and the name band
- * carries the alias in bold over the registered name.
+ * The rating and position stack on the left, while confidence and form stack on
+ * the right so match cards keep their status signals in one corner.
  */
 function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
   const fullName = formatFullName(player.firstName, player.lastName)
 
   return (
     <>
-      <div className="flex items-baseline justify-between gap-[2cqi] px-[6cqi] pt-[4cqi] leading-none">
+      <ConfidenceDonut
+        value={player.confidencePct}
+        className={cn(
+          'absolute top-[4cqi] right-[5cqi]',
+          COMPACT_SIZES.confidence,
+        )}
+      />
+      <FormStateIcon
+        state={player.formState}
+        className={cn('absolute top-[17cqi] right-[5cqi]', COMPACT_SIZES.form)}
+      />
+
+      <div className="flex flex-col items-start gap-[1cqi] px-[6cqi] pt-[4cqi] leading-none">
         <span
           className={cn(
             'numeric font-black',
@@ -271,6 +289,11 @@ function FullFace({
         </span>
       </div>
 
+      <div className="absolute top-2.5 right-2.5 z-10 flex flex-col items-center gap-1">
+        <ConfidenceDonut value={player.confidencePct} className="size-5" />
+        <FormStateIcon state={player.formState} className="size-4" />
+      </div>
+
       <div className="flex flex-1 items-center justify-center px-3 pt-3 pb-1">
         <PlayerPhoto
           avatarUrl={avatarUrl}
@@ -326,6 +349,79 @@ function FullFace({
         </span>
       ) : null}
     </>
+  )
+}
+
+function ConfidenceDonut({
+  value,
+  className,
+}: {
+  value: number
+  className?: string
+}) {
+  const bounded = Math.min(100, Math.max(0, value))
+
+  return (
+    <span
+      aria-label={`Confianza ${Math.round(bounded)}%`}
+      title={`Confianza ${Math.round(bounded)}%`}
+      className={cn(
+        'block rounded-full border border-white/45 bg-black/25 p-[2px]',
+        className,
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className="block size-full rounded-full"
+        style={{
+          background: `conic-gradient(#38bdf8 ${bounded}%, rgb(15 23 42 / 0.72) 0)`,
+        }}
+      />
+    </span>
+  )
+}
+
+function FormStateIcon({
+  state,
+  className,
+}: {
+  state: PlayerFormState | null
+  className?: string
+}) {
+  if (!state) return null
+
+  const iconClassName = cn('drop-shadow-[0_1px_1px_rgb(0_0_0/0.65)]', className)
+
+  if (state === 'fire') {
+    return (
+      <Flame
+        aria-label="En racha"
+        className={cn(iconClassName, 'text-red-400')}
+      />
+    )
+  }
+  if (state === 'ice') {
+    return (
+      <Snowflake
+        aria-label="Enfriándose"
+        className={cn(iconClassName, 'text-cyan-200')}
+      />
+    )
+  }
+  if (state === 'down') {
+    return (
+      <ArrowDown
+        aria-label="Por debajo de su media"
+        className={cn(iconClassName, 'text-rose-300')}
+      />
+    )
+  }
+
+  return (
+    <ArrowUp
+      aria-label="Por encima de su media"
+      className={cn(iconClassName, 'text-emerald-300')}
+    />
   )
 }
 

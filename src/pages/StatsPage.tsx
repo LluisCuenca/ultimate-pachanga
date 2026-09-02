@@ -111,7 +111,7 @@ function GeneralTab({
 
       <PodiumCard
         title="Mejor estado de forma actual"
-        description="Valoración 0-100, medida sobre el último partido de cada jugador"
+        description="Valoración 45-99, ponderada entre histórico y último partido"
       >
         <PodiumList
           players={topBy(players, (player) => player.cardRating)}

@@ -1,13 +1,13 @@
 -- ============================================================================
 -- Derived views: market values, card ratings and metric averages
 --
--- The 0.5/0.5 weighting only becomes distinguishable from a plain career
--- average once a player has three or more matches, so this file builds that
--- case explicitly rather than relying on the two-match seed.
+-- The metric-first 0.5/0.5 weighting only becomes distinguishable from a plain
+-- career average once a player has three or more matches, so this file builds
+-- that case explicitly rather than relying on the two-match seed.
 -- ============================================================================
 
 begin;
-select plan(17);
+select plan(20);
 
 -- Cleared so the new-user trigger makes this account an administrator
 -- regardless of who already exists in this database.
@@ -23,13 +23,15 @@ values (
 -- ---------------------------------------------------------------------------
 -- The specification's worked example, built from scratch:
 --
---   previous scores 7.0, 8.0, 6.0  -> previous average 7.0
---   latest score    9.5
---   weighted        (0.5 x 7.0) + (0.5 x 9.5) = 8.25
---   market value    8.25 x 1,000,000 = 8,250,000
+--   attack:  previous 7, 8, 6 -> previous average 7.0; latest 10 -> 8.5
+--   defence: previous 7, 8, 6 -> previous average 7.0; latest 9  -> 8.0
+--   rating score = weighted(final_score / 20 * 10) = 4.125
+--   base rating = one standard deviation above the league = 90
+--   confidence adjustment = 4 of 6 recent league matches -> final rating 86
+--   market value = 86 x 1,000,000 = 86,000,000
 --
--- Note this differs from the career average of 7.625, which is the point of
--- the weighting.
+-- Note this differs from the career average of 7.625, and includes any points
+-- already stored in final_score.
 -- ---------------------------------------------------------------------------
 
 insert into public.leagues (id, title, market_constant_gbp)
@@ -134,41 +136,62 @@ select is(
 select is(
   (select weighted_performance_score from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000001'),
-  8.25::numeric,
-  'the weighted score halves the earlier career and the latest match'
+  4.125::numeric,
+  'the weighted score halves the earlier rating score and the latest rating score'
 );
 
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000001'),
-  8250000.00::numeric,
-  'market value is the weighted score times the league constant'
+  86000000.00::numeric,
+  'market value is the card rating times the league constant'
 );
 
--- The rating is a standing, not a measurement. Two players have a latest score
--- here — 9.5 and 4.0 — so the league mean is 6.75 and the population standard
--- deviation is exactly 2.75. Each of them therefore sits one deviation from the
--- centre, which is twelve points.
+-- The rating is a standing, not a measurement. Two players have a weighted
+-- rating score here — 4.125 and 2.0 — so the league mean is 3.0625 and the
+-- population standard deviation is exactly 1.0625. Each of them therefore sits
+-- one deviation from the centre, which is eighteen points.
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000001'),
-  82,
-  'a player one standard deviation above the league rates 70 + 12'
+  86,
+  'a player one standard deviation above the league is adjusted by confidence'
 );
 
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000002'),
-  58,
-  'and one standard deviation below rates 70 - 12'
+  45,
+  'and one standard deviation below is also adjusted by confidence'
 );
 
 -- Nobody to compare against yet, so the centre is the only honest answer.
 select is(
   (select card_rating from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000003'),
-  70,
-  'a player who has never been scored sits at the centre'
+  62,
+  'a player who has never been scored sits at the centre before confidence'
+);
+
+select is(
+  (select confidence_pct from public.player_market_values
+   where player_id = '77777777-7777-4777-8777-000000000001'),
+  100::numeric,
+  'four of the last six league matches fills the confidence donut'
+);
+
+select is(
+  (select confidence_adjustment_pct from public.player_market_values
+   where player_id = '77777777-7777-4777-8777-000000000002'),
+  16.667::numeric,
+  'one of the last six league matches keeps the raw confidence share'
+);
+
+select is(
+  (select form_state from public.player_market_values
+   where player_id = '77777777-7777-4777-8777-000000000001'),
+  'up',
+  'a latest rating score 5% above history shows an upward arrow'
 );
 
 -- ---------------------------------------------------------------------------
@@ -178,21 +201,19 @@ select is(
 select is(
   (select weighted_performance_score from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000002'),
-  4.0::numeric,
-  'with one match the weighted score is that match'
+  2.0::numeric,
+  'with one match the weighted score is that match rating score'
 );
 
 select is(
   (select market_value_gbp from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000002'),
-  4000000.00::numeric,
-  'with one match the market value is that score times the constant'
+  45000000.00::numeric,
+  'with one match the market value is the rating times the constant'
 );
 
 -- ---------------------------------------------------------------------------
--- No matches: the league average of players who have played
---
--- (8.25 + 4.0) / 2 = 6.125
+-- No matches: no weighted rating score yet
 -- ---------------------------------------------------------------------------
 
 select is(
@@ -205,8 +226,8 @@ select is(
 select is(
   (select weighted_performance_score from public.player_market_values
    where player_id = '77777777-7777-4777-8777-000000000003'),
-  6.125::numeric,
-  'a player with no matches inherits the league average'
+  0::numeric,
+  'a player with no matches has no weighted rating score yet'
 );
 
 select ok(
@@ -239,15 +260,15 @@ select is(
   (select career_average from public.player_metric_averages
    where player_id = '77777777-7777-4777-8777-000000000001'
      and metric_code = 'attack'),
-  7.75::numeric,
-  'metric averages are computed per metric'
+  8.5::numeric,
+  'metric averages expose the 50/50 metric form score'
 );
 
 select is(
   (select (metric_card_stats ->> 'attack')::integer from public.player_cards
    where id = '77777777-7777-4777-8777-000000000001'),
-  78,
-  'player_cards exposes per-metric card stats'
+  85,
+  'player_cards exposes per-metric card stats from the weighted metric score'
 );
 
 select * from finish();

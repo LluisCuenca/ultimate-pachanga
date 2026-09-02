@@ -23,6 +23,18 @@ describe('PlayerCard', () => {
     expect(screen.getByText('David Castelló')).toBeInTheDocument()
     expect(screen.getByText('CM')).toBeInTheDocument()
     expect(screen.getByText('£9,63 M')).toBeInTheDocument()
+    expect(screen.getByLabelText('Confianza 100%')).toBeInTheDocument()
+  })
+
+  it('shows a form icon when the player has a form state', () => {
+    renderWithProviders(
+      <PlayerCard
+        player={buildPlayerCard({ formState: 'fire' })}
+        metrics={TEST_METRICS}
+      />,
+    )
+
+    expect(screen.getByLabelText('En racha')).toBeInTheDocument()
   })
 
   it('prints the registered name under the alias', () => {
@@ -170,6 +182,7 @@ describe('PlayerCard', () => {
       expect(screen.getByText('David Castelló')).toBeInTheDocument()
       expect(screen.getByText('CM')).toBeInTheDocument()
       expect(screen.getByText('DC')).toBeInTheDocument()
+      expect(screen.getByLabelText('Confianza 100%')).toBeInTheDocument()
     })
 
     // Seven of these share one pitch; the metric grid and market value are

@@ -15,8 +15,8 @@
 const CARD_STAT_MAX = 99
 
 /** Bounds and shape of the card rating. Mirrors `public.to_card_rating`. */
-const CARD_RATING_CENTRE = 70
-const CARD_RATING_POINTS_PER_DEVIATION = 12
+const CARD_RATING_CENTRE = 72
+const CARD_RATING_POINTS_PER_DEVIATION = 18
 const CARD_RATING_MIN = 45
 const CARD_RATING_MAX = 99
 
@@ -27,6 +27,8 @@ const CARD_RATING_MAX = 99
  * configurable per league — it is part of the definition of the score.
  */
 export const VICTORY_POINTS = 2
+export const DEFAULT_RATING_SCORE_DENOMINATOR = 40
+export const CONFIDENCE_WINDOW_MATCHES = 6
 
 export interface MetricDefinition {
   code: string
@@ -130,6 +132,61 @@ export function calculateScoreBreakdown(
   }
 }
 
+export function calculateWeightedMetricScore(
+  previousAverage: number | null | undefined,
+  latestScore: number | null | undefined,
+): number | null {
+  if (latestScore === null || latestScore === undefined) return null
+  if (previousAverage === null || previousAverage === undefined) {
+    return latestScore
+  }
+
+  return 0.5 * previousAverage + 0.5 * latestScore
+}
+
+export function calculateWeightedMetricMean(
+  metricScores: readonly (number | null | undefined)[],
+): number | null {
+  const values = metricScores.filter((score): score is number =>
+    Number.isFinite(score),
+  )
+
+  return calculateMean(values)
+}
+
+export function calculateMatchRatingScore(
+  finalScore: number | null | undefined,
+  denominator = DEFAULT_RATING_SCORE_DENOMINATOR,
+): number | null {
+  if (
+    finalScore === null ||
+    finalScore === undefined ||
+    !Number.isFinite(finalScore) ||
+    denominator <= 0
+  ) {
+    return null
+  }
+
+  return (finalScore / denominator) * 10
+}
+
+export function calculateConfidencePct(matchesPlayedInWindow: number): number {
+  const raw = (matchesPlayedInWindow / CONFIDENCE_WINDOW_MATCHES) * 100
+
+  return raw > 60 ? 100 : raw
+}
+
+export function applyConfidenceAdjustment(
+  cardRating: number,
+  rawConfidencePct: number,
+): number {
+  return clamp(
+    Math.floor(cardRating - 10 * ((100 - rawConfidencePct) / 100)),
+    CARD_RATING_MIN,
+    CARD_RATING_MAX,
+  )
+}
+
 /**
  * Converts a 0–10 average onto the 0–99 scale shown on cards.
  *
@@ -146,23 +203,23 @@ export function toCardStat(average: number | null | undefined): number | null {
 /**
  * Where a score sits among its peers, on the 45–99 card scale.
  *
- * Mirrors `public.to_card_rating`: the latest score placed on a normal
- * distribution of every player's latest score, centred on 70 with twelve points
- * per standard deviation. The database computes this for the current standings;
- * this exists so the evolution chart can compute what the rating *was* after
- * each past match, which nothing stores.
+ * Mirrors `public.to_card_rating`: the player's weighted match valuation placed
+ * on a normal distribution of everybody's weighted match valuation, centred on
+ * 72 with eighteen points per standard deviation. The database computes this
+ * for the current standings; this exists so the evolution chart can compute
+ * what the rating *was* after each past match, which nothing stores.
  *
  * With no spread to place anyone within — nobody has played, or everyone scored
  * identically — every player sits at the centre.
  */
 export function toCardRating(
-  latestScore: number | null | undefined,
+  weightedMatchRatingScore: number | null | undefined,
   leagueMean: number | null | undefined,
   leagueSpread: number | null | undefined,
 ): number {
   if (
-    latestScore === null ||
-    latestScore === undefined ||
+    weightedMatchRatingScore === null ||
+    weightedMatchRatingScore === undefined ||
     leagueMean === null ||
     leagueMean === undefined ||
     !leagueSpread
@@ -174,7 +231,7 @@ export function toCardRating(
     roundHalfAwayFromZero(
       CARD_RATING_CENTRE +
         CARD_RATING_POINTS_PER_DEVIATION *
-          ((latestScore - leagueMean) / leagueSpread),
+          ((weightedMatchRatingScore - leagueMean) / leagueSpread),
     ),
     CARD_RATING_MIN,
     CARD_RATING_MAX,
