@@ -98,54 +98,57 @@ function RouteFallback() {
  * behind the admin guard. React Router ranks static segments above dynamic
  * ones, so the static route still wins — pinned by router.test.tsx.
  */
-const router = createBrowserRouter([
-  { path: '/login', element: <LoginPage /> },
-  { path: '/forgot-password', element: <ForgotPasswordPage /> },
-  {
-    element: <ProtectedRoute />,
-    children: [
-      // Outside the layout and the membership guard: this is where an account
-      // with neither a league nor a player is sent, and the shell has nothing
-      // to render for one.
-      { path: '/onboarding', element: <OnboardingPage /> },
-      { path: '/reset-password', element: <ResetPasswordPage /> },
-      {
-        element: <LeagueMemberRoute />,
-        children: [
-          {
-            element: <AppLayout />,
-            children: [
-              { index: true, element: <Navigate to="/league" replace /> },
-              { path: '/league', element: <LeaguePage /> },
-              { path: '/profile', element: <ProfilePage /> },
-              { path: '/players', element: <PlayersPage /> },
-              { path: '/players/:playerId', element: <PlayerDetailPage /> },
-              { path: '/matches', element: <MatchesPage /> },
-              { path: '/matches/:matchId', element: <MatchDetailPage /> },
-              { path: '/stats', element: <StatsPage /> },
-              // The section was called "Clasificaciones" and lived at
-              // /rankings; anyone who bookmarked it keeps working.
-              {
-                path: '/rankings',
-                element: <Navigate to="/stats" replace />,
-              },
-              {
-                element: <AdminRoute />,
-                children: [
-                  { path: '/matches/new', element: <MatchNewPage /> },
-                  { path: '/admin/players', element: <AdminPlayersPage /> },
-                  { path: '/admin/settings', element: <AdminSettingsPage /> },
-                  { path: '/admin/members', element: <AdminMembersPage /> },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  { path: '*', element: <NotFoundPage /> },
-])
+const router = createBrowserRouter(
+  [
+    { path: '/login', element: <LoginPage /> },
+    { path: '/forgot-password', element: <ForgotPasswordPage /> },
+    {
+      element: <ProtectedRoute />,
+      children: [
+        // Outside the layout and the membership guard: this is where an account
+        // with neither a league nor a player is sent, and the shell has nothing
+        // to render for one.
+        { path: '/onboarding', element: <OnboardingPage /> },
+        { path: '/reset-password', element: <ResetPasswordPage /> },
+        {
+          element: <LeagueMemberRoute />,
+          children: [
+            {
+              element: <AppLayout />,
+              children: [
+                { index: true, element: <Navigate to="/league" replace /> },
+                { path: '/league', element: <LeaguePage /> },
+                { path: '/profile', element: <ProfilePage /> },
+                { path: '/players', element: <PlayersPage /> },
+                { path: '/players/:playerId', element: <PlayerDetailPage /> },
+                { path: '/matches', element: <MatchesPage /> },
+                { path: '/matches/:matchId', element: <MatchDetailPage /> },
+                { path: '/stats', element: <StatsPage /> },
+                // The section was called "Clasificaciones" and lived at
+                // /rankings; anyone who bookmarked it keeps working.
+                {
+                  path: '/rankings',
+                  element: <Navigate to="/stats" replace />,
+                },
+                {
+                  element: <AdminRoute />,
+                  children: [
+                    { path: '/matches/new', element: <MatchNewPage /> },
+                    { path: '/admin/players', element: <AdminPlayersPage /> },
+                    { path: '/admin/settings', element: <AdminSettingsPage /> },
+                    { path: '/admin/members', element: <AdminMembersPage /> },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    { path: '*', element: <NotFoundPage /> },
+  ],
+  { basename: import.meta.env.BASE_URL },
+)
 
 export function AppRouter() {
   return (
