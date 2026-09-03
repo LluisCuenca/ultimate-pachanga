@@ -204,6 +204,7 @@ export function PlayerDetailPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      <h1 className="sr-only">{player.displayName}</h1>
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/players">
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -216,7 +217,7 @@ export function PlayerDetailPage() {
           player={player}
           metrics={metrics}
           showcase
-          className="h-full min-h-[28rem] lg:min-h-[34rem]"
+          className="h-full lg:min-h-[34rem]"
         />
 
         <Card className="h-full border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0e0e0e_100%)]">
@@ -226,8 +227,7 @@ export function PlayerDetailPage() {
               <h2>Datos de competición</h2>
             </CardTitle>
             <p className="technical text-xs text-muted-foreground uppercase">
-              {player.playerCode} · {player.preferredPosition} ·{' '}
-              {formatPosition(player.preferredPosition)}
+              {player.preferredPosition} · {formatPosition(player.preferredPosition)}
             </p>
           </CardHeader>
           <CardContent className="pt-4">
@@ -298,7 +298,83 @@ export function PlayerDetailPage() {
               className="border-0 py-6"
             />
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <div className="flex flex-col gap-3 md:hidden">
+              {history.map((entry) => (
+                <article
+                  key={entry.matchId}
+                  className="border border-border bg-black/20 p-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <Link
+                        to={`/matches/${entry.matchId}`}
+                        className="font-heading text-2xl leading-none font-bold uppercase hover:text-primary"
+                      >
+                        {entry.matchTitle}
+                      </Link>
+                      <p className="body-meta mt-2 text-muted-foreground">
+                        {formatMatchDate(entry.playedAt)}
+                      </p>
+                    </div>
+                    <span className="numeric shrink-0 text-4xl leading-none text-primary">
+                      {formatScore(entry.finalScore)}
+                    </span>
+                  </div>
+                  <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3 text-center">
+                    <div>
+                      <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                        Goles
+                      </dt>
+                      <dd className="numeric mt-1 text-xl">{entry.goals}</dd>
+                    </div>
+                    <div>
+                      <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                        Victoria
+                      </dt>
+                      <dd className="numeric mt-1 text-xl">
+                        {formatVictories(entry.victory)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                        Base
+                      </dt>
+                      <dd className="numeric mt-1 text-xl">
+                        {formatScore(entry.baseScore)}
+                      </dd>
+                    </div>
+                  </dl>
+                  <details className="mt-3 border-t border-border pt-3">
+                    <summary className="cursor-pointer text-sm font-semibold text-primary">
+                      Ver desglose
+                    </summary>
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                      {metrics.map((metric) => (
+                        <p key={metric.code} className="flex justify-between gap-3">
+                          <span className="text-muted-foreground">{metric.label}</span>
+                          <strong className="numeric">
+                            {formatScore(entry.metricScores[metric.code] ?? null)}
+                          </strong>
+                        </p>
+                      ))}
+                    </div>
+                    {entry.attributes.length > 0 ? (
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {entry.attributes.map((attribute) => (
+                          <AttributeBadge
+                            key={attribute.code}
+                            label={attribute.label}
+                            points={attribute.points}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </details>
+                </article>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -361,6 +437,7 @@ export function PlayerDetailPage() {
                 </TableBody>
               </Table>
             </div>
+            </>
           )}
         </CardContent>
       </Card>

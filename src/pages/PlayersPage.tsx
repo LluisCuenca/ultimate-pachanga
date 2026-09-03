@@ -19,8 +19,8 @@ import {
 import { fetchPlayerCards, playerKeys } from '@/features/players/api'
 import {
   useIsAdmin,
+  useLeague,
   useLeagueMetrics,
-  useMembership,
 } from '@/features/league/useLeague'
 import { formatPosition } from '@/lib/formatting'
 import { PLAYER_POSITIONS, type PlayerCardData } from '@/types/domain'
@@ -52,7 +52,7 @@ function comparePlayers(sortBy: SortKey) {
 }
 
 export function PlayersPage() {
-  const { data: membership } = useMembership()
+  const { data: league } = useLeague()
   const { data: metrics = [] } = useLeagueMetrics()
   const isAdmin = useIsAdmin()
 
@@ -67,9 +67,9 @@ export function PlayersPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: playerKeys.cards(membership?.leagueId ?? ''),
-    enabled: Boolean(membership),
-    queryFn: () => fetchPlayerCards(membership!.leagueId),
+    queryKey: playerKeys.cards(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchPlayerCards(league!.id),
   })
 
   const visiblePlayers = useMemo(() => {
@@ -95,6 +95,10 @@ export function PlayersPage() {
       })
       .sort(comparePlayers(sortBy))
   }, [players, search, position, sortBy, showInactive, isAdmin])
+  const hasActiveFilters = Boolean(search.trim()) || position !== ALL_POSITIONS
+  const totalPlayers = (players ?? []).filter(
+    (player) => player.isActive || (isAdmin && showInactive),
+  ).length
 
   return (
     <div className="flex flex-col gap-7">
@@ -103,7 +107,9 @@ export function PlayersPage() {
         <p className="mt-3 text-lg text-muted-foreground">
           {isPending
             ? 'Cargando plantilla…'
-            : `${visiblePlayers.length} jugadores en total`}
+            : hasActiveFilters
+              ? `${visiblePlayers.length} resultados de ${totalPlayers}`
+              : `${totalPlayers} jugadores`}
         </p>
       </div>
 
@@ -127,7 +133,7 @@ export function PlayersPage() {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:flex">
           <div className="flex-1 sm:w-44">
             <Label htmlFor="position-filter" className="sr-only">
               Filtrar por posición

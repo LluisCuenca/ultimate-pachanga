@@ -5,6 +5,7 @@ import {
   BarChart3,
   CalendarDays,
   Ellipsis,
+  LogIn,
   LogOut,
   Settings,
   Shield,
@@ -23,9 +24,10 @@ import {
 } from '@/components/ui/sheet'
 import { AdminOnly } from '@/components/AdminOnly'
 import { signOut } from '@/features/auth/api'
+import { useAuth } from '@/features/auth/useAuth'
 import { fetchPlayerCard, playerKeys } from '@/features/players/api'
 import { useMyPlayerId } from '@/features/players/useMyPlayer'
-import { useLeague } from '@/features/league/useLeague'
+import { BRAND_NAME, LOGO_URL } from '@/lib/brand'
 import { getAvatarUrl } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
@@ -35,14 +37,14 @@ interface NavigationItem {
   icon: typeof Users
 }
 
-const BRAND_NAME = 'Ultimate Pachangas'
-const LOGO_URL = `${import.meta.env.BASE_URL}ultimate-pachangas-logo.png`
-
 const NAVIGATION: NavigationItem[] = [
   { to: '/league', label: 'Liga', icon: Shield },
   { to: '/players', label: 'Jugadores', icon: Users },
   { to: '/matches', label: 'Partidos', icon: CalendarDays },
   { to: '/stats', label: 'Estadísticas', icon: BarChart3 },
+]
+
+const PROFILE_NAVIGATION: NavigationItem[] = [
   { to: '/profile', label: 'Mi perfil', icon: UserRound },
 ]
 
@@ -144,11 +146,15 @@ function BrandLockup({
   )
 }
 
-function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
-  const { data: league } = useLeague()
-
+function DesktopSidebar({
+  onSignOut,
+  isAuthenticated,
+}: {
+  onSignOut: () => void
+  isAuthenticated: boolean
+}) {
   return (
-    <aside className="sticky top-0 hidden h-svh w-72 shrink-0 flex-col border-r border-border bg-[#090909] px-4 py-5 lg:flex">
+    <aside className="sticky top-0 hidden h-svh w-72 shrink-0 flex-col overflow-y-auto border-r border-border bg-[#090909] px-4 py-5 lg:flex">
       <BrandLockup />
 
       <div className="mt-7 border-t border-primary/35 pt-6">
@@ -157,6 +163,9 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
         </p>
         <nav className="flex flex-col gap-1.5">
           <NavigationLinks items={NAVIGATION} />
+          {isAuthenticated ? (
+            <NavigationLinks items={PROFILE_NAVIGATION} />
+          ) : null}
         </nav>
       </div>
 
@@ -172,20 +181,23 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
       </AdminOnly>
 
       <div className="mt-auto border-t border-border pt-5">
-        <p className="technical px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
-          Liga activa
-        </p>
-        <p className="mt-1 truncate px-3 font-heading text-2xl leading-none font-bold uppercase">
-          {league?.title ?? BRAND_NAME}
-        </p>
-        <Button
-          variant="ghost"
-          onClick={onSignOut}
-          className="mt-5 w-full justify-start text-muted-foreground"
-        >
-          <LogOut className="size-4" aria-hidden="true" />
-          Salir
-        </Button>
+        {isAuthenticated ? (
+          <Button
+            variant="ghost"
+            onClick={onSignOut}
+            className="w-full justify-start text-muted-foreground"
+          >
+            <LogOut className="size-4" aria-hidden="true" />
+            Salir
+          </Button>
+        ) : (
+          <Button asChild className="w-full justify-start">
+            <Link to="/login">
+              <LogIn className="size-4" aria-hidden="true" />
+              Entrar o registrarme
+            </Link>
+          </Button>
+        )}
       </div>
     </aside>
   )
@@ -194,7 +206,9 @@ function DesktopSidebar({ onSignOut }: { onSignOut: () => void }) {
 /** Shell for every signed-in page. */
 export function AppLayout() {
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const isAuthenticated = Boolean(session)
 
   async function handleSignOut() {
     try {
@@ -209,7 +223,10 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-svh bg-background">
-      <DesktopSidebar onSignOut={() => void handleSignOut()} />
+      <DesktopSidebar
+        onSignOut={() => void handleSignOut()}
+        isAuthenticated={isAuthenticated}
+      />
 
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
@@ -237,6 +254,12 @@ export function AppLayout() {
                   items={NAVIGATION}
                   onNavigate={() => setIsMenuOpen(false)}
                 />
+                {isAuthenticated ? (
+                  <NavigationLinks
+                    items={PROFILE_NAVIGATION}
+                    onNavigate={() => setIsMenuOpen(false)}
+                  />
+                ) : null}
                 <AdminOnly>
                   <p className="technical mt-7 mb-2 px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
                     Administración
@@ -247,14 +270,23 @@ export function AppLayout() {
                   />
                 </AdminOnly>
               </nav>
-              <Button
-                variant="ghost"
-                onClick={() => void handleSignOut()}
-                className="mt-8 w-full justify-start text-muted-foreground"
-              >
-                <LogOut className="size-4" aria-hidden="true" />
-                Salir
-              </Button>
+              {isAuthenticated ? (
+                <Button
+                  variant="ghost"
+                  onClick={() => void handleSignOut()}
+                  className="mt-8 w-full justify-start text-muted-foreground"
+                >
+                  <LogOut className="size-4" aria-hidden="true" />
+                  Salir
+                </Button>
+              ) : (
+                <Button asChild className="mt-8 w-full justify-start">
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    <LogIn className="size-4" aria-hidden="true" />
+                    Entrar o registrarme
+                  </Link>
+                </Button>
+              )}
             </SheetContent>
           </Sheet>
         </header>

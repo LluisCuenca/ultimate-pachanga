@@ -2,7 +2,12 @@ import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import { Loader2 } from 'lucide-react'
 import { AppLayout } from '@/app/AppLayout'
-import { AdminRoute, LeagueMemberRoute, ProtectedRoute } from '@/app/guards'
+import {
+  AdminRoute,
+  LeagueMemberRoute,
+  LeagueViewerRoute,
+  ProtectedRoute,
+} from '@/app/guards'
 import { LoginPage } from '@/pages/LoginPage'
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
@@ -110,26 +115,34 @@ const router = createBrowserRouter(
         // to render for one.
         { path: '/onboarding', element: <OnboardingPage /> },
         { path: '/reset-password', element: <ResetPasswordPage /> },
+      ],
+    },
+    {
+      element: <AppLayout />,
+      children: [
         {
-          element: <LeagueMemberRoute />,
+          element: <LeagueViewerRoute />,
+          children: [
+            { index: true, element: <Navigate to="/league" replace /> },
+            { path: '/league', element: <LeaguePage /> },
+            { path: '/players', element: <PlayersPage /> },
+            { path: '/players/:playerId', element: <PlayerDetailPage /> },
+            { path: '/matches', element: <MatchesPage /> },
+            { path: '/matches/:matchId', element: <MatchDetailPage /> },
+            { path: '/stats', element: <StatsPage /> },
+            {
+              path: '/rankings',
+              element: <Navigate to="/stats" replace />,
+            },
+          ],
+        },
+        {
+          element: <ProtectedRoute />,
           children: [
             {
-              element: <AppLayout />,
+              element: <LeagueMemberRoute />,
               children: [
-                { index: true, element: <Navigate to="/league" replace /> },
-                { path: '/league', element: <LeaguePage /> },
                 { path: '/profile', element: <ProfilePage /> },
-                { path: '/players', element: <PlayersPage /> },
-                { path: '/players/:playerId', element: <PlayerDetailPage /> },
-                { path: '/matches', element: <MatchesPage /> },
-                { path: '/matches/:matchId', element: <MatchDetailPage /> },
-                { path: '/stats', element: <StatsPage /> },
-                // The section was called "Clasificaciones" and lived at
-                // /rankings; anyone who bookmarked it keeps working.
-                {
-                  path: '/rankings',
-                  element: <Navigate to="/stats" replace />,
-                },
                 {
                   element: <AdminRoute />,
                   children: [

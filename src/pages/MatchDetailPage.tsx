@@ -67,6 +67,7 @@ import { fetchPlayerCards, playerKeys } from '@/features/players/api'
 import { useMyPlayerId } from '@/features/players/useMyPlayer'
 import {
   useIsAdmin,
+  useLeague,
   useLeagueAttributes,
   useLeagueMetrics,
   useMembership,
@@ -129,6 +130,7 @@ export function MatchDetailPage() {
   const queryClient = useQueryClient()
   const isAdmin = useIsAdmin()
   const { data: membership } = useMembership()
+  const { data: league } = useLeague()
   const { data: myPlayerId } = useMyPlayerId()
   const { data: metrics = [] } = useLeagueMetrics()
   const { data: attributes = [] } = useLeagueAttributes()
@@ -165,9 +167,9 @@ export function MatchDetailPage() {
   // Needed by every viewer now, not just administrators: the pitch renders
   // player cards, which come from this view rather than from the squad query.
   const { data: players = [] } = useQuery({
-    queryKey: playerKeys.cards(membership?.leagueId ?? ''),
-    enabled: Boolean(membership),
-    queryFn: () => fetchPlayerCards(membership!.leagueId),
+    queryKey: playerKeys.cards(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchPlayerCards(league!.id),
   })
 
   /**
@@ -248,7 +250,7 @@ export function MatchDetailPage() {
    * every one of these; this only decides what is worth rendering.
    */
   const isUpcoming = isUpcomingMatch(match?.status)
-  const canArrangeLineup = isAdmin || isUpcoming
+  const canArrangeLineup = Boolean(membership) && (isAdmin || isUpcoming)
   const canManageSquad = isAdmin && isUpcoming
   const isAlreadyCalledUp = squad.some(
     (member) => member.playerId === myPlayerId,
@@ -610,8 +612,8 @@ export function MatchDetailPage() {
 
       {isEditing ? (
         <Card className="max-w-2xl">
-          <CardHeader>
-            <CardTitle>
+          <CardHeader className="border-b border-border">
+            <CardTitle className="text-4xl leading-none uppercase">
               <h2>Editar partido</h2>
             </CardTitle>
           </CardHeader>
@@ -793,7 +795,87 @@ export function MatchDetailPage() {
             ) : null}
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            <div className="flex flex-col gap-3 md:hidden">
+              {resultRows.map((row) => (
+                <article
+                  key={row.playerId}
+                  className="border border-border bg-black/20 p-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <Link
+                        to={`/players/${row.playerId}`}
+                        className="font-heading text-2xl leading-none font-bold uppercase hover:text-primary"
+                      >
+                        {row.displayName}
+                      </Link>
+                      <p className="body-meta mt-1 text-muted-foreground">
+                        {row.teamName}
+                      </p>
+                    </div>
+                    <span className="numeric shrink-0 text-4xl leading-none text-primary">
+                      {formatScore(row.score?.finalScore ?? null)}
+                    </span>
+                  </div>
+                  {row.score ? (
+                    <>
+                      <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3 text-center">
+                        <div>
+                          <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                            Goles
+                          </dt>
+                          <dd className="numeric mt-1 text-xl">{row.score.goals}</dd>
+                        </div>
+                        <div>
+                          <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                            Victoria
+                          </dt>
+                          <dd className="numeric mt-1 text-xl">
+                            {formatVictories(row.score.victory)}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
+                            Base
+                          </dt>
+                          <dd className="numeric mt-1 text-xl">
+                            {formatScore(row.score.baseScore)}
+                          </dd>
+                        </div>
+                      </dl>
+                      <details className="mt-3 border-t border-border pt-3">
+                        <summary className="cursor-pointer text-sm font-semibold text-primary">
+                          Ver métricas
+                        </summary>
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                          {metrics.map((metric) => (
+                            <p key={metric.code} className="flex justify-between gap-2">
+                              <span className="text-muted-foreground">{metric.label}</span>
+                              <strong className="numeric">
+                                {formatScore(row.score?.metricScores[metric.code] ?? null)}
+                              </strong>
+                            </p>
+                          ))}
+                        </div>
+                      </details>
+                    </>
+                  ) : null}
+                  {isAdmin ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-4 w-full"
+                      data-testid={`edit-score-mobile-${row.playerCode}`}
+                      onClick={() => setScoreTarget(toScoreTarget(row))}
+                    >
+                      <Pencil className="size-4" aria-hidden="true" />
+                      {row.score ? 'Editar puntuación' : 'Puntuar jugador'}
+                    </Button>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
               <Table>
                 <TableHeader>
                   <TableRow>

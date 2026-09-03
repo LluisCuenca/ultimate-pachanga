@@ -84,8 +84,8 @@ describe('PitchLineups', () => {
   it('draws a pitch for each team', () => {
     renderLineups()
 
-    expect(screen.getByText('Los Cracks')).toBeInTheDocument()
-    expect(screen.getByText('Los Pachangueros')).toBeInTheDocument()
+    expect(screen.getAllByText('Los Cracks')).toHaveLength(2)
+    expect(screen.getAllByText('Los Pachangueros')).toHaveLength(2)
 
     // The same pitch image is used twice, once per side.
     const pitches = screen
@@ -499,7 +499,9 @@ describe('PitchLineups', () => {
     it('makes no player interactive', () => {
       renderLineups({ interactive: false, canChangeFormation: false })
 
-      expect(screen.queryAllByRole('button')).toHaveLength(0)
+      expect(
+        screen.getByLabelText('Portero Local, Portería'),
+      ).not.toHaveAttribute('role', 'button')
       expect(screen.getByText('Portero Local')).toBeInTheDocument()
     })
 

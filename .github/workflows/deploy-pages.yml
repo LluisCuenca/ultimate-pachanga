@@ -35,7 +35,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: https://sbplcaoenljkbhlhuokg.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Wb1vRLOabIT369YHn7qLlQ_wE8fR4R4
-          VITE_APP_NAME: Ultimate Pachanga
+          VITE_APP_NAME: Ultimate Pachangas
 
       - name: Add single-page fallback
         run: cp dist/index.html dist/404.html

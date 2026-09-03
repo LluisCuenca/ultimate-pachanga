@@ -38,6 +38,22 @@ export function ProtectedRoute() {
 }
 
 /**
+ * Allows anonymous spectators through, while keeping the original onboarding
+ * flow for signed-in accounts that have not joined the league yet.
+ */
+export function LeagueViewerRoute() {
+  const { session, isLoading: isAuthLoading } = useAuth()
+  const { data: membership, isPending: isMembershipPending } = useMembership()
+
+  if (isAuthLoading) return <FullPageSpinner label="Comprobando sesión" />
+  if (!session) return <Outlet />
+  if (isMembershipPending) return <FullPageSpinner label="Cargando tu liga" />
+  if (!membership) return <Navigate to="/onboarding" replace />
+
+  return <Outlet />
+}
+
+/**
  * Requires a league and a player.
  *
  * Registering grants nothing, so a fresh account has neither and every page

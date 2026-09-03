@@ -113,6 +113,7 @@ export function PitchLineups({
   valuation,
 }: PitchLineupsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [mobileSide, setMobileSide] = useState<'home' | 'away'>('home')
 
   // The arrangement is applied optimistically so a drag feels instant, then
   // reconciled from the server once the write lands.
@@ -322,13 +323,38 @@ export function PitchLineups({
           : 'valor actual, banquillo aparte'}
       </p>
 
+      <div className="grid grid-cols-2 gap-1 border border-border bg-muted p-1 sm:hidden">
+        <Button
+          type="button"
+          variant={mobileSide === 'home' ? 'default' : 'ghost'}
+          onClick={() => setMobileSide('home')}
+          className="min-w-0 truncate font-heading text-lg uppercase"
+        >
+          {homeTeamName}
+        </Button>
+        <Button
+          type="button"
+          variant={mobileSide === 'away' ? 'default' : 'ghost'}
+          onClick={() => setMobileSide('away')}
+          className="min-w-0 truncate font-heading text-lg uppercase"
+        >
+          {awayTeamName}
+        </Button>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         {(['home', 'away'] as const).map((side) => {
           const formation = side === 'home' ? homeFormation : awayFormation
           const teamName = side === 'home' ? homeTeamName : awayTeamName
 
           return (
-            <div key={side} className="flex flex-col gap-2">
+            <div
+              key={side}
+              className={cn(
+                'flex-col gap-2 sm:flex',
+                mobileSide === side ? 'flex' : 'hidden',
+              )}
+            >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <h3 className="truncate text-sm font-bold" title={teamName}>

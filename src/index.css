@@ -209,24 +209,8 @@
         box-shadow 200ms ease;
     }
 
-    .motion-card:hover {
-      border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
-      box-shadow:
-        0 20px 42px rgb(0 0 0 / 0.38),
-        0 0 28px rgb(234 175 53 / 0.1);
-    }
-
-    .motion-card:hover .motion-card-photo img {
-      filter: saturate(1.08) contrast(1.03);
-      transform: scale(1.055);
-    }
-
     .motion-card-title {
       transition: color 180ms ease;
-    }
-
-    .motion-card:hover .motion-card-title {
-      color: var(--primary);
     }
 
     .motion-nav-link {
@@ -241,12 +225,31 @@
       transition: transform 170ms ease;
     }
 
-    .motion-nav-link:hover {
-      transform: translateX(3px);
-    }
 
-    .motion-nav-link:hover svg {
-      transform: scale(1.12);
+    @media (hover: hover) and (pointer: fine) {
+      .motion-card:hover {
+        border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+        box-shadow:
+          0 20px 42px rgb(0 0 0 / 0.38),
+          0 0 28px rgb(234 175 53 / 0.1);
+      }
+
+      .motion-card:hover .motion-card-photo img {
+        filter: saturate(1.08) contrast(1.03);
+        transform: scale(1.055);
+      }
+
+      .motion-card:hover .motion-card-title {
+        color: var(--primary);
+      }
+
+      .motion-nav-link:hover {
+        transform: translateX(3px);
+      }
+
+      .motion-nav-link:hover svg {
+        transform: scale(1.12);
+      }
     }
 
     .motion-grid > * {
@@ -302,7 +305,7 @@
 
   .page-title {
     font-family: var(--font-heading);
-    font-size: 3.75rem;
+    font-size: 2.5rem;
     font-weight: 700;
     line-height: 0.85;
     letter-spacing: 0;
@@ -311,7 +314,7 @@
 
   .section-title {
     font-family: var(--font-heading);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     line-height: 0.9;
     letter-spacing: 0;
@@ -320,7 +323,7 @@
 
   .card-title {
     font-family: var(--font-heading);
-    font-size: 1.875rem;
+    font-size: 1.625rem;
     font-weight: 700;
     line-height: 0.9;
     letter-spacing: 0;
@@ -340,5 +343,19 @@
   .body-meta {
     font-size: 0.8125rem;
     line-height: 1.4;
+  }
+
+  @media (min-width: 64rem) {
+    .page-title {
+      font-size: 3.75rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+    }
+
+    .card-title {
+      font-size: 1.875rem;
+    }
   }
 }

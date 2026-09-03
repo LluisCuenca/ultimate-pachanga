@@ -125,18 +125,17 @@ export function ProfilePage() {
           player={player}
           metrics={metrics}
           showcase
-          className="h-full min-h-[30rem] lg:min-h-[38rem]"
+          className="h-full lg:min-h-[38rem]"
         />
 
-        <Card className="min-h-[30rem] border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] lg:min-h-[38rem]">
+        <Card className="border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] lg:min-h-[38rem]">
           <CardHeader className="border-b border-primary/20">
             <p className="section-kicker text-primary">Tu ficha</p>
             <CardTitle className="mt-3 text-5xl leading-none uppercase">
               Tus datos
             </CardTitle>
             <CardDescription>
-              Código de importación {player.playerCode} · posición{' '}
-              {formatPosition(player.preferredPosition)}
+              {player.preferredPosition} · {formatPosition(player.preferredPosition)}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex h-full flex-col items-start gap-6 pt-6">
@@ -175,9 +174,8 @@ export function ProfilePage() {
             </div>
 
             <p className="text-base leading-relaxed text-muted-foreground">
-              Puedes cambiar tu nombre, apellidos, apodo, posición preferida y
-              foto. Para cualquier otra cosa —tu código, las convocatorias o las
-              puntuaciones— habla con un administrador.
+              Puedes cambiar tu nombre, apodo, posición preferida y fotografía.
+              Las convocatorias y puntuaciones las gestiona la liga.
             </p>
 
             <Button

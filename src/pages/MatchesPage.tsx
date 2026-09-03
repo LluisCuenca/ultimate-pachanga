@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { MatchCard } from '@/components/MatchCard'
 import { fetchMatches, matchKeys } from '@/features/matches/api'
-import { useMembership } from '@/features/league/useLeague'
+import { useLeague } from '@/features/league/useLeague'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import type { MatchRow } from '@/types/domain'
 
@@ -41,7 +41,7 @@ function MatchSection({
 }
 
 export function MatchesPage() {
-  const { data: membership } = useMembership()
+  const { data: league } = useLeague()
 
   const {
     data: matches,
@@ -49,9 +49,9 @@ export function MatchesPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: matchKeys.list(membership?.leagueId ?? ''),
-    enabled: Boolean(membership),
-    queryFn: () => fetchMatches(membership!.leagueId),
+    queryKey: matchKeys.list(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchMatches(league!.id),
   })
 
   // Fixtures ahead read best soonest-first; results read best newest-first.

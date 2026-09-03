@@ -41,8 +41,8 @@ export function MatchHero({ match }: { match: MatchRow }) {
       </div>
 
       <div className="flex flex-col gap-4 px-6 py-7 sm:px-9 sm:py-9">
-        <div className="flex items-start justify-between gap-3">
-          <p className="technical min-w-0 pt-2 text-xs font-semibold text-primary uppercase">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="technical min-w-0 text-xs font-semibold text-primary uppercase">
             {match.title}
           </p>
           <div className="flex shrink-0 items-center gap-2">
@@ -51,10 +51,10 @@ export function MatchHero({ match }: { match: MatchRow }) {
               <DialogTrigger asChild>
                 <Button
                   variant="secondary"
-                  className="border border-primary/45 bg-black/70 text-foreground backdrop-blur hover:bg-primary hover:text-primary-foreground"
+                  className="border border-primary/45 bg-black/70 px-3 text-foreground backdrop-blur hover:bg-primary hover:text-primary-foreground"
                 >
                   <Maximize2 className="size-4" aria-hidden="true" />
-                  Ver imagen
+                  <span className="hidden sm:inline">Ver imagen</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="h-auto max-h-[94svh] w-fit max-w-[96vw] overflow-hidden border-primary/30 bg-black p-0">
@@ -73,10 +73,10 @@ export function MatchHero({ match }: { match: MatchRow }) {
             </Dialog>
           </div>
         </div>
-        <h1 className="flex min-w-0 flex-col font-heading text-5xl leading-[0.84] font-bold uppercase">
-          <span className="truncate">{match.home_team_name}</span>
-          <span className="truncate text-muted-foreground">vs</span>
-          <span className="truncate">{match.away_team_name}</span>
+        <h1 className="flex min-w-0 flex-col font-heading text-4xl leading-[0.88] font-bold uppercase sm:text-5xl">
+          <span className="break-words">{match.home_team_name}</span>
+          <span className="text-muted-foreground">vs</span>
+          <span className="break-words">{match.away_team_name}</span>
         </h1>
         <dl className="mt-auto flex flex-col gap-2 border-t border-primary/20 pt-5 text-base text-muted-foreground">
           <div className="flex items-center gap-2">

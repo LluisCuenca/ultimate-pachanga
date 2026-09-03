@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Award,
   CalendarDays,
-  Crown,
   TrendingUp,
   Trophy,
   Users,
@@ -11,14 +10,17 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AttributeBadge } from '@/components/AttributeBadge'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { MarketValue } from '@/components/MarketValue'
 import { MatchCard } from '@/components/MatchCard'
-import { fetchPlayerCards, playerKeys } from '@/features/players/api'
+import {
+  fetchLatestAwardWinners,
+  fetchPlayerCards,
+  playerKeys,
+} from '@/features/players/api'
 import { fetchMatches, fetchSquad, matchKeys } from '@/features/matches/api'
-import { useLeagueAttributes, useMembership } from '@/features/league/useLeague'
+import { useLeague, useLeagueAttributes } from '@/features/league/useLeague'
 import { formatVictories, formatWinRate, toInitials } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import { getAvatarUrl } from '@/lib/supabase'
@@ -94,10 +96,8 @@ function LeaderboardCard({
 
 function AwardSpotlight({
   entry,
-  index,
 }: {
   entry: AwardEntry
-  index: number
 }) {
   const player = entry.holders[0]
   const avatarUrl = getAvatarUrl(player.avatarPath)
@@ -114,7 +114,7 @@ function AwardSpotlight({
     >
       <span className="absolute top-0 right-0 h-20 w-20 border-t border-r border-primary/55" />
       <span className="technical text-[0.6875rem] font-semibold text-primary uppercase">
-        Reconocimiento {String(index + 1).padStart(2, '0')}
+        Último reconocimiento
       </span>
       <div className="mt-5 flex items-center justify-between gap-4">
         <div>
@@ -122,7 +122,7 @@ function AwardSpotlight({
             {entry.attribute.label}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Titular actual del reconocimiento
+            Ganador más reciente
           </p>
         </div>
         <Award className="size-8 shrink-0 text-primary" aria-hidden="true" />
@@ -139,7 +139,7 @@ function AwardSpotlight({
             {player.displayName}
           </p>
           <p className="technical mt-2 text-xs text-muted-foreground uppercase">
-            {player.attributeCounts[entry.attribute.code]} distinciones
+            {player.attributeCounts[entry.attribute.code]} en total
           </p>
         </div>
       </div>
@@ -147,73 +147,8 @@ function AwardSpotlight({
   )
 }
 
-function HonoursRoll({ awards }: { awards: readonly AwardEntry[] }) {
-  return (
-    <Card className="motion-card border-primary/20 bg-[linear-gradient(135deg,#17120a_0%,#111111_42%,#0c0c0c_100%)]">
-      <CardHeader className="border-b border-primary/20">
-        <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
-          <Crown className="size-7 text-primary" aria-hidden="true" />
-          <h2>Palmarés</h2>
-        </CardTitle>
-        <p className="mt-2 text-base text-muted-foreground">
-          Todos los reconocimientos que han dejado huella en la liga.
-        </p>
-      </CardHeader>
-      <CardContent className="grid gap-x-10 gap-y-8 pt-7 xl:grid-cols-2">
-        {awards.map(({ attribute, holders }) => (
-          <section
-            key={attribute.code}
-            className="border-l-2 border-primary/65 pl-5"
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <AttributeBadge
-                label={attribute.label}
-                points={attribute.points}
-              />
-              <p className="font-heading text-2xl leading-none font-bold uppercase">
-                {attribute.label}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-              {holders.map((player) => {
-                const avatarUrl = getAvatarUrl(player.avatarPath)
-                const initials = toInitials(
-                  player.firstName,
-                  player.lastName,
-                  player.displayName,
-                )
-
-                return (
-                  <Link
-                    key={player.id}
-                    to={`/players/${player.id}`}
-                    className="group flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary"
-                  >
-                    <Avatar className="size-8 border border-primary/50 shadow-[0_0_14px_rgb(234_175_53/0.18)] transition-transform group-hover:scale-105">
-                      {avatarUrl ? (
-                        <AvatarImage src={avatarUrl} alt="" />
-                      ) : null}
-                      <AvatarFallback className="bg-primary/15 font-heading text-sm text-primary">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{player.displayName}</span>
-                    <span className="numeric text-primary">
-                      ×{player.attributeCounts[attribute.code]}
-                    </span>
-                  </Link>
-                )
-              })}
-            </div>
-          </section>
-        ))}
-      </CardContent>
-    </Card>
-  )
-}
-
 export function LeaguePage() {
-  const { data: membership } = useMembership()
+  const { data: league } = useLeague()
   const { data: attributes = [] } = useLeagueAttributes()
 
   const {
@@ -222,15 +157,15 @@ export function LeaguePage() {
     error: playersError,
     refetch: refetchPlayers,
   } = useQuery({
-    queryKey: playerKeys.cards(membership?.leagueId ?? ''),
-    enabled: Boolean(membership),
-    queryFn: () => fetchPlayerCards(membership!.leagueId),
+    queryKey: playerKeys.cards(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchPlayerCards(league!.id),
   })
 
   const { data: matches, isPending: areMatchesPending } = useQuery({
-    queryKey: matchKeys.list(membership?.leagueId ?? ''),
-    enabled: Boolean(membership),
-    queryFn: () => fetchMatches(membership!.leagueId),
+    queryKey: matchKeys.list(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchMatches(league!.id),
   })
 
   const activePlayers = (players ?? []).filter(
@@ -258,6 +193,11 @@ export function LeaguePage() {
     enabled: Boolean(nextMatch),
     queryFn: () => fetchSquad(nextMatch!.id),
   })
+  const { data: latestAwardWinners = [] } = useQuery({
+    queryKey: playerKeys.latestAwards(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchLatestAwardWinners(league!.id),
+  })
   const nextSquadPlayers = nextSquad
     .map((member) =>
       (players ?? []).find((player) => player.id === member.playerId),
@@ -266,19 +206,17 @@ export function LeaguePage() {
   const recentMatches = (matches ?? [])
     .filter((match) => match.status === 'scored')
     .slice(0, 3)
-  const awardHolders: AwardEntry[] = attributes
-    .filter((attribute) => attribute.points > 0)
-    .map((attribute) => ({
-      attribute,
-      holders: rankedPlayers
-        .filter((player) => (player.attributeCounts[attribute.code] ?? 0) > 0)
-        .sort(
-          (left, right) =>
-            (right.attributeCounts[attribute.code] ?? 0) -
-            (left.attributeCounts[attribute.code] ?? 0),
-        )
-        .slice(0, 3),
-    }))
+  const latestAwardEntries: AwardEntry[] = attributes
+    .map((attribute) => {
+      const winner = latestAwardWinners.find(
+        (entry) => entry.attributeCode === attribute.code,
+      )
+      const player = winner
+        ? rankedPlayers.find((entry) => entry.id === winner.playerId)
+        : undefined
+
+      return { attribute, holders: player ? [player] : [] }
+    })
     .filter((entry) => entry.holders.length > 0)
 
   return (
@@ -289,7 +227,7 @@ export function LeaguePage() {
         <Skeleton className="h-96 rounded-xl" />
       ) : nextMatch ? (
         <section className="motion-enter flex flex-col gap-4">
-          <h2 className="font-heading text-4xl leading-none font-bold whitespace-nowrap text-primary uppercase sm:text-5xl lg:text-[3.75rem]">
+          <h2 className="font-heading text-3xl leading-none font-bold whitespace-nowrap text-primary uppercase sm:text-5xl lg:text-[3.75rem]">
             Próxima jornada
           </h2>
           <div className="w-full max-w-[1280px]">
@@ -306,8 +244,8 @@ export function LeaguePage() {
         <section className="motion-enter flex flex-col gap-4">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="section-kicker">Archivo reciente</p>
-              <h2 className="section-title mt-3 text-5xl">Últimos partidos</h2>
+              <p className="section-kicker">Últimas jornadas</p>
+              <h2 className="section-title mt-3">Últimos partidos</h2>
             </div>
             <Link
               to="/matches"
@@ -365,7 +303,7 @@ export function LeaguePage() {
               )}
             />
             <LeaderboardCard
-              title="Más victoriosos"
+              title="Mejor porcentaje de victorias"
               icon={Trophy}
               players={topByVictories}
               renderValue={(player) => (
@@ -382,25 +320,21 @@ export function LeaguePage() {
         </section>
       )}
 
-      {awardHolders.length > 0 ? (
-        <>
+      {latestAwardEntries.length > 0 ? (
           <section className="motion-enter flex flex-col gap-5">
             <div>
               <p className="section-kicker">La vitrina</p>
               <h2 className="section-title mt-3">Reconocimientos</h2>
             </div>
             <div className="grid gap-5 xl:grid-cols-3">
-              {awardHolders.slice(0, 3).map((entry, index) => (
+              {latestAwardEntries.slice(0, 3).map((entry) => (
                 <AwardSpotlight
                   key={entry.attribute.code}
                   entry={entry}
-                  index={index}
                 />
               ))}
             </div>
           </section>
-          <HonoursRoll awards={awardHolders} />
-        </>
       ) : null}
     </div>
   )

@@ -67,12 +67,14 @@ export function MatchCard({
           <p
             className={
               featured
-                ? 'motion-card-title flex min-w-0 flex-col font-heading text-4xl leading-[0.84] font-bold uppercase sm:text-5xl'
-                : 'flex min-w-0 flex-col font-heading text-3xl leading-[0.86] font-bold uppercase'
+                  ? 'motion-card-title flex min-w-0 flex-col font-heading text-3xl leading-[0.88] font-bold uppercase sm:text-5xl'
+                  : 'flex min-w-0 flex-col font-heading text-[1.75rem] leading-[0.9] font-bold uppercase sm:text-3xl'
             }
           >
-            <span className="truncate">{match.home_team_name}</span>
-            <span className="truncate">
+            <span className="truncate" title={match.home_team_name}>
+              {match.home_team_name}
+            </span>
+            <span className="truncate" title={match.away_team_name}>
               <span className="font-normal text-muted-foreground">vs </span>
               {match.away_team_name}
             </span>

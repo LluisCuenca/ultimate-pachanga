@@ -85,13 +85,13 @@ function toShortMetricLabel(metric: LeagueMetricRow): string {
  * card from turning into a poster on the roomier bench grid.
  */
 const COMPACT_SIZES = {
-  rating: 'text-[clamp(0.5625rem,22cqi,1.125rem)]',
-  position: 'text-[clamp(0.375rem,12cqi,0.625rem)]',
-  form: 'size-[clamp(0.4375rem,10cqi,0.75rem)]',
-  confidence: 'size-[clamp(0.5rem,11cqi,0.8125rem)]',
-  alias: 'text-[clamp(0.5rem,14cqi,0.8125rem)]',
-  fullName: 'text-[clamp(0.4375rem,11cqi,0.6875rem)]',
-  initials: 'text-[clamp(0.5rem,18cqi,1.125rem)]',
+  rating: 'text-[clamp(0.6875rem,22cqi,1.125rem)]',
+  position: 'text-[clamp(0.5rem,12cqi,0.625rem)]',
+  form: 'size-[clamp(0.5rem,10cqi,0.75rem)]',
+  confidence: 'size-[clamp(0.5625rem,11cqi,0.8125rem)]',
+  alias: 'text-[clamp(0.625rem,14cqi,0.8125rem)]',
+  fullName: 'text-[clamp(0.5625rem,11cqi,0.6875rem)]',
+  initials: 'text-[clamp(0.625rem,18cqi,1.125rem)]',
   /** Height, with the width following from the square ratio. */
   photo: 'h-[clamp(1.25rem,52cqi,4rem)]',
 } as const

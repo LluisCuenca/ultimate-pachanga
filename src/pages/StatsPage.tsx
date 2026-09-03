@@ -13,8 +13,8 @@ import { fetchPlayerCards, playerKeys } from '@/features/players/api'
 import { EvolutionSection } from '@/features/stats/EvolutionSection'
 import {
   useLeagueAttributes,
+  useLeague,
   useLeagueMetrics,
-  useMembership,
 } from '@/features/league/useLeague'
 import type { LeagueMetricRow, PlayerCardData } from '@/types/domain'
 
@@ -46,7 +46,7 @@ function PodiumCard({
   children: React.ReactNode
 }) {
   return (
-    <Card className="overflow-hidden border-border bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)]">
+    <Card className="motion-card overflow-hidden border-border bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] transition-transform hover:-translate-y-0.5">
       <CardHeader className="border-b border-border/80">
         <CardTitle className="card-title">
           <h2>{title}</h2>
@@ -111,7 +111,7 @@ function GeneralTab({
 
       <PodiumCard
         title="Mejor estado de forma actual"
-        description="Valoración 45-99, ponderada entre histórico y último partido"
+        description="Quién llega más fuerte a la próxima jornada"
       >
         <PodiumList
           players={topBy(players, (player) => player.cardRating)}
@@ -142,7 +142,7 @@ function GeneralTab({
 }
 
 export function StatsPage() {
-  const { data: membership } = useMembership()
+  const { data: league } = useLeague()
   const { data: metrics = [] } = useLeagueMetrics()
   const { data: attributes = [] } = useLeagueAttributes()
   const [tab, setTab] = useState('general')
@@ -153,9 +153,9 @@ export function StatsPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: playerKeys.cards(membership?.leagueId ?? ''),
-    enabled: Boolean(membership),
-    queryFn: () => fetchPlayerCards(membership!.leagueId),
+    queryKey: playerKeys.cards(league?.id ?? ''),
+    enabled: Boolean(league),
+    queryFn: () => fetchPlayerCards(league!.id),
   })
 
   // Guests are left out of every tab, the evolution chart included: `ranked` is
@@ -276,9 +276,9 @@ export function StatsPage() {
         </TabsContent>
 
         <TabsContent value="evolution" className="mt-6">
-          {membership ? (
+          {league ? (
             <EvolutionSection
-              leagueId={membership.leagueId}
+              leagueId={league.id}
               players={ranked}
               metrics={metrics}
             />
