@@ -48,7 +48,7 @@ export function MatchHero({ match }: { match: MatchRow }) {
               Ver imagen
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-5xl overflow-hidden border-primary/30 bg-black p-0">
+          <DialogContent className="h-[94svh] w-[94vw] max-w-none overflow-hidden border-primary/30 bg-black p-0">
             <DialogHeader className="sr-only">
               <DialogTitle>{imageLabel}</DialogTitle>
               <DialogDescription>
@@ -58,7 +58,7 @@ export function MatchHero({ match }: { match: MatchRow }) {
             <img
               src={imageUrl}
               alt={imageLabel}
-              className="max-h-[82svh] w-full object-contain"
+              className="size-full object-contain"
             />
           </DialogContent>
         </Dialog>

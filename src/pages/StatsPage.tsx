@@ -222,10 +222,25 @@ export function StatsPage() {
 
       <Tabs value={tab} onValueChange={setTab}>
         {/* Scrolls sideways on a phone rather than wrapping into a tall block. */}
-        <TabsList className="flex h-12 w-full justify-start overflow-x-auto text-base">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="palmares">Palmarés</TabsTrigger>
-          <TabsTrigger value="evolution">Evolución</TabsTrigger>
+        <TabsList className="grid h-16 w-full grid-cols-3 justify-start overflow-x-auto">
+          <TabsTrigger
+            value="general"
+            className="h-14 font-heading text-xl font-semibold uppercase"
+          >
+            General
+          </TabsTrigger>
+          <TabsTrigger
+            value="palmares"
+            className="h-14 font-heading text-xl font-semibold uppercase"
+          >
+            Palmarés
+          </TabsTrigger>
+          <TabsTrigger
+            value="evolution"
+            className="h-14 font-heading text-xl font-semibold uppercase"
+          >
+            Evolución
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="mt-6">

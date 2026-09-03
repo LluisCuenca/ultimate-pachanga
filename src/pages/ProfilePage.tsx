@@ -113,10 +113,10 @@ export function ProfilePage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="page-title">Mi perfil</h1>
-        <p className="mt-3 text-lg text-muted-foreground">
-          Tu cuenta juega como {player.displayName}. Tus puntuaciones y tu valor
-          de mercado los calcula la liga; el resto lo decides tú.
+        <h1 className="page-title">{player.displayName}</h1>
+        <p className="body-copy mt-3 text-muted-foreground">
+          Tu perfil de jugador. Tus puntuaciones y tu valor de mercado los
+          calcula la liga; el resto lo decides tú.
         </p>
       </div>
 
@@ -124,10 +124,11 @@ export function ProfilePage() {
         <PlayerCard
           player={player}
           metrics={metrics}
-          className="h-full min-h-[28rem] lg:min-h-[34rem]"
+          showcase
+          className="h-full min-h-[30rem] lg:min-h-[38rem]"
         />
 
-        <Card className="min-h-[28rem] border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] lg:min-h-[34rem]">
+        <Card className="min-h-[30rem] border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] lg:min-h-[38rem]">
           <CardHeader className="border-b border-primary/20">
             <p className="section-kicker text-primary">Tu ficha</p>
             <CardTitle className="mt-3 text-5xl leading-none uppercase">

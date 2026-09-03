@@ -1,17 +1,26 @@
 import { Link } from 'react-router'
 import { CalendarDays, MapPin } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card } from '@/components/ui/card'
 import { MatchStatusBadge } from '@/components/MatchStatusBadge'
 import { VenuePhoto } from '@/components/VenuePhoto'
-import { formatMatchDateTime, formatMatchRelative } from '@/lib/formatting'
-import type { MatchRow } from '@/types/domain'
+import {
+  formatMatchDateTime,
+  formatMatchRelative,
+  toInitials,
+} from '@/lib/formatting'
+import { getAvatarUrl } from '@/lib/supabase'
+import type { MatchRow, PlayerCardData } from '@/types/domain'
 
 export function MatchCard({
   match,
   featured = false,
+  participants = [],
 }: {
   match: MatchRow
   featured?: boolean
+  /** The featured fixture can preview the players already called up. */
+  participants?: readonly PlayerCardData[]
 }) {
   return (
     <Link
@@ -21,8 +30,8 @@ export function MatchCard({
       <Card
         className={
           featured
-            ? 'grid aspect-[2/1] min-h-72 grid-cols-[46%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 lg:min-h-96'
-            : 'grid aspect-[4/3] min-h-64 grid-cols-[42%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-72'
+            ? 'grid aspect-[5/2] min-h-72 grid-cols-[46%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 lg:min-h-80'
+            : 'grid aspect-video min-h-52 grid-cols-[42%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-56'
         }
       >
         <VenuePhoto
@@ -38,7 +47,7 @@ export function MatchCard({
           className={
             featured
               ? 'flex min-w-0 flex-col gap-4 px-7 py-8'
-              : 'flex min-w-0 flex-col gap-1.5 py-3.5 pr-4 pl-3'
+              : 'flex min-w-0 flex-col gap-2 py-4 pr-4 pl-3'
           }
         >
           <div className="flex items-start justify-between gap-2">
@@ -58,7 +67,7 @@ export function MatchCard({
             className={
               featured
                 ? 'flex min-w-0 flex-col font-heading text-5xl leading-[0.84] font-bold uppercase'
-                : 'flex min-w-0 flex-col font-heading text-2xl leading-[0.9] font-bold uppercase'
+                : 'flex min-w-0 flex-col font-heading text-3xl leading-[0.86] font-bold uppercase'
             }
           >
             <span className="truncate">{match.home_team_name}</span>
@@ -68,11 +77,60 @@ export function MatchCard({
             </span>
           </p>
 
+          {featured && participants.length > 0 ? (
+            <div className="border-t border-primary/20 pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="technical text-[0.6875rem] font-semibold text-primary uppercase">
+                  Convocados
+                </span>
+                <span className="numeric text-sm text-muted-foreground">
+                  {participants.length}
+                </span>
+              </div>
+              <div className="mt-3 flex items-center gap-2 overflow-hidden">
+                {participants.slice(0, 7).map((player) => {
+                  const avatarUrl = getAvatarUrl(player.avatarPath)
+
+                  return (
+                    <Avatar
+                      key={player.id}
+                      title={player.displayName}
+                      className="size-9 shrink-0 border border-primary/55 shadow-[0_0_14px_rgb(234_175_53/0.2)]"
+                    >
+                      {avatarUrl ? (
+                        <AvatarImage src={avatarUrl} alt="" />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/15 font-heading text-sm text-primary">
+                        {toInitials(
+                          player.firstName,
+                          player.lastName,
+                          player.displayName,
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
+                  )
+                })}
+                {participants.length > 7 ? (
+                  <span className="numeric text-sm text-muted-foreground">
+                    +{participants.length - 7}
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-2 truncate text-sm text-muted-foreground">
+                {participants
+                  .slice(0, 4)
+                  .map((player) => player.displayName)
+                  .join(' · ')}
+                {participants.length > 4 ? ' · …' : ''}
+              </p>
+            </div>
+          ) : null}
+
           <dl
             className={
               featured
                 ? 'mt-auto flex flex-col gap-2 text-base text-muted-foreground'
-                : 'mt-auto flex flex-col gap-1 text-xs text-muted-foreground'
+                : 'mt-1 flex flex-col gap-1.5 text-sm text-muted-foreground'
             }
           >
             <div className="flex items-center gap-1.5">

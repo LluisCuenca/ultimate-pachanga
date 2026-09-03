@@ -17,7 +17,7 @@ import { ErrorState } from '@/components/ErrorState'
 import { MarketValue } from '@/components/MarketValue'
 import { MatchCard } from '@/components/MatchCard'
 import { fetchPlayerCards, playerKeys } from '@/features/players/api'
-import { fetchMatches, matchKeys } from '@/features/matches/api'
+import { fetchMatches, fetchSquad, matchKeys } from '@/features/matches/api'
 import { useLeagueAttributes, useMembership } from '@/features/league/useLeague'
 import { formatVictories, formatWinRate, toInitials } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
@@ -110,7 +110,7 @@ function AwardSpotlight({
   return (
     <Link
       to={`/players/${player.id}`}
-      className="group relative min-h-96 overflow-hidden border border-border bg-[linear-gradient(145deg,#191919_0%,#0a0a0a_78%)] p-6 transition-all hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_22px_44px_rgb(0_0_0/0.42),0_0_32px_rgb(234_175_53/0.12)]"
+      className="group relative min-h-72 overflow-hidden border border-border bg-[linear-gradient(145deg,#191919_0%,#0a0a0a_78%)] p-6 transition-all hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_22px_44px_rgb(0_0_0/0.42),0_0_32px_rgb(234_175_53/0.12)]"
     >
       <span className="absolute top-0 right-0 h-20 w-20 border-t border-r border-primary/55" />
       <span className="technical text-[0.6875rem] font-semibold text-primary uppercase">
@@ -127,7 +127,7 @@ function AwardSpotlight({
         </div>
         <Award className="size-8 shrink-0 text-primary" aria-hidden="true" />
       </div>
-      <div className="absolute right-7 bottom-7 left-7 flex items-end gap-5 border-t border-primary/25 pt-6">
+      <div className="absolute right-7 bottom-7 left-7 flex items-end gap-5 border-t border-primary/25 pt-5">
         <Avatar className="size-24 border-2 border-primary/75 shadow-[0_0_28px_rgb(234_175_53/0.28)] transition-transform duration-200 group-hover:scale-105">
           {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
           <AvatarFallback className="bg-primary/15 font-heading text-3xl text-primary">
@@ -175,18 +175,35 @@ function HonoursRoll({ awards }: { awards: readonly AwardEntry[] }) {
               </p>
             </div>
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-              {holders.map((player) => (
-                <Link
-                  key={player.id}
-                  to={`/players/${player.id}`}
-                  className="text-lg font-medium transition-colors hover:text-primary"
-                >
-                  {player.displayName}
-                  <span className="numeric ml-2 text-primary">
-                    ×{player.attributeCounts[attribute.code]}
-                  </span>
-                </Link>
-              ))}
+              {holders.map((player) => {
+                const avatarUrl = getAvatarUrl(player.avatarPath)
+                const initials = toInitials(
+                  player.firstName,
+                  player.lastName,
+                  player.displayName,
+                )
+
+                return (
+                  <Link
+                    key={player.id}
+                    to={`/players/${player.id}`}
+                    className="group flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary"
+                  >
+                    <Avatar className="size-8 border border-primary/50 shadow-[0_0_14px_rgb(234_175_53/0.18)] transition-transform group-hover:scale-105">
+                      {avatarUrl ? (
+                        <AvatarImage src={avatarUrl} alt="" />
+                      ) : null}
+                      <AvatarFallback className="bg-primary/15 font-heading text-sm text-primary">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{player.displayName}</span>
+                    <span className="numeric text-primary">
+                      ×{player.attributeCounts[attribute.code]}
+                    </span>
+                  </Link>
+                )
+              })}
             </div>
           </section>
         ))}
@@ -236,6 +253,16 @@ export function LeaguePage() {
   const nextMatch: MatchRow | undefined = (matches ?? [])
     .filter((match) => isUpcomingMatch(match.status))
     .at(-1)
+  const { data: nextSquad = [] } = useQuery({
+    queryKey: matchKeys.squad(nextMatch?.id ?? ''),
+    enabled: Boolean(nextMatch),
+    queryFn: () => fetchSquad(nextMatch!.id),
+  })
+  const nextSquadPlayers = nextSquad
+    .map((member) =>
+      (players ?? []).find((player) => player.id === member.playerId),
+    )
+    .filter((player): player is PlayerCardData => Boolean(player))
   const recentMatches = (matches ?? [])
     .filter((match) => match.status === 'scored')
     .slice(0, 3)
@@ -264,7 +291,11 @@ export function LeaguePage() {
         <section className="flex flex-col gap-4">
           <h2 className="page-title text-primary">Próxima jornada</h2>
           <div className="w-full max-w-[1280px]">
-            <MatchCard match={nextMatch} featured />
+            <MatchCard
+              match={nextMatch}
+              featured
+              participants={nextSquadPlayers}
+            />
           </div>
         </section>
       ) : null}

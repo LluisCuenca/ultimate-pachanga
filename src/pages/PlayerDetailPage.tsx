@@ -1,6 +1,15 @@
 import { Link, useParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, History, Radar } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  CircleGauge,
+  Flame,
+  History,
+  Radar,
+  Snowflake,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -34,6 +43,72 @@ import {
   formatVictories,
   formatWinRate,
 } from '@/lib/formatting'
+import type { PlayerCardData } from '@/types/domain'
+
+function PlayerStatusSummary({ player }: { player: PlayerCardData }) {
+  const state = player.formState
+  const stateDetails =
+    state === 'fire'
+      ? { label: 'En racha', Icon: Flame, className: 'text-red-400' }
+      : state === 'ice'
+        ? { label: 'Enfriándose', Icon: Snowflake, className: 'text-cyan-200' }
+        : state === 'down'
+          ? {
+              label: 'Por debajo de su media',
+              Icon: ArrowDown,
+              className: 'text-rose-300',
+            }
+          : state === 'up'
+            ? {
+                label: 'Por encima de su media',
+                Icon: ArrowUp,
+                className: 'text-emerald-300',
+              }
+            : {
+                label: 'Sin tendencia',
+                Icon: CircleGauge,
+                className: 'text-muted-foreground',
+              }
+  const boundedConfidence = Math.min(100, Math.max(0, player.confidencePct))
+
+  return (
+    <div className="mt-5 grid grid-cols-2 gap-4">
+      <div className="border border-primary/25 bg-black/20 p-4">
+        <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
+          Confianza
+        </p>
+        <div className="mt-3 flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="size-12 rounded-full border border-primary/60 p-1"
+            style={{
+              background: `conic-gradient(var(--primary) ${boundedConfidence}%, rgb(0 0 0 / 0.75) 0)`,
+            }}
+          >
+            <span className="block size-full rounded-full bg-card" />
+          </span>
+          <span className="numeric text-4xl leading-none text-primary">
+            {Math.round(boundedConfidence)}%
+          </span>
+        </div>
+      </div>
+      <div className="border border-primary/25 bg-black/20 p-4">
+        <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
+          Estado actual
+        </p>
+        <div className="mt-4 flex items-center gap-3">
+          <stateDetails.Icon
+            className={`size-8 ${stateDetails.className}`}
+            aria-hidden="true"
+          />
+          <span className="font-heading text-2xl leading-none font-bold uppercase">
+            {stateDetails.label}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function SummaryRow({
   label,
@@ -140,6 +215,7 @@ export function PlayerDetailPage() {
         <PlayerCard
           player={player}
           metrics={metrics}
+          showcase
           className="h-full min-h-[28rem] lg:min-h-[34rem]"
         />
 
@@ -191,11 +267,6 @@ export function PlayerDetailPage() {
               <SummaryRow label="Última puntuación">
                 <span className="numeric text-xl">
                   {formatScore(player.latestScore)}
-                </span>
-              </SummaryRow>
-              <SummaryRow label="Confianza">
-                <span className="numeric text-xl">
-                  {Math.round(player.confidencePct)}%
                 </span>
               </SummaryRow>
             </dl>
@@ -304,14 +375,11 @@ export function PlayerDetailPage() {
             Medias por métrica y reconocimientos obtenidos en la competición.
           </p>
         </CardHeader>
-        <CardContent className="grid gap-8 pt-7 xl:grid-cols-[1.25fr_0.75fr]">
-          <MetricRadarChart
-            player={player}
-            metrics={metrics}
-            className="h-[24rem] lg:h-[30rem]"
-          />
-          <div className="flex flex-col justify-center border-l-0 border-primary/20 xl:border-l xl:pl-8">
-            <p className="section-kicker text-primary">Extras</p>
+        <CardContent className="grid gap-8 pt-7 xl:grid-cols-[0.8fr_1.2fr]">
+          <div className="flex flex-col justify-center border-r-0 border-primary/20 xl:border-r xl:pr-8">
+            <p className="section-kicker text-primary">Estado de forma</p>
+            <PlayerStatusSummary player={player} />
+            <p className="section-kicker mt-8 text-primary">Distinciones</p>
             {earnedAttributes.length > 0 ? (
               <ol className="mt-6 flex flex-col divide-y divide-primary/20 border-y border-primary/20">
                 {earnedAttributes.map((attribute) => (
@@ -334,6 +402,11 @@ export function PlayerDetailPage() {
               </p>
             )}
           </div>
+          <MetricRadarChart
+            player={player}
+            metrics={metrics}
+            className="h-[28rem] lg:h-[34rem]"
+          />
         </CardContent>
       </Card>
     </div>

@@ -103,6 +103,8 @@ interface PlayerCardProps {
   linkTo?: string
   /** The smaller card used on the pitch. */
   compact?: boolean
+  /** Enlarges the full-card composition for a profile or player detail view. */
+  showcase?: boolean
   className?: string
 }
 
@@ -111,6 +113,7 @@ export function PlayerCard({
   metrics,
   linkTo,
   compact,
+  showcase = false,
   className,
 }: PlayerCardProps) {
   const tier = toCardTier(player.cardRating)
@@ -158,6 +161,7 @@ export function PlayerCard({
           tier={tier}
           avatarUrl={avatarUrl}
           initials={initials}
+          showcase={showcase}
         />
       )}
     </article>
@@ -265,6 +269,7 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
 
 interface FullFaceProps extends FaceProps {
   metrics: readonly LeagueMetricRow[]
+  showcase: boolean
 }
 
 /** The squad and detail card: the compact face plus the stats it has room for. */
@@ -274,6 +279,7 @@ function FullFace({
   tier,
   avatarUrl,
   initials,
+  showcase,
 }: FullFaceProps) {
   const fullName = formatFullName(player.firstName, player.lastName)
 
@@ -282,7 +288,13 @@ function FullFace({
       {/* Rating and position ride in the corner rather than taking a column of
           their own, which leaves the photograph the whole width. */}
       <div className="absolute top-2.5 left-3 z-10 flex flex-col items-center leading-none">
-        <span className={cn('numeric text-2xl font-black', TIER_ACCENTS[tier])}>
+        <span
+          className={cn(
+            'numeric font-black',
+            showcase ? 'text-4xl' : 'text-2xl',
+            TIER_ACCENTS[tier],
+          )}
+        >
           {player.cardRating}
         </span>
         <span className="text-[0.625rem] font-bold tracking-wider opacity-80">
@@ -299,18 +311,30 @@ function FullFace({
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
-          className="h-auto w-[66%] border-2 shadow-[0_0_28px_rgb(234_175_53/0.2)]"
-          fallbackClassName="text-2xl"
+          className={cn(
+            'h-auto border-2 shadow-[0_0_28px_rgb(234_175_53/0.2)]',
+            showcase ? 'w-[72%]' : 'w-[66%]',
+          )}
+          fallbackClassName={showcase ? 'text-4xl' : 'text-2xl'}
         />
       </div>
 
       {/* The name band, ruled off the way a card prints it. */}
       <div className={cn('border-t px-3 py-1.5 text-center', TIER_RULES[tier])}>
-        <h3 className="truncate text-sm font-bold" title={player.displayName}>
+        <h3
+          className={cn('truncate font-bold', showcase ? 'text-xl' : 'text-sm')}
+          title={player.displayName}
+        >
           {player.displayName}
         </h3>
         {fullName && fullName !== player.displayName ? (
-          <p className="truncate text-[0.6875rem] opacity-70" title={fullName}>
+          <p
+            className={cn(
+              'truncate opacity-70',
+              showcase ? 'text-sm' : 'text-[0.6875rem]',
+            )}
+            title={fullName}
+          >
             {fullName}
           </p>
         ) : null}
