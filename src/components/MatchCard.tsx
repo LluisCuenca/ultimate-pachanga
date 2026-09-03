@@ -25,17 +25,18 @@ export function MatchCard({
   return (
     <Link
       to={`/matches/${match.id}`}
-      className="block rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="motion-card block rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <Card
         className={
           featured
-            ? 'grid aspect-[4/5] min-h-[34rem] grid-rows-[42%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 lg:aspect-[5/2] lg:min-h-80 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)] lg:grid-rows-none'
+            ? 'grid grid-rows-[12rem_auto] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 sm:grid-rows-[15rem_auto] lg:aspect-[5/2] lg:min-h-80 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)] lg:grid-rows-none'
             : 'grid aspect-video min-h-52 grid-cols-[minmax(0,42%)_minmax(0,1fr)] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-56'
         }
       >
         <VenuePhoto
           match={match}
+          className="motion-card-photo"
           overlayClassName={
             featured
               ? 'bg-gradient-to-b from-transparent via-card/25 to-card lg:bg-gradient-to-r'
@@ -46,7 +47,7 @@ export function MatchCard({
         <div
           className={
             featured
-              ? 'flex min-w-0 flex-col gap-4 px-7 py-8'
+              ? 'flex min-w-0 flex-col gap-5 px-5 py-6 sm:px-7 sm:py-8'
               : 'flex min-w-0 flex-col gap-2 py-4 pr-4 pl-3'
           }
         >
@@ -66,7 +67,7 @@ export function MatchCard({
           <p
             className={
               featured
-                ? 'flex min-w-0 flex-col font-heading text-5xl leading-[0.84] font-bold uppercase'
+                ? 'motion-card-title flex min-w-0 flex-col font-heading text-4xl leading-[0.84] font-bold uppercase sm:text-5xl'
                 : 'flex min-w-0 flex-col font-heading text-3xl leading-[0.86] font-bold uppercase'
             }
           >
@@ -78,24 +79,20 @@ export function MatchCard({
           </p>
 
           {featured && participants.length > 0 ? (
-            <div className="border-t border-primary/20 pt-4">
-              <div className="flex items-center justify-between gap-3">
-                <span className="technical text-[0.6875rem] font-semibold text-primary uppercase">
-                  Convocados
-                </span>
-                <span className="numeric text-sm text-muted-foreground">
-                  {participants.length}
-                </span>
-              </div>
-              <div className="mt-3 flex items-center gap-2 overflow-hidden">
-                {participants.slice(0, 7).map((player) => {
+            <div
+              className="border-t border-primary/20 pt-4"
+              role="group"
+              aria-label={`Convocados: ${participants.map((player) => player.displayName).join(', ')}`}
+            >
+              <div className="flex items-center gap-2 overflow-hidden">
+                {participants.slice(0, 6).map((player) => {
                   const avatarUrl = getAvatarUrl(player.avatarPath)
 
                   return (
                     <Avatar
                       key={player.id}
                       title={player.displayName}
-                      className="size-9 shrink-0 border border-primary/55 shadow-[0_0_14px_rgb(234_175_53/0.2)]"
+                      className="size-10 shrink-0 border border-primary/55 shadow-[0_0_18px_rgb(234_175_53/0.3)] sm:size-11"
                     >
                       {avatarUrl ? (
                         <AvatarImage src={avatarUrl} alt="" />
@@ -110,19 +107,12 @@ export function MatchCard({
                     </Avatar>
                   )
                 })}
-                {participants.length > 7 ? (
-                  <span className="numeric text-sm text-muted-foreground">
-                    +{participants.length - 7}
+                {participants.length > 6 ? (
+                  <span className="numeric flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/45 bg-primary/10 text-sm text-primary sm:size-11">
+                    +{participants.length - 6}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 truncate text-sm text-muted-foreground">
-                {participants
-                  .slice(0, 4)
-                  .map((player) => player.displayName)
-                  .join(' · ')}
-                {participants.length > 4 ? ' · …' : ''}
-              </p>
             </div>
           ) : null}
 

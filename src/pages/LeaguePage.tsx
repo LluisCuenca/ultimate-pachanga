@@ -47,7 +47,7 @@ function LeaderboardCard({
   renderValue: (player: PlayerCardData) => React.ReactNode
 }) {
   return (
-    <Card className="overflow-hidden border-border/90 bg-[linear-gradient(145deg,#171717_0%,#0d0d0d_100%)]">
+    <Card className="motion-card overflow-hidden border-border/90 bg-[linear-gradient(145deg,#171717_0%,#0d0d0d_100%)]">
       <CardHeader className="border-b border-border/80 pb-4">
         <CardTitle className="flex items-center gap-3 text-3xl leading-none uppercase">
           <span className="flex size-10 items-center justify-center border border-primary/40 bg-primary/10 text-primary">
@@ -110,7 +110,7 @@ function AwardSpotlight({
   return (
     <Link
       to={`/players/${player.id}`}
-      className="group relative min-h-72 overflow-hidden border border-border bg-[linear-gradient(145deg,#191919_0%,#0a0a0a_78%)] p-6 transition-all hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_22px_44px_rgb(0_0_0/0.42),0_0_32px_rgb(234_175_53/0.12)]"
+      className="motion-card group relative min-h-72 overflow-hidden border border-border bg-[linear-gradient(145deg,#191919_0%,#0a0a0a_78%)] p-6 transition-all hover:-translate-y-1 hover:border-primary/70 hover:shadow-[0_22px_44px_rgb(0_0_0/0.42),0_0_32px_rgb(234_175_53/0.12)]"
     >
       <span className="absolute top-0 right-0 h-20 w-20 border-t border-r border-primary/55" />
       <span className="technical text-[0.6875rem] font-semibold text-primary uppercase">
@@ -149,7 +149,7 @@ function AwardSpotlight({
 
 function HonoursRoll({ awards }: { awards: readonly AwardEntry[] }) {
   return (
-    <Card className="border-primary/20 bg-[linear-gradient(135deg,#17120a_0%,#111111_42%,#0c0c0c_100%)]">
+    <Card className="motion-card border-primary/20 bg-[linear-gradient(135deg,#17120a_0%,#111111_42%,#0c0c0c_100%)]">
       <CardHeader className="border-b border-primary/20">
         <CardTitle className="flex items-center gap-3 text-4xl leading-none uppercase">
           <Crown className="size-7 text-primary" aria-hidden="true" />
@@ -282,14 +282,16 @@ export function LeaguePage() {
     .filter((entry) => entry.holders.length > 0)
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="motion-page flex flex-col gap-12">
       <h1 className="sr-only">Ultimate Pachangas</h1>
 
       {areMatchesPending ? (
         <Skeleton className="h-96 rounded-xl" />
       ) : nextMatch ? (
-        <section className="flex flex-col gap-4">
-          <h2 className="page-title text-primary">Próxima jornada</h2>
+        <section className="motion-enter flex flex-col gap-4">
+          <h2 className="font-heading text-4xl leading-none font-bold whitespace-nowrap text-primary uppercase sm:text-5xl lg:text-[3.75rem]">
+            Próxima jornada
+          </h2>
           <div className="w-full max-w-[1280px]">
             <MatchCard
               match={nextMatch}
@@ -301,11 +303,11 @@ export function LeaguePage() {
       ) : null}
 
       {recentMatches.length > 0 ? (
-        <section className="flex flex-col gap-4">
+        <section className="motion-enter flex flex-col gap-4">
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="section-kicker">Archivo reciente</p>
-              <h2 className="section-title mt-3">Últimos partidos</h2>
+              <h2 className="section-title mt-3 text-5xl">Últimos partidos</h2>
             </div>
             <Link
               to="/matches"
@@ -345,7 +347,7 @@ export function LeaguePage() {
           description="Las estadísticas y los valores de mercado aparecerán tras el primer partido."
         />
       ) : (
-        <section className="flex flex-col gap-5">
+        <section className="motion-enter flex flex-col gap-5">
           <div>
             <p className="section-kicker">La élite</p>
             <h2 className="section-title mt-3">Clasificación individual</h2>
@@ -382,7 +384,7 @@ export function LeaguePage() {
 
       {awardHolders.length > 0 ? (
         <>
-          <section className="flex flex-col gap-5">
+          <section className="motion-enter flex flex-col gap-5">
             <div>
               <p className="section-kicker">La vitrina</p>
               <h2 className="section-title mt-3">Reconocimientos</h2>

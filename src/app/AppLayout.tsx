@@ -54,7 +54,7 @@ const ADMIN_NAVIGATION: NavigationItem[] = [
 
 function navigationLinkClasses({ isActive }: { isActive: boolean }): string {
   return cn(
-    'group flex min-h-13 items-center gap-3 border border-transparent px-3.5 py-2 font-heading text-xl leading-none font-semibold uppercase transition-all',
+    'motion-nav-link group flex min-h-13 items-center gap-3 border border-transparent px-3.5 py-2 font-heading text-xl leading-none font-semibold uppercase transition-all',
     isActive
       ? 'border-primary/70 bg-primary text-primary-foreground shadow-[0_12px_26px_rgb(234_175_53/0.18)]'
       : 'text-muted-foreground hover:border-primary/35 hover:bg-accent/70 hover:text-foreground',
@@ -259,7 +259,7 @@ export function AppLayout() {
           </Sheet>
         </header>
 
-        <main className="mx-auto w-full max-w-[1680px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10 xl:px-14">
+        <main className="app-main mx-auto w-full max-w-[1680px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10 xl:px-14">
           <Outlet />
         </main>
       </div>

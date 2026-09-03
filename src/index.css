@@ -154,6 +154,122 @@
 }
 
 @layer utilities {
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes soft-fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .app-main > * {
+      animation: soft-fade-in 260ms ease-out both;
+    }
+
+    .motion-enter {
+      animation: rise-in 440ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .motion-page > .motion-enter:nth-of-type(2) {
+      animation-delay: 70ms;
+    }
+
+    .motion-page > .motion-enter:nth-of-type(3) {
+      animation-delay: 130ms;
+    }
+
+    .motion-page > .motion-enter:nth-of-type(4) {
+      animation-delay: 190ms;
+    }
+
+    .motion-card-photo img {
+      transition:
+        transform 480ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        filter 480ms ease;
+    }
+
+    .motion-card {
+      transition:
+        border-color 200ms ease,
+        box-shadow 200ms ease;
+    }
+
+    .motion-card:hover {
+      border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+      box-shadow:
+        0 20px 42px rgb(0 0 0 / 0.38),
+        0 0 28px rgb(234 175 53 / 0.1);
+    }
+
+    .motion-card:hover .motion-card-photo img {
+      filter: saturate(1.08) contrast(1.03);
+      transform: scale(1.055);
+    }
+
+    .motion-card-title {
+      transition: color 180ms ease;
+    }
+
+    .motion-card:hover .motion-card-title {
+      color: var(--primary);
+    }
+
+    .motion-nav-link {
+      transition:
+        transform 170ms ease,
+        border-color 170ms ease,
+        background-color 170ms ease,
+        color 170ms ease;
+    }
+
+    .motion-nav-link svg {
+      transition: transform 170ms ease;
+    }
+
+    .motion-nav-link:hover {
+      transform: translateX(3px);
+    }
+
+    .motion-nav-link:hover svg {
+      transform: scale(1.12);
+    }
+
+    .motion-grid > * {
+      animation: rise-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .motion-grid > :nth-child(5n + 2) {
+      animation-delay: 45ms;
+    }
+
+    .motion-grid > :nth-child(5n + 3) {
+      animation-delay: 90ms;
+    }
+
+    .motion-grid > :nth-child(5n + 4) {
+      animation-delay: 135ms;
+    }
+
+    .motion-grid > :nth-child(5n) {
+      animation-delay: 180ms;
+    }
+  }
+
   .numeric {
     font-family: var(--font-heading);
     font-variant-numeric: tabular-nums;
