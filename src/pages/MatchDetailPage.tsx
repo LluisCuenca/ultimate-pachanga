@@ -795,85 +795,78 @@ export function MatchDetailPage() {
             ) : null}
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col gap-3 md:hidden">
-              {resultRows.map((row) => (
-                <article
-                  key={row.playerId}
-                  className="border border-border bg-black/20 p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <Link
-                        to={`/players/${row.playerId}`}
-                        className="font-heading text-2xl leading-none font-bold uppercase hover:text-primary"
+            <div className="overflow-x-auto md:hidden">
+              <Table className="min-w-[20rem] table-fixed text-xs">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-28 px-2 text-left">
+                      Jugador
+                    </TableHead>
+                    {metrics.map((metric) => (
+                      <TableHead
+                        key={metric.code}
+                        className="w-9 px-1 text-center"
+                        title={metric.label}
                       >
-                        {row.displayName}
-                      </Link>
-                      <p className="body-meta mt-1 text-muted-foreground">
-                        {row.teamName}
-                      </p>
-                    </div>
-                    <span className="numeric shrink-0 text-4xl leading-none text-primary">
-                      {formatScore(row.score?.finalScore ?? null)}
-                    </span>
-                  </div>
-                  {row.score ? (
-                    <>
-                      <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3 text-center">
-                        <div>
-                          <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
-                            Goles
-                          </dt>
-                          <dd className="numeric mt-1 text-xl">{row.score.goals}</dd>
-                        </div>
-                        <div>
-                          <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
-                            Victoria
-                          </dt>
-                          <dd className="numeric mt-1 text-xl">
-                            {formatVictories(row.score.victory)}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
-                            Base
-                          </dt>
-                          <dd className="numeric mt-1 text-xl">
-                            {formatScore(row.score.baseScore)}
-                          </dd>
-                        </div>
-                      </dl>
-                      <details className="mt-3 border-t border-border pt-3">
-                        <summary className="cursor-pointer text-sm font-semibold text-primary">
-                          Ver métricas
-                        </summary>
-                        <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                          {metrics.map((metric) => (
-                            <p key={metric.code} className="flex justify-between gap-2">
-                              <span className="text-muted-foreground">{metric.label}</span>
-                              <strong className="numeric">
-                                {formatScore(row.score?.metricScores[metric.code] ?? null)}
-                              </strong>
-                            </p>
-                          ))}
-                        </div>
-                      </details>
-                    </>
-                  ) : null}
-                  {isAdmin ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-4 w-full"
-                      data-testid={`edit-score-mobile-${row.playerCode}`}
-                      onClick={() => setScoreTarget(toScoreTarget(row))}
-                    >
-                      <Pencil className="size-4" aria-hidden="true" />
-                      {row.score ? 'Editar puntuación' : 'Puntuar jugador'}
-                    </Button>
-                  ) : null}
-                </article>
-              ))}
+                        {metric.label.slice(0, 3)}
+                      </TableHead>
+                    ))}
+                    <TableHead className="w-11 px-1 text-right">
+                      Final
+                    </TableHead>
+                    {isAdmin ? (
+                      <TableHead className="w-9 px-1 text-right">
+                        <span className="sr-only">Acciones</span>
+                      </TableHead>
+                    ) : null}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {resultRows.map((row) => (
+                    <TableRow key={row.playerId}>
+                      <TableCell className="px-2 py-2">
+                        <Link
+                          to={`/players/${row.playerId}`}
+                          className="block truncate font-semibold hover:text-primary"
+                          title={row.displayName}
+                        >
+                          {row.displayName}
+                        </Link>
+                      </TableCell>
+                      {metrics.map((metric) => (
+                        <TableCell
+                          key={metric.code}
+                          className="numeric px-1 py-2 text-center text-muted-foreground"
+                        >
+                          {formatScore(
+                            row.score?.metricScores[metric.code] ?? null,
+                          )}
+                        </TableCell>
+                      ))}
+                      <TableCell className="numeric px-1 py-2 text-right text-base font-bold text-primary">
+                        {formatScore(row.score?.finalScore ?? null)}
+                      </TableCell>
+                      {isAdmin ? (
+                        <TableCell className="px-1 py-1 text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={
+                              row.score
+                                ? `Editar puntuación de ${row.displayName}`
+                                : `Puntuar a ${row.displayName}`
+                            }
+                            data-testid={`edit-score-mobile-${row.playerCode}`}
+                            onClick={() => setScoreTarget(toScoreTarget(row))}
+                          >
+                            <Pencil className="size-4" aria-hidden="true" />
+                          </Button>
+                        </TableCell>
+                      ) : null}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
             <div className="hidden overflow-x-auto md:block">
               <Table>
