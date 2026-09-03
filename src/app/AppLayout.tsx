@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   BarChart3,
   CalendarDays,
-  Ellipsis,
+  Menu,
   LogIn,
   LogOut,
   Settings,
@@ -229,7 +229,7 @@ export function AppLayout() {
       />
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
+        <header className="liquid-panel sticky top-0 z-40 flex h-16 items-center border-b border-border px-4 lg:hidden">
           <BrandLockup iconOnly />
 
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -240,10 +240,13 @@ export function AppLayout() {
                 aria-label="Abrir menú"
                 className="ml-auto"
               >
-                <Ellipsis className="size-6" />
+                <Menu className="size-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 overflow-y-auto p-4">
+            <SheetContent
+              side="right"
+              className="liquid-panel w-72 overflow-y-auto p-4"
+            >
               <SheetTitle className="sr-only">Navegación</SheetTitle>
               <BrandLockup />
               <nav className="mt-7 border-t border-primary/35 pt-6">

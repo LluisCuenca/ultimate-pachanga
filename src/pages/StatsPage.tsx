@@ -221,22 +221,22 @@ export function StatsPage() {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid h-auto min-h-20 w-full grid-cols-3 gap-1 overflow-visible p-1">
+        <TabsList className="grid h-auto min-h-15 w-full grid-cols-3 gap-1 overflow-visible p-1">
           <TabsTrigger
             value="general"
-            className="h-auto min-h-[4.5rem] px-2 py-2 font-heading text-xl leading-none font-semibold uppercase"
+            className="h-auto min-h-14 px-2 py-1 font-heading text-lg leading-none font-semibold uppercase sm:text-xl"
           >
             General
           </TabsTrigger>
           <TabsTrigger
             value="palmares"
-            className="h-auto min-h-[4.5rem] px-2 py-2 font-heading text-xl leading-none font-semibold uppercase"
+            className="h-auto min-h-14 px-2 py-1 font-heading text-lg leading-none font-semibold uppercase sm:text-xl"
           >
             Palmarés
           </TabsTrigger>
           <TabsTrigger
             value="evolution"
-            className="h-auto min-h-[4.5rem] px-2 py-2 font-heading text-xl leading-none font-semibold uppercase"
+            className="h-auto min-h-14 px-2 py-1 font-heading text-lg leading-none font-semibold uppercase sm:text-xl"
           >
             Evolución
           </TabsTrigger>

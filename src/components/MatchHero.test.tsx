@@ -13,7 +13,7 @@ vi.mock('@/lib/supabase', () => ({
 }))
 
 describe('MatchHero', () => {
-  it('opens the artwork in a dialog sized by the image instead of a fixed frame', async () => {
+  it('opens the artwork in a full-screen viewer without distorting it', async () => {
     const user = userEvent.setup()
     const match = buildMatch({ photo_path: 'league-1/jornada-3.webp' })
 
@@ -23,6 +23,12 @@ describe('MatchHero', () => {
 
     const image = screen.getByRole('img', { name: /imagen de jornada 3/i })
     expect(image).toHaveClass('h-auto', 'w-auto', 'object-contain')
-    expect(image).toHaveClass('max-h-[94svh]', 'max-w-[96vw]')
+    expect(image).toHaveClass(
+      'max-h-[calc(100svh-2rem)]',
+      'max-w-[calc(100vw-2rem)]',
+    )
+    expect(
+      screen.getByRole('button', { name: /cerrar imagen/i }),
+    ).toBeInTheDocument()
   })
 })

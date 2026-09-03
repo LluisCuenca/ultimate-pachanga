@@ -13,10 +13,11 @@ import { renderWithProviders } from '@/test/render'
  */
 
 const useMembership = vi.hoisted(() => vi.fn())
+const useLeague = vi.hoisted(() => vi.fn())
 const useMyPlayerId = vi.hoisted(() => vi.fn())
 const useAuth = vi.hoisted(() => vi.fn())
 
-vi.mock('@/features/league/useLeague', () => ({ useMembership }))
+vi.mock('@/features/league/useLeague', () => ({ useLeague, useMembership }))
 vi.mock('@/features/players/useMyPlayer', () => ({ useMyPlayerId }))
 vi.mock('@/features/auth/useAuth', () => ({ useAuth }))
 
@@ -51,6 +52,12 @@ describe('LeagueMemberRoute', () => {
     useMembership.mockReset()
     useMyPlayerId.mockReset()
     useAuth.mockReturnValue({ session: null, user: null, isLoading: false })
+    useLeague.mockReturnValue({
+      data: { id: 'league-1' },
+      error: null,
+      isPending: false,
+      refetch: vi.fn(),
+    })
   })
 
   it('lets a member with a player through', () => {
@@ -97,6 +104,12 @@ describe('LeagueViewerRoute', () => {
   beforeEach(() => {
     useMembership.mockReset()
     useAuth.mockReset()
+    useLeague.mockReturnValue({
+      data: { id: 'league-1' },
+      error: null,
+      isPending: false,
+      refetch: vi.fn(),
+    })
   })
 
   it('lets an anonymous spectator through without asking for an account', () => {
@@ -124,5 +137,25 @@ describe('LeagueViewerRoute', () => {
     renderViewerGuard()
 
     expect(screen.getByText('Elige tu jugador')).toBeInTheDocument()
+  })
+
+  it('explains a public data failure instead of showing an empty page', () => {
+    useAuth.mockReturnValue({ session: null, user: null, isLoading: false })
+    useMembership.mockReturnValue({ data: undefined, isPending: false })
+    useLeague.mockReturnValue({
+      data: undefined,
+      error: new Error('function does not exist'),
+      isPending: false,
+      refetch: vi.fn(),
+    })
+
+    renderViewerGuard()
+
+    expect(
+      screen.getByText('No hemos podido cargar la liga'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Reintentar' }),
+    ).toBeInTheDocument()
   })
 })

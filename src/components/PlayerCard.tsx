@@ -131,7 +131,7 @@ export function PlayerCard({
       data-tier={tier}
       data-compact={compact ? 'true' : undefined}
       className={cn(
-        'relative flex flex-col overflow-hidden',
+        'relative flex h-full flex-col overflow-hidden',
         CARD_EDGE,
         TIER_FACES[tier],
         TIER_EDGES[tier],
@@ -141,8 +141,7 @@ export function PlayerCard({
         // own type is measured against; the grid card gets its height from the
         // metric and value bands below.
         compact ? '@container aspect-[4/5] rounded-lg' : 'rounded-xl',
-        !compact &&
-          'transition-all duration-200 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-[0_20px_36px_rgb(0_0_0/0.48),0_0_26px_rgb(234_175_53/0.16)]',
+        !compact && 'motion-card transition-all duration-200',
         !player.isActive && 'opacity-60 saturate-50',
         className,
       )}
@@ -172,7 +171,7 @@ export function PlayerCard({
   return (
     <Link
       to={linkTo}
-      className="rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="block h-full rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
       aria-label={`Ver ficha de ${player.displayName}`}
     >
       {card}
@@ -323,7 +322,12 @@ function FullFace({
       </div>
 
       {/* The name band, ruled off the way a card prints it. */}
-      <div className={cn('border-t px-3 py-1.5 text-center', TIER_RULES[tier])}>
+      <div
+        className={cn(
+          'flex min-h-12 flex-col justify-center border-t px-3 py-1.5 text-center',
+          TIER_RULES[tier],
+        )}
+      >
         <h3
           className={cn('truncate font-bold', showcase ? 'text-xl' : 'text-sm')}
           title={player.displayName}

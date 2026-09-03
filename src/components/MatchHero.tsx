@@ -1,8 +1,9 @@
-import { CalendarDays, MapPin, Maximize2 } from 'lucide-react'
+import { CalendarDays, MapPin, Maximize2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -51,23 +52,37 @@ export function MatchHero({ match }: { match: MatchRow }) {
               <DialogTrigger asChild>
                 <Button
                   variant="secondary"
+                  aria-label="Ver imagen en grande"
                   className="border border-primary/45 bg-black/70 px-3 text-foreground backdrop-blur hover:bg-primary hover:text-primary-foreground"
                 >
                   <Maximize2 className="size-4" aria-hidden="true" />
                   <span className="hidden sm:inline">Ver imagen</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="h-auto max-h-[94svh] w-fit max-w-[96vw] overflow-hidden border-primary/30 bg-black p-0">
+              <DialogContent
+                showCloseButton={false}
+                className="liquid-viewer inset-0 top-0 left-0 h-svh w-screen max-w-none translate-x-0 translate-y-0 place-items-center overflow-hidden rounded-none border-0 p-4 ring-0 sm:max-w-none"
+              >
                 <DialogHeader className="sr-only">
                   <DialogTitle>{imageLabel}</DialogTitle>
                   <DialogDescription>
                     Imagen asociada a la jornada.
                   </DialogDescription>
                 </DialogHeader>
+                <DialogClose asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="absolute top-4 right-4 z-10 border border-white/20 bg-black/65 text-white backdrop-blur-xl hover:border-primary hover:bg-primary hover:text-black"
+                    aria-label="Cerrar imagen"
+                  >
+                    <X className="size-5" aria-hidden="true" />
+                  </Button>
+                </DialogClose>
                 <img
                   src={imageUrl}
                   alt={imageLabel}
-                  className="block h-auto max-h-[94svh] w-auto max-w-[96vw] object-contain"
+                  className="block h-auto max-h-[calc(100svh-2rem)] w-auto max-w-[calc(100vw-2rem)] object-contain"
                 />
               </DialogContent>
             </Dialog>

@@ -1,12 +1,6 @@
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import {
-  Award,
-  CalendarDays,
-  TrendingUp,
-  Trophy,
-  Users,
-} from 'lucide-react'
+import { Award, CalendarDays, TrendingUp, Trophy, Users } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,7 +15,7 @@ import {
 } from '@/features/players/api'
 import { fetchMatches, fetchSquad, matchKeys } from '@/features/matches/api'
 import { useLeague, useLeagueAttributes } from '@/features/league/useLeague'
-import { formatVictories, formatWinRate, toInitials } from '@/lib/formatting'
+import { formatVictories, toInitials } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import { getAvatarUrl } from '@/lib/supabase'
 import type {
@@ -94,11 +88,7 @@ function LeaderboardCard({
   )
 }
 
-function AwardSpotlight({
-  entry,
-}: {
-  entry: AwardEntry
-}) {
+function AwardSpotlight({ entry }: { entry: AwardEntry }) {
   const player = entry.holders[0]
   const avatarUrl = getAvatarUrl(player.avatarPath)
   const initials = toInitials(
@@ -180,9 +170,23 @@ export function LeaguePage() {
   const topByVictories = [...rankedPlayers]
     .sort(
       (left, right) =>
-        right.totalVictories / right.matchesPlayed -
-          left.totalVictories / left.matchesPlayed ||
+        right.totalVictories - left.totalVictories ||
         right.matchesPlayed - left.matchesPlayed,
+    )
+    .slice(0, LEADERBOARD_SIZE)
+  const honoursCount = (player: PlayerCardData) =>
+    attributes
+      .filter((attribute) => attribute.points > 0)
+      .reduce(
+        (total, attribute) =>
+          total + (player.attributeCounts[attribute.code] ?? 0),
+        0,
+      )
+  const topByHonours = [...rankedPlayers]
+    .sort(
+      (left, right) =>
+        honoursCount(right) - honoursCount(left) ||
+        right.cardRating - left.cardRating,
     )
     .slice(0, LEADERBOARD_SIZE)
   const nextMatch: MatchRow | undefined = (matches ?? [])
@@ -207,6 +211,7 @@ export function LeaguePage() {
     .filter((match) => match.status === 'scored')
     .slice(0, 3)
   const latestAwardEntries: AwardEntry[] = attributes
+    .filter((attribute) => attribute.points > 0)
     .map((attribute) => {
       const winner = latestAwardWinners.find(
         (entry) => entry.attributeCode === attribute.code,
@@ -227,9 +232,10 @@ export function LeaguePage() {
         <Skeleton className="h-96 rounded-xl" />
       ) : nextMatch ? (
         <section className="motion-enter flex flex-col gap-4">
-          <h2 className="font-heading text-3xl leading-none font-bold whitespace-nowrap text-primary uppercase sm:text-5xl lg:text-[3.75rem]">
-            Próxima jornada
-          </h2>
+          <div>
+            <p className="section-kicker">En cartel</p>
+            <h2 className="section-title mt-3">Próxima jornada</h2>
+          </div>
           <div className="w-full max-w-[1280px]">
             <MatchCard
               match={nextMatch}
@@ -290,7 +296,7 @@ export function LeaguePage() {
             <p className="section-kicker">La élite</p>
             <h2 className="section-title mt-3">Clasificación individual</h2>
           </div>
-          <div className="grid gap-5 xl:grid-cols-2">
+          <div className="grid gap-5 xl:grid-cols-3">
             <LeaderboardCard
               title="Valor de mercado"
               icon={TrendingUp}
@@ -303,15 +309,24 @@ export function LeaguePage() {
               )}
             />
             <LeaderboardCard
-              title="Mejor porcentaje de victorias"
+              title="Más victoriosos"
               icon={Trophy}
               players={topByVictories}
               renderValue={(player) => (
                 <span className="numeric text-lg font-semibold">
-                  {formatWinRate(player.totalVictories, player.matchesPlayed)}
-                  <span className="ml-2 font-normal text-muted-foreground">
-                    {formatVictories(player.totalVictories)}/
-                    {player.matchesPlayed}
+                  {formatVictories(player.totalVictories)} victorias
+                </span>
+              )}
+            />
+            <LeaderboardCard
+              title="Palmarés"
+              icon={Award}
+              players={topByHonours}
+              renderValue={(player) => (
+                <span className="numeric text-lg font-semibold">
+                  {honoursCount(player)}{' '}
+                  <span className="font-normal text-muted-foreground">
+                    {honoursCount(player) === 1 ? 'distinción' : 'distinciones'}
                   </span>
                 </span>
               )}
@@ -321,20 +336,17 @@ export function LeaguePage() {
       )}
 
       {latestAwardEntries.length > 0 ? (
-          <section className="motion-enter flex flex-col gap-5">
-            <div>
-              <p className="section-kicker">La vitrina</p>
-              <h2 className="section-title mt-3">Reconocimientos</h2>
-            </div>
-            <div className="grid gap-5 xl:grid-cols-3">
-              {latestAwardEntries.slice(0, 3).map((entry) => (
-                <AwardSpotlight
-                  key={entry.attribute.code}
-                  entry={entry}
-                />
-              ))}
-            </div>
-          </section>
+        <section className="motion-enter flex flex-col gap-5">
+          <div>
+            <p className="section-kicker">La vitrina</p>
+            <h2 className="section-title mt-3">Reconocimientos</h2>
+          </div>
+          <div className="grid gap-5 xl:grid-cols-3">
+            {latestAwardEntries.slice(0, 3).map((entry) => (
+              <AwardSpotlight key={entry.attribute.code} entry={entry} />
+            ))}
+          </div>
+        </section>
       ) : null}
     </div>
   )
