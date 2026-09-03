@@ -7,7 +7,7 @@
 -- ============================================================================
 
 begin;
-select plan(14);
+select plan(15);
 
 -- ---------------------------------------------------------------------------
 -- One administrator and one member. Registration itself grants nothing since
@@ -57,6 +57,11 @@ select is(
    where grantee = 'anon' and table_schema = 'public'),
   0,
   'the anon role has no privileges on anything in public'
+);
+
+select ok(
+  not has_table_privilege('authenticated', 'public.players', 'DELETE'),
+  'the authenticated role has no DELETE privilege on players'
 );
 
 -- A view without security_invoker runs as its owner and silently bypasses RLS
