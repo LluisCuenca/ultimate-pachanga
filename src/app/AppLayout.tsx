@@ -23,6 +23,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { AdminOnly } from '@/components/AdminOnly'
+import { BrandLogoDialog } from '@/components/BrandLogoDialog'
 import { signOut } from '@/features/auth/api'
 import { useAuth } from '@/features/auth/useAuth'
 import { fetchPlayerCard, playerKeys } from '@/features/players/api'
@@ -229,8 +230,18 @@ export function AppLayout() {
       />
 
       <div className="min-w-0 flex-1">
-        <header className="liquid-panel sticky top-0 z-40 flex h-16 items-center border-b border-border px-4 lg:hidden">
-          <BrandLockup iconOnly />
+        <header className="liquid-panel sticky top-0 z-40 grid h-18 grid-cols-[3.25rem_minmax(0,1fr)_3.25rem] items-center border-b border-border px-3 lg:hidden">
+          <BrandLogoDialog
+            className="justify-self-start"
+            imageClassName="h-13 w-13"
+          />
+
+          <Link
+            to="/league"
+            className="truncate text-center font-heading text-xl leading-none font-bold uppercase"
+          >
+            {BRAND_NAME}
+          </Link>
 
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
@@ -238,7 +249,7 @@ export function AppLayout() {
                 variant="ghost"
                 size="icon"
                 aria-label="Abrir menú"
-                className="ml-auto"
+                className="justify-self-end"
               >
                 <Menu className="size-6" />
               </Button>

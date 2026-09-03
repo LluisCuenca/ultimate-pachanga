@@ -84,8 +84,12 @@ describe('PitchLineups', () => {
   it('draws a pitch for each team', () => {
     renderLineups()
 
-    expect(screen.getAllByText('Los Cracks')).toHaveLength(2)
-    expect(screen.getAllByText('Los Pachangueros')).toHaveLength(2)
+    expect(
+      screen.getByRole('heading', { name: 'Los Cracks' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Los Pachangueros' }),
+    ).toBeInTheDocument()
 
     // The same pitch image is used twice, once per side.
     const pitches = screen

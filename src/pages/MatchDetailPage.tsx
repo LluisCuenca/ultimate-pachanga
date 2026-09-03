@@ -560,24 +560,6 @@ export function MatchDetailPage() {
 
         {/* A status rather than a control: there is no self-removal, and saying
             so where the sign-up button was avoids the hunt for one. */}
-        {isUpcoming && isAlreadyCalledUp ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge
-                variant="secondary"
-                className="h-9 gap-1.5 px-3"
-                tabIndex={0}
-              >
-                <Check className="size-4" aria-hidden="true" />
-                Estás convocado
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              Solo un administrador puede quitar a alguien de la convocatoria.
-            </TooltipContent>
-          </Tooltip>
-        ) : null}
-
         <AdminOnly>
           <Button
             variant="outline"
@@ -685,7 +667,7 @@ export function MatchDetailPage() {
         </CardHeader>
         <CardContent>
           {isSquadPending ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-7 lg:grid-cols-2">
               <Skeleton className="aspect-[1000/1250] rounded-xl" />
               <Skeleton className="aspect-[1000/1250] rounded-xl" />
             </div>
@@ -721,10 +703,27 @@ export function MatchDetailPage() {
       </Card>
 
       <Card>
-        <CardHeader className="border-b border-border">
-          <CardTitle className="text-4xl leading-none uppercase">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
+          <CardTitle className="text-3xl leading-none uppercase sm:text-4xl">
             <h2>Convocados ({squad.length})</h2>
           </CardTitle>
+          {isUpcoming && isAlreadyCalledUp ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge
+                  variant="secondary"
+                  className="h-8 gap-1.5 px-2.5"
+                  tabIndex={0}
+                >
+                  <Check className="size-4" aria-hidden="true" />
+                  Estás convocado
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                Solo un administrador puede quitar a alguien de la convocatoria.
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
         </CardHeader>
         <CardContent>
           {isSquadPending ? (

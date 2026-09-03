@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { MarketValue } from '@/components/MarketValue'
 import { MatchCard } from '@/components/MatchCard'
+import { BrandLogoDialog } from '@/components/BrandLogoDialog'
 import {
   fetchLatestAwardWinners,
   fetchPlayerCards,
@@ -18,6 +19,7 @@ import { useLeague, useLeagueAttributes } from '@/features/league/useLeague'
 import { formatVictories, toInitials } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import { getAvatarUrl } from '@/lib/supabase'
+import { BRAND_NAME } from '@/lib/brand'
 import type {
   LeagueAttributeRow,
   MatchRow,
@@ -226,16 +228,25 @@ export function LeaguePage() {
 
   return (
     <div className="motion-page flex flex-col gap-12">
-      <h1 className="sr-only">Ultimate Pachangas</h1>
+      <h1 className="sr-only">{BRAND_NAME}</h1>
+      <section className="motion-enter -mt-2 flex flex-col items-center pb-2 text-center lg:hidden">
+        <BrandLogoDialog
+          className="w-full max-w-64"
+          imageClassName="mx-auto h-auto w-full drop-shadow-[0_0_34px_rgb(234_175_53/0.24)]"
+        />
+        <p
+          aria-hidden="true"
+          className="mt-3 font-heading text-6xl leading-[0.82] font-bold uppercase"
+        >
+          {BRAND_NAME}
+        </p>
+      </section>
 
       {areMatchesPending ? (
         <Skeleton className="h-96 rounded-xl" />
       ) : nextMatch ? (
         <section className="motion-enter flex flex-col gap-4">
-          <div>
-            <p className="section-kicker">En cartel</p>
-            <h2 className="section-title mt-3">Próxima jornada</h2>
-          </div>
+          <p className="section-kicker">Próxima jornada</p>
           <div className="w-full max-w-[1280px]">
             <MatchCard
               match={nextMatch}
@@ -249,10 +260,7 @@ export function LeaguePage() {
       {recentMatches.length > 0 ? (
         <section className="motion-enter flex flex-col gap-4">
           <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="section-kicker">Últimas jornadas</p>
-              <h2 className="section-title mt-3">Últimos partidos</h2>
-            </div>
+            <p className="section-kicker">Últimas jornadas</p>
             <Link
               to="/matches"
               className="technical text-xs font-semibold text-primary uppercase hover:underline"

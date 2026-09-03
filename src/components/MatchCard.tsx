@@ -30,8 +30,8 @@ export function MatchCard({
       <Card
         className={
           featured
-            ? 'grid grid-rows-[12rem_auto] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 sm:grid-rows-[15rem_auto] lg:aspect-[5/2] lg:min-h-80 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)] lg:grid-rows-none'
-            : 'grid aspect-video min-h-52 grid-cols-[minmax(0,42%)_minmax(0,1fr)] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-56'
+            ? 'grid grid-rows-[12rem_auto] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_44px_rgb(234_175_53/0.16)] transition-all hover:-translate-y-1 hover:border-primary/80 sm:grid-rows-[15rem_auto] lg:aspect-[5/2] lg:min-h-80 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)] lg:grid-rows-none'
+            : 'grid aspect-video min-h-52 grid-cols-[minmax(0,42%)_minmax(0,1fr)] gap-0 py-0 shadow-[0_16px_34px_rgb(0_0_0/0.38),0_0_30px_rgb(234_175_53/0.1)] transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_18px_38px_rgb(0_0_0/0.4),0_0_40px_rgb(234_175_53/0.2)] lg:min-h-56'
         }
       >
         <VenuePhoto
@@ -67,8 +67,8 @@ export function MatchCard({
           <p
             className={
               featured
-                  ? 'motion-card-title flex min-w-0 flex-col font-heading text-3xl leading-[0.88] font-bold uppercase sm:text-5xl'
-                  : 'flex min-w-0 flex-col font-heading text-[1.75rem] leading-[0.9] font-bold uppercase sm:text-3xl'
+                ? 'motion-card-title flex min-w-0 flex-col font-heading text-3xl leading-[0.88] font-bold uppercase sm:text-5xl'
+                : 'flex min-w-0 flex-col font-heading text-[1.75rem] leading-[0.9] font-bold uppercase sm:text-3xl'
             }
           >
             <span className="truncate" title={match.home_team_name}>

@@ -204,7 +204,6 @@ export function PlayerDetailPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="sr-only">{player.displayName}</h1>
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/players">
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -224,10 +223,11 @@ export function PlayerDetailPage() {
           <CardHeader className="border-b border-primary/20">
             <p className="section-kicker text-primary">Ficha de jugador</p>
             <CardTitle className="mt-3 text-5xl leading-none uppercase">
-              <h2>Datos de competición</h2>
+              <h1>{player.displayName}</h1>
             </CardTitle>
             <p className="technical text-xs text-muted-foreground uppercase">
-              {player.preferredPosition} · {formatPosition(player.preferredPosition)}
+              {player.preferredPosition} ·{' '}
+              {formatPosition(player.preferredPosition)}
             </p>
           </CardHeader>
           <CardContent className="pt-4">
@@ -299,144 +299,122 @@ export function PlayerDetailPage() {
             />
           ) : (
             <>
-            <div className="flex flex-col gap-3 md:hidden">
-              {history.map((entry) => (
-                <article
-                  key={entry.matchId}
-                  className="border border-border bg-black/20 p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <Link
-                        to={`/matches/${entry.matchId}`}
-                        className="font-heading text-2xl leading-none font-bold uppercase hover:text-primary"
-                      >
-                        {entry.matchTitle}
-                      </Link>
-                      <p className="body-meta mt-2 text-muted-foreground">
-                        {formatMatchDate(entry.playedAt)}
-                      </p>
-                    </div>
-                    <span className="numeric shrink-0 text-4xl leading-none text-primary">
-                      {formatScore(entry.finalScore)}
-                    </span>
-                  </div>
-                  <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-3 text-center">
-                    <div>
-                      <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
-                        Goles
-                      </dt>
-                      <dd className="numeric mt-1 text-xl">{entry.goals}</dd>
-                    </div>
-                    <div>
-                      <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
-                        Victoria
-                      </dt>
-                      <dd className="numeric mt-1 text-xl">
-                        {formatVictories(entry.victory)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="technical text-[0.6875rem] text-muted-foreground uppercase">
-                        Base
-                      </dt>
-                      <dd className="numeric mt-1 text-xl">
-                        {formatScore(entry.baseScore)}
-                      </dd>
-                    </div>
-                  </dl>
-                  <details className="mt-3 border-t border-border pt-3">
-                    <summary className="cursor-pointer text-sm font-semibold text-primary">
-                      Ver desglose
-                    </summary>
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                      {metrics.map((metric) => (
-                        <p key={metric.code} className="flex justify-between gap-3">
-                          <span className="text-muted-foreground">{metric.label}</span>
-                          <strong className="numeric">
-                            {formatScore(entry.metricScores[metric.code] ?? null)}
-                          </strong>
-                        </p>
-                      ))}
-                    </div>
-                    {entry.attributes.length > 0 ? (
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {entry.attributes.map((attribute) => (
-                          <AttributeBadge
-                            key={attribute.code}
-                            label={attribute.label}
-                            points={attribute.points}
-                          />
-                        ))}
-                      </div>
-                    ) : null}
-                  </details>
-                </article>
-              ))}
-            </div>
-            <div className="hidden overflow-x-auto md:block">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Partido</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    {metrics.map((metric) => (
-                      <TableHead key={metric.code} className="text-right">
-                        {metric.label}
+              <div className="overflow-x-auto md:hidden">
+                <Table className="min-w-[20rem] table-fixed text-xs">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-28 px-2 text-left">
+                        Jornada
                       </TableHead>
-                    ))}
-                    <TableHead className="text-right">Goles</TableHead>
-                    <TableHead className="text-right">Victoria</TableHead>
-                    <TableHead className="text-right">Base</TableHead>
-                    <TableHead>Atributos</TableHead>
-                    <TableHead className="text-right">Final</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {history.map((entry) => (
-                    <TableRow key={entry.matchId}>
-                      <TableCell className="font-medium">
-                        {entry.matchTitle}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-muted-foreground">
-                        {formatMatchDate(entry.playedAt)}
-                      </TableCell>
                       {metrics.map((metric) => (
-                        <TableCell
+                        <TableHead
                           key={metric.code}
-                          className="numeric text-right"
+                          className="w-9 px-1 text-center"
+                          title={metric.label}
                         >
-                          {formatScore(entry.metricScores[metric.code] ?? null)}
-                        </TableCell>
+                          {metric.label.slice(0, 3)}
+                        </TableHead>
                       ))}
-                      <TableCell className="numeric text-right">
-                        {entry.goals}
-                      </TableCell>
-                      <TableCell className="numeric text-right">
-                        {formatVictories(entry.victory)}
-                      </TableCell>
-                      <TableCell className="numeric text-right">
-                        {formatScore(entry.baseScore)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {entry.attributes.map((attribute) => (
-                            <AttributeBadge
-                              key={attribute.code}
-                              label={attribute.label}
-                              points={attribute.points}
-                            />
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell className="numeric text-right text-lg font-bold text-primary">
-                        {formatScore(entry.finalScore)}
-                      </TableCell>
+                      <TableHead className="w-11 px-1 text-right">
+                        Final
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {history.map((entry) => (
+                      <TableRow key={entry.matchId}>
+                        <TableCell className="px-2 py-2">
+                          <Link
+                            to={`/matches/${entry.matchId}`}
+                            className="block truncate font-semibold hover:text-primary"
+                            title={`${entry.matchTitle} · ${formatMatchDate(entry.playedAt)}`}
+                          >
+                            {entry.matchTitle}
+                          </Link>
+                        </TableCell>
+                        {metrics.map((metric) => (
+                          <TableCell
+                            key={metric.code}
+                            className="numeric px-1 py-2 text-center text-muted-foreground"
+                          >
+                            {formatScore(
+                              entry.metricScores[metric.code] ?? null,
+                            )}
+                          </TableCell>
+                        ))}
+                        <TableCell className="numeric px-1 py-2 text-right text-base font-bold text-primary">
+                          {formatScore(entry.finalScore)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="hidden overflow-x-auto md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Partido</TableHead>
+                      <TableHead>Fecha</TableHead>
+                      {metrics.map((metric) => (
+                        <TableHead key={metric.code} className="text-right">
+                          {metric.label}
+                        </TableHead>
+                      ))}
+                      <TableHead className="text-right">Goles</TableHead>
+                      <TableHead className="text-right">Victoria</TableHead>
+                      <TableHead className="text-right">Base</TableHead>
+                      <TableHead>Atributos</TableHead>
+                      <TableHead className="text-right">Final</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {history.map((entry) => (
+                      <TableRow key={entry.matchId}>
+                        <TableCell className="font-medium">
+                          {entry.matchTitle}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {formatMatchDate(entry.playedAt)}
+                        </TableCell>
+                        {metrics.map((metric) => (
+                          <TableCell
+                            key={metric.code}
+                            className="numeric text-right"
+                          >
+                            {formatScore(
+                              entry.metricScores[metric.code] ?? null,
+                            )}
+                          </TableCell>
+                        ))}
+                        <TableCell className="numeric text-right">
+                          {entry.goals}
+                        </TableCell>
+                        <TableCell className="numeric text-right">
+                          {formatVictories(entry.victory)}
+                        </TableCell>
+                        <TableCell className="numeric text-right">
+                          {formatScore(entry.baseScore)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {entry.attributes.map((attribute) => (
+                              <AttributeBadge
+                                key={attribute.code}
+                                label={attribute.label}
+                                points={attribute.points}
+                              />
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell className="numeric text-right text-lg font-bold text-primary">
+                          {formatScore(entry.finalScore)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </>
           )}
         </CardContent>

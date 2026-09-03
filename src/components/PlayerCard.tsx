@@ -92,8 +92,6 @@ const COMPACT_SIZES = {
   alias: 'text-[clamp(0.625rem,14cqi,0.8125rem)]',
   fullName: 'text-[clamp(0.5625rem,11cqi,0.6875rem)]',
   initials: 'text-[clamp(0.625rem,18cqi,1.125rem)]',
-  /** Height, with the width following from the square ratio. */
-  photo: 'h-[clamp(1.25rem,52cqi,4rem)]',
 } as const
 
 interface PlayerCardProps {
@@ -197,19 +195,43 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
 
   return (
     <>
+      <div className="absolute inset-0 overflow-hidden bg-black/35">
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt=""
+            className="size-full object-cover object-top saturate-[0.92]"
+            loading="lazy"
+          />
+        ) : (
+          <div
+            className={cn(
+              'flex size-full items-center justify-center bg-[radial-gradient(circle_at_50%_35%,rgb(234_175_53/0.18),transparent_62%)] font-heading font-bold text-white/75',
+              COMPACT_SIZES.initials,
+            )}
+          >
+            {initials}
+          </div>
+        )}
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(0_0_0/0.18)_0%,transparent_35%,rgb(0_0_0/0.2)_52%,rgb(0_0_0/0.96)_100%)]" />
+      </div>
+
       <ConfidenceDonut
         value={player.confidencePct}
         className={cn(
-          'absolute top-[4cqi] right-[5cqi]',
+          'absolute top-[4cqi] right-[5cqi] z-10 shadow-[0_0_12px_rgb(234_175_53/0.4)]',
           COMPACT_SIZES.confidence,
         )}
       />
       <FormStateIcon
         state={player.formState}
-        className={cn('absolute top-[17cqi] right-[5cqi]', COMPACT_SIZES.form)}
+        className={cn(
+          'absolute top-[17cqi] right-[5cqi] z-10',
+          COMPACT_SIZES.form,
+        )}
       />
 
-      <div className="flex flex-col items-start gap-[1cqi] px-[6cqi] pt-[4cqi] leading-none">
+      <div className="absolute top-[4cqi] left-[5cqi] z-10 flex flex-col items-start gap-[1cqi] leading-none drop-shadow-[0_2px_4px_rgb(0_0_0/0.9)]">
         <span
           className={cn(
             'numeric font-black',
@@ -229,22 +251,9 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
         </span>
       </div>
 
-      {/* Centred in whatever the two bands leave, and never taller than that. */}
-      <div className="flex min-h-0 flex-1 items-center justify-center py-[3cqi]">
-        <PlayerPhoto
-          avatarUrl={avatarUrl}
-          initials={initials}
-          className={cn(
-            'max-h-full w-auto shadow-[0_0_26px_rgb(234_175_53/0.36)]',
-            COMPACT_SIZES.photo,
-          )}
-          fallbackClassName={COMPACT_SIZES.initials}
-        />
-      </div>
-
       <div
         className={cn(
-          'border-t px-[5cqi] py-[3cqi] text-center leading-tight',
+          'absolute inset-x-0 bottom-0 z-10 border-t px-[5cqi] py-[4cqi] text-center leading-tight backdrop-blur-[1px]',
           TIER_RULES[tier],
         )}
       >
