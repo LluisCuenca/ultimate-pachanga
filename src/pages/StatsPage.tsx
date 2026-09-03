@@ -221,23 +221,22 @@ export function StatsPage() {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        {/* Scrolls sideways on a phone rather than wrapping into a tall block. */}
-        <TabsList className="grid h-16 w-full grid-cols-3 justify-start overflow-x-auto">
+        <TabsList className="grid h-auto min-h-20 w-full grid-cols-3 gap-1 overflow-visible p-1">
           <TabsTrigger
             value="general"
-            className="h-14 font-heading text-xl font-semibold uppercase"
+            className="h-auto min-h-[4.5rem] px-2 py-2 font-heading text-xl leading-none font-semibold uppercase"
           >
             General
           </TabsTrigger>
           <TabsTrigger
             value="palmares"
-            className="h-14 font-heading text-xl font-semibold uppercase"
+            className="h-auto min-h-[4.5rem] px-2 py-2 font-heading text-xl leading-none font-semibold uppercase"
           >
             Palmarés
           </TabsTrigger>
           <TabsTrigger
             value="evolution"
-            className="h-14 font-heading text-xl font-semibold uppercase"
+            className="h-auto min-h-[4.5rem] px-2 py-2 font-heading text-xl leading-none font-semibold uppercase"
           >
             Evolución
           </TabsTrigger>

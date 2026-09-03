@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import {
   BarChart3,
   CalendarDays,
+  Ellipsis,
   LogOut,
-  Menu,
   Settings,
   Shield,
   UserCog,
@@ -108,13 +108,19 @@ function NavigationLinks({
   )
 }
 
-function BrandLockup({ compact = false }: { compact?: boolean }) {
+function BrandLockup({
+  compact = false,
+  iconOnly = false,
+}: {
+  compact?: boolean
+  iconOnly?: boolean
+}) {
   return (
     <Link
       to="/league"
       className={cn(
         'flex min-w-0 items-center',
-        compact ? 'gap-2.5' : 'w-full justify-center',
+        compact ? 'gap-2.5' : iconOnly ? 'w-fit' : 'w-full justify-center',
       )}
     >
       <img
@@ -122,10 +128,14 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
         alt={BRAND_NAME}
         className={cn(
           'object-contain',
-          compact ? 'size-10 shrink-0' : 'h-auto w-full max-w-60',
+          compact
+            ? 'size-10 shrink-0'
+            : iconOnly
+              ? 'h-12 w-auto max-w-none'
+              : 'h-auto w-full max-w-60',
         )}
       />
-      {compact ? (
+      {compact && !iconOnly ? (
         <span className="truncate font-heading text-xl leading-none font-bold uppercase">
           {BRAND_NAME}
         </span>
@@ -203,16 +213,26 @@ export function AppLayout() {
 
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
+          <BrandLockup iconOnly />
+
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Abrir menú">
-                <Menu className="size-5" />
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Abrir menú"
+                className="ml-auto"
+              >
+                <Ellipsis className="size-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 overflow-y-auto p-4">
+            <SheetContent side="right" className="w-72 overflow-y-auto p-4">
               <SheetTitle className="sr-only">Navegación</SheetTitle>
-              <BrandLockup compact />
-              <nav className="mt-8 flex flex-col gap-1.5">
+              <BrandLockup />
+              <nav className="mt-7 border-t border-primary/35 pt-6">
+                <p className="technical mb-3 px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
+                  Competición
+                </p>
                 <NavigationLinks
                   items={NAVIGATION}
                   onNavigate={() => setIsMenuOpen(false)}
@@ -237,11 +257,6 @@ export function AppLayout() {
               </Button>
             </SheetContent>
           </Sheet>
-
-          <div className="mx-auto">
-            <BrandLockup compact />
-          </div>
-          <div className="size-8" aria-hidden="true" />
         </header>
 
         <main className="mx-auto w-full max-w-[1680px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10 xl:px-14">

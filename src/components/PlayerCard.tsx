@@ -235,7 +235,10 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
-          className={cn('max-h-full w-auto', COMPACT_SIZES.photo)}
+          className={cn(
+            'max-h-full w-auto shadow-[0_0_26px_rgb(234_175_53/0.36)]',
+            COMPACT_SIZES.photo,
+          )}
           fallbackClassName={COMPACT_SIZES.initials}
         />
       </div>

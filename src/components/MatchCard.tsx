@@ -30,15 +30,15 @@ export function MatchCard({
       <Card
         className={
           featured
-            ? 'grid aspect-[5/2] min-h-72 grid-cols-[46%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 lg:min-h-80'
-            : 'grid aspect-video min-h-52 grid-cols-[42%_1fr] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-56'
+            ? 'grid aspect-[4/5] min-h-[34rem] grid-rows-[42%_1fr] gap-0 overflow-hidden border-primary/35 py-0 shadow-[0_24px_54px_rgb(0_0_0/0.45),0_0_36px_rgb(234_175_53/0.08)] transition-all hover:-translate-y-1 hover:border-primary/80 lg:aspect-[5/2] lg:min-h-80 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)] lg:grid-rows-none'
+            : 'grid aspect-video min-h-52 grid-cols-[minmax(0,42%)_minmax(0,1fr)] gap-0 py-0 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_16px_32px_rgb(0_0_0/0.35)] lg:min-h-56'
         }
       >
         <VenuePhoto
           match={match}
           overlayClassName={
             featured
-              ? 'bg-gradient-to-r from-transparent via-card/25 to-card'
+              ? 'bg-gradient-to-b from-transparent via-card/25 to-card lg:bg-gradient-to-r'
               : undefined
           }
         />
