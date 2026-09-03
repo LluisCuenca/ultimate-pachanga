@@ -331,6 +331,7 @@ create policy score_attributes_manage_admins
 -- ---------------------------------------------------------------------------
 
 revoke all on all tables in schema public from anon;
+revoke all on all tables in schema public from authenticated;
 
 grant select on public.leagues to authenticated;
 grant update on public.leagues to authenticated;
