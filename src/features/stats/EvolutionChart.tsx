@@ -80,10 +80,7 @@ export function EvolutionChart({
 
   return (
     <div className="flex flex-col gap-3">
-      <div
-        className="h-[26rem] w-full lg:h-[36rem]"
-        data-testid="evolution-chart"
-      >
+      <div className="h-72 w-full lg:h-96" data-testid="evolution-chart">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartRows}
@@ -184,7 +181,7 @@ export function EvolutionChart({
                 onClick={() => onRemove(entry.playerId)}
                 data-testid={`evolution-legend-${entry.playerId}`}
                 title={`Quitar ${entry.name}`}
-                className="flex items-center gap-1.5 rounded-4xl border px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
+                className="flex min-h-9 items-center gap-1.5 rounded-sm border px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
               >
                 <span
                   aria-hidden="true"

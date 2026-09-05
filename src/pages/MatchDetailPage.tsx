@@ -652,327 +652,340 @@ export function MatchDetailPage() {
         </Card>
       ) : null}
 
-      <Tabs key={match.id} defaultValue={match.status === 'scored' ? 'results' : 'lineups'}>
+      <Tabs
+        key={match.id}
+        defaultValue={match.status === 'scored' ? 'results' : 'lineups'}
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="results">Resultados</TabsTrigger>
           <TabsTrigger value="lineups">Alineaciones</TabsTrigger>
           <TabsTrigger value="squad">Convocados</TabsTrigger>
         </TabsList>
-      <TabsContent value="lineups">
-      <Card>
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
-          <CardTitle className="text-4xl leading-none uppercase">
-            <h2>Alineaciones</h2>
-          </CardTitle>
-          {isUpcoming ? (
-            <BalanceTeamsButton
-              isAdmin={isAdmin}
-              hasEnoughPlayers={squad.length >= 2}
-              isPending={balance.isPending}
-              onBalance={() => balance.mutate()}
-            />
-          ) : null}
-        </CardHeader>
-        <CardContent>
-          {isSquadPending ? (
-            <div className="grid gap-7 lg:grid-cols-2">
-              <Skeleton className="aspect-[1000/1250] rounded-xl" />
-              <Skeleton className="aspect-[1000/1250] rounded-xl" />
-            </div>
-          ) : squad.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title="Nadie convocado todavía"
-              description={
-                isUpcoming
-                  ? 'Apúntate o añade jugadores y aparecerán sobre el campo.'
-                  : 'Este partido se jugó sin convocatoria registrada.'
-              }
-              className="border-0 py-6"
-            />
-          ) : (
-            <PitchLineups
-              entries={lineupEntries}
-              metrics={metrics}
-              homeTeamName={match.home_team_name}
-              awayTeamName={match.away_team_name}
-              homeFormation={match.home_formation}
-              awayFormation={match.away_formation}
-              interactive={canArrangeLineup}
-              canChangeFormation={isAdmin}
-              onFormationChange={(side, formation) =>
-                persistFormation.mutate({ side, formation })
-              }
-              onLineupChange={(changes) => persistLineup.mutate(changes)}
-              valuation={valuation}
-            />
-          )}
-        </CardContent>
-      </Card>
-
-      </TabsContent>
-      <TabsContent value="squad">
-      <Card>
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
-          <CardTitle className="text-3xl leading-none uppercase sm:text-4xl">
-            <h2>Convocados ({squad.length})</h2>
-          </CardTitle>
-          {isUpcoming && isAlreadyCalledUp ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant="secondary"
-                  className="h-8 gap-1.5 px-2.5"
-                  tabIndex={0}
-                >
-                  <Check className="size-4" aria-hidden="true" />
-                  Estás convocado
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                Solo un administrador puede quitar a alguien de la convocatoria.
-              </TooltipContent>
-            </Tooltip>
-          ) : null}
-        </CardHeader>
-        <CardContent>
-          {isSquadPending ? (
-            <Skeleton className="h-24" />
-          ) : squad.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title="Nadie convocado todavía"
-              description={
-                isUpcoming
-                  ? 'Cualquiera puede apuntarse; quitar a alguien es cosa del administrador.'
-                  : 'Nadie quedó registrado en este partido.'
-              }
-              className="border-0 py-6"
-            />
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { title: match.home_team_name, members: homeSquad },
-                { title: match.away_team_name, members: awaySquad },
-                { title: 'Sin asignar', members: unassignedSquad },
-              ]
-                .filter((group) => group.members.length > 0)
-                .map((group) => (
-                  <div key={group.title}>
-                    <h3 className="mb-2 text-sm font-semibold">
-                      {group.title}{' '}
-                      <span className="numeric font-normal text-muted-foreground">
-                        ({group.members.length})
-                      </span>
-                    </h3>
-                    <ul className="flex flex-col gap-1">
-                      {group.members.map((member) => (
-                        <li
-                          key={member.playerId}
-                          className="flex items-baseline justify-between gap-2 text-sm"
-                        >
-                          <Link
-                            to={`/players/${member.playerId}`}
-                            className="hover:underline"
-                          >
-                            {member.displayName}
-                          </Link>
-                          <span className="text-xs text-muted-foreground">
-                            {formatPosition(member.preferredPosition)}
+        <TabsContent value="lineups">
+          <Card>
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
+              <CardTitle className="text-4xl leading-none uppercase">
+                <h2>Alineaciones</h2>
+              </CardTitle>
+              {isUpcoming ? (
+                <BalanceTeamsButton
+                  isAdmin={isAdmin}
+                  hasEnoughPlayers={squad.length >= 2}
+                  isPending={balance.isPending}
+                  onBalance={() => balance.mutate()}
+                />
+              ) : null}
+            </CardHeader>
+            <CardContent>
+              {isSquadPending ? (
+                <div className="grid gap-7 lg:grid-cols-2">
+                  <Skeleton className="aspect-[1000/1250] rounded-xl" />
+                  <Skeleton className="aspect-[1000/1250] rounded-xl" />
+                </div>
+              ) : squad.length === 0 ? (
+                <EmptyState
+                  icon={Users}
+                  title="Nadie convocado todavía"
+                  description={
+                    isUpcoming
+                      ? 'Apúntate o añade jugadores y aparecerán sobre el campo.'
+                      : 'Este partido se jugó sin convocatoria registrada.'
+                  }
+                  className="border-0 py-6"
+                />
+              ) : (
+                <PitchLineups
+                  entries={lineupEntries}
+                  metrics={metrics}
+                  homeTeamName={match.home_team_name}
+                  awayTeamName={match.away_team_name}
+                  homeFormation={match.home_formation}
+                  awayFormation={match.away_formation}
+                  interactive={canArrangeLineup}
+                  canChangeFormation={isAdmin}
+                  onFormationChange={(side, formation) =>
+                    persistFormation.mutate({ side, formation })
+                  }
+                  onLineupChange={(changes) => persistLineup.mutate(changes)}
+                  valuation={valuation}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="squad">
+          <Card>
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
+              <CardTitle className="text-3xl leading-none uppercase sm:text-4xl">
+                <h2>Convocados ({squad.length})</h2>
+              </CardTitle>
+              {isUpcoming && isAlreadyCalledUp ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="secondary"
+                      className="h-8 gap-1.5 px-2.5"
+                      tabIndex={0}
+                    >
+                      <Check className="size-4" aria-hidden="true" />
+                      Estás convocado
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Solo un administrador puede quitar a alguien de la
+                    convocatoria.
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
+            </CardHeader>
+            <CardContent>
+              {isSquadPending ? (
+                <Skeleton className="h-24" />
+              ) : squad.length === 0 ? (
+                <EmptyState
+                  icon={Users}
+                  title="Nadie convocado todavía"
+                  description={
+                    isUpcoming
+                      ? 'Cualquiera puede apuntarse; quitar a alguien es cosa del administrador.'
+                      : 'Nadie quedó registrado en este partido.'
+                  }
+                  className="border-0 py-6"
+                />
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {[
+                    { title: match.home_team_name, members: homeSquad },
+                    { title: match.away_team_name, members: awaySquad },
+                    { title: 'Sin asignar', members: unassignedSquad },
+                  ]
+                    .filter((group) => group.members.length > 0)
+                    .map((group) => (
+                      <div key={group.title}>
+                        <h3 className="mb-2 text-sm font-semibold">
+                          {group.title}{' '}
+                          <span className="numeric font-normal text-muted-foreground">
+                            ({group.members.length})
                           </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      </TabsContent>
-      <TabsContent value="results">
-      {resultRows.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <h2>Resultados</h2>
-            </CardTitle>
-            {isAdmin ? (
-              <p className="text-sm text-muted-foreground">
-                Edita cualquier puntuación, gol o atributo aquí mismo; se guarda
-                en la base de datos al instante.
-              </p>
-            ) : null}
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto md:hidden">
-              <Table className="min-w-[20rem] table-fixed text-xs">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-28 px-2 text-left">
-                      Jugador
-                    </TableHead>
-                    {metrics.map((metric) => (
-                      <TableHead
-                        key={metric.code}
-                        className="w-9 px-1 text-center"
-                        title={metric.label}
-                      >
-                        {metric.label.slice(0, 3)}
-                      </TableHead>
-                    ))}
-                    <TableHead className="w-11 px-1 text-right">
-                      Final
-                    </TableHead>
-                    {isAdmin ? (
-                      <TableHead className="w-9 px-1 text-right">
-                        <span className="sr-only">Acciones</span>
-                      </TableHead>
-                    ) : null}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {resultRows.map((row) => (
-                    <TableRow key={row.playerId}>
-                      <TableCell className="px-2 py-2">
-                        <Link
-                          to={`/players/${row.playerId}`}
-                          className="block truncate font-semibold hover:text-primary"
-                          title={row.displayName}
-                        >
-                          {row.displayName}
-                        </Link>
-                      </TableCell>
-                      {metrics.map((metric) => (
-                        <TableCell
-                          key={metric.code}
-                          className="numeric px-1 py-2 text-center text-muted-foreground"
-                        >
-                          {formatScore(
-                            row.score?.metricScores[metric.code] ?? null,
-                          )}
-                        </TableCell>
-                      ))}
-                      <TableCell className="numeric px-1 py-2 text-right text-base font-bold text-primary">
-                        {formatScore(row.score?.finalScore ?? null)}
-                      </TableCell>
-                      {isAdmin ? (
-                        <TableCell className="px-1 py-1 text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={
-                              row.score
-                                ? `Editar puntuación de ${row.displayName}`
-                                : `Puntuar a ${row.displayName}`
-                            }
-                            data-testid={`edit-score-mobile-${row.playerCode}`}
-                            onClick={() => setScoreTarget(toScoreTarget(row))}
-                          >
-                            <Pencil className="size-4" aria-hidden="true" />
-                          </Button>
-                        </TableCell>
-                      ) : null}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            <div className="hidden overflow-x-auto md:block">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Jugador</TableHead>
-                    <TableHead>Equipo</TableHead>
-                    {metrics.map((metric) => (
-                      <TableHead key={metric.code} className="text-right">
-                        {metric.label}
-                      </TableHead>
-                    ))}
-                    <TableHead className="text-right">Goles</TableHead>
-                    <TableHead className="text-right">Victoria</TableHead>
-                    <TableHead className="text-right">Base</TableHead>
-                    <TableHead>Atributos</TableHead>
-                    <TableHead className="text-right">Final</TableHead>
-                    {isAdmin ? (
-                      <TableHead className="text-right">
-                        <span className="sr-only">Acciones</span>
-                      </TableHead>
-                    ) : null}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {resultRows.map((row) => (
-                    <TableRow key={row.playerId}>
-                      <TableCell className="font-medium">
-                        <Link
-                          to={`/players/${row.playerId}`}
-                          className="hover:underline"
-                        >
-                          {row.displayName}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-muted-foreground">
-                        {row.teamName}
-                      </TableCell>
-                      {metrics.map((metric) => (
-                        <TableCell
-                          key={metric.code}
-                          className="numeric text-right"
-                        >
-                          {formatScore(
-                            row.score?.metricScores[metric.code] ?? null,
-                          )}
-                        </TableCell>
-                      ))}
-                      <TableCell className="numeric text-right">
-                        {row.score ? row.score.goals : '—'}
-                      </TableCell>
-                      <TableCell className="numeric text-right">
-                        {row.score ? formatVictories(row.score.victory) : '—'}
-                      </TableCell>
-                      <TableCell className="numeric text-right">
-                        {formatScore(row.score?.baseScore ?? null)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {(row.score?.attributes ?? []).map((attribute) => (
-                            <AttributeBadge
-                              key={attribute.code}
-                              label={attribute.label}
-                              points={attribute.points}
-                            />
+                        </h3>
+                        <ul className="flex flex-col gap-1">
+                          {group.members.map((member) => (
+                            <li
+                              key={member.playerId}
+                              className="flex items-baseline justify-between gap-2 text-sm"
+                            >
+                              <Link
+                                to={`/players/${member.playerId}`}
+                                className="hover:underline"
+                              >
+                                {member.displayName}
+                              </Link>
+                              <span className="text-xs text-muted-foreground">
+                                {formatPosition(member.preferredPosition)}
+                              </span>
+                            </li>
                           ))}
-                        </div>
-                      </TableCell>
-                      <TableCell className="numeric text-right font-bold">
-                        {formatScore(row.score?.finalScore ?? null)}
-                      </TableCell>
-                      {isAdmin ? (
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            data-testid={`edit-score-${row.playerCode}`}
-                            onClick={() => setScoreTarget(toScoreTarget(row))}
+                        </ul>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="results">
+          {resultRows.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <h2>Resultados</h2>
+                </CardTitle>
+                {isAdmin ? (
+                  <p className="text-sm text-muted-foreground">
+                    Edita cualquier puntuación, gol o atributo aquí mismo; se
+                    guarda en la base de datos al instante.
+                  </p>
+                ) : null}
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto md:hidden">
+                  <Table className="min-w-[20rem] table-fixed text-xs">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-28 px-2 text-left">
+                          Jugador
+                        </TableHead>
+                        {metrics.map((metric) => (
+                          <TableHead
+                            key={metric.code}
+                            className="w-9 px-1 text-center"
+                            title={metric.label}
                           >
-                            <Pencil className="size-4" aria-hidden="true" />
-                            {row.score ? 'Editar' : 'Puntuar'}
-                          </Button>
-                        </TableCell>
-                      ) : null}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <EmptyState title="Todavía no hay puntuaciones" description="Los resultados aparecerán aquí cuando se puntúe la jornada." />
-      )}
-      </TabsContent>
+                            {metric.label.slice(0, 3)}
+                          </TableHead>
+                        ))}
+                        <TableHead className="w-11 px-1 text-right">
+                          Final
+                        </TableHead>
+                        {isAdmin ? (
+                          <TableHead className="w-9 px-1 text-right">
+                            <span className="sr-only">Acciones</span>
+                          </TableHead>
+                        ) : null}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {resultRows.map((row) => (
+                        <TableRow key={row.playerId}>
+                          <TableCell className="px-2 py-2">
+                            <Link
+                              to={`/players/${row.playerId}`}
+                              className="block truncate font-semibold hover:text-primary"
+                              title={row.displayName}
+                            >
+                              {row.displayName}
+                            </Link>
+                          </TableCell>
+                          {metrics.map((metric) => (
+                            <TableCell
+                              key={metric.code}
+                              className="numeric px-1 py-2 text-center text-muted-foreground"
+                            >
+                              {formatScore(
+                                row.score?.metricScores[metric.code] ?? null,
+                              )}
+                            </TableCell>
+                          ))}
+                          <TableCell className="numeric px-1 py-2 text-right text-base font-bold text-primary">
+                            {formatScore(row.score?.finalScore ?? null)}
+                          </TableCell>
+                          {isAdmin ? (
+                            <TableCell className="px-1 py-1 text-right">
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={
+                                  row.score
+                                    ? `Editar puntuación de ${row.displayName}`
+                                    : `Puntuar a ${row.displayName}`
+                                }
+                                data-testid={`edit-score-mobile-${row.playerCode}`}
+                                onClick={() =>
+                                  setScoreTarget(toScoreTarget(row))
+                                }
+                              >
+                                <Pencil className="size-4" aria-hidden="true" />
+                              </Button>
+                            </TableCell>
+                          ) : null}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <div className="hidden overflow-x-auto md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Jugador</TableHead>
+                        <TableHead>Equipo</TableHead>
+                        {metrics.map((metric) => (
+                          <TableHead key={metric.code} className="text-right">
+                            {metric.label}
+                          </TableHead>
+                        ))}
+                        <TableHead className="text-right">Goles</TableHead>
+                        <TableHead className="text-right">Victoria</TableHead>
+                        <TableHead className="text-right">Base</TableHead>
+                        <TableHead>Atributos</TableHead>
+                        <TableHead className="text-right">Final</TableHead>
+                        {isAdmin ? (
+                          <TableHead className="text-right">
+                            <span className="sr-only">Acciones</span>
+                          </TableHead>
+                        ) : null}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {resultRows.map((row) => (
+                        <TableRow key={row.playerId}>
+                          <TableCell className="font-medium">
+                            <Link
+                              to={`/players/${row.playerId}`}
+                              className="hover:underline"
+                            >
+                              {row.displayName}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap text-muted-foreground">
+                            {row.teamName}
+                          </TableCell>
+                          {metrics.map((metric) => (
+                            <TableCell
+                              key={metric.code}
+                              className="numeric text-right"
+                            >
+                              {formatScore(
+                                row.score?.metricScores[metric.code] ?? null,
+                              )}
+                            </TableCell>
+                          ))}
+                          <TableCell className="numeric text-right">
+                            {row.score ? row.score.goals : '—'}
+                          </TableCell>
+                          <TableCell className="numeric text-right">
+                            {row.score
+                              ? formatVictories(row.score.victory)
+                              : '—'}
+                          </TableCell>
+                          <TableCell className="numeric text-right">
+                            {formatScore(row.score?.baseScore ?? null)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {(row.score?.attributes ?? []).map(
+                                (attribute) => (
+                                  <AttributeBadge
+                                    key={attribute.code}
+                                    label={attribute.label}
+                                    points={attribute.points}
+                                  />
+                                ),
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="numeric text-right font-bold">
+                            {formatScore(row.score?.finalScore ?? null)}
+                          </TableCell>
+                          {isAdmin ? (
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                data-testid={`edit-score-${row.playerCode}`}
+                                onClick={() =>
+                                  setScoreTarget(toScoreTarget(row))
+                                }
+                              >
+                                <Pencil className="size-4" aria-hidden="true" />
+                                {row.score ? 'Editar' : 'Puntuar'}
+                              </Button>
+                            </TableCell>
+                          ) : null}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <EmptyState
+              title="Todavía no hay puntuaciones"
+              description="Los resultados aparecerán aquí cuando se puntúe la jornada."
+            />
+          )}
+        </TabsContent>
       </Tabs>
 
       <MatchScoreDialog

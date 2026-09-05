@@ -245,7 +245,7 @@ export function LeaguePage() {
         ) : nextMatch ? (
           <section className="motion-enter flex min-w-0 flex-col gap-2">
             <h2 className="section-kicker">Próxima jornada</h2>
-            <div className="w-full max-w-[1280px]">
+            <div className="next-fixture-card w-full">
               <MatchCard
                 match={nextMatch}
                 featured

@@ -234,7 +234,6 @@ export function PlayerDetailPage() {
               <SummaryRow label="Valor de mercado" featured>
                 <MarketValue
                   value={player.marketValueGbp}
-                  exact
                   className="text-5xl leading-none text-primary"
                 />
               </SummaryRow>

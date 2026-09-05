@@ -87,7 +87,10 @@ export function RankingTable({
                         )}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="truncate text-base font-medium">
+                    <span
+                      className="max-w-32 truncate text-base font-medium sm:max-w-48"
+                      title={player.displayName}
+                    >
                       {player.displayName}
                     </span>
                   </Link>
