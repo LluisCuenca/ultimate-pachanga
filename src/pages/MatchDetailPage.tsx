@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Tooltip,
   TooltipContent,
@@ -550,7 +551,7 @@ export function MatchDetailPage() {
 
       <MatchHero match={match} />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 empty:hidden">
         {canJoin ? (
           <Button onClick={() => join.mutate()} disabled={join.isPending}>
             <UserPlus className="size-4" aria-hidden="true" />
@@ -651,6 +652,13 @@ export function MatchDetailPage() {
         </Card>
       ) : null}
 
+      <Tabs key={match.id} defaultValue={match.status === 'scored' ? 'results' : 'lineups'}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="results">Resultados</TabsTrigger>
+          <TabsTrigger value="lineups">Alineaciones</TabsTrigger>
+          <TabsTrigger value="squad">Convocados</TabsTrigger>
+        </TabsList>
+      <TabsContent value="lineups">
       <Card>
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
           <CardTitle className="text-4xl leading-none uppercase">
@@ -702,6 +710,8 @@ export function MatchDetailPage() {
         </CardContent>
       </Card>
 
+      </TabsContent>
+      <TabsContent value="squad">
       <Card>
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border">
           <CardTitle className="text-3xl leading-none uppercase sm:text-4xl">
@@ -780,6 +790,8 @@ export function MatchDetailPage() {
         </CardContent>
       </Card>
 
+      </TabsContent>
+      <TabsContent value="results">
       {resultRows.length > 0 ? (
         <Card>
           <CardHeader>
@@ -957,7 +969,11 @@ export function MatchDetailPage() {
             </div>
           </CardContent>
         </Card>
-      ) : null}
+      ) : (
+        <EmptyState title="Todavía no hay puntuaciones" description="Los resultados aparecerán aquí cuando se puntúe la jornada." />
+      )}
+      </TabsContent>
+      </Tabs>
 
       <MatchScoreDialog
         open={scoreTarget !== null}

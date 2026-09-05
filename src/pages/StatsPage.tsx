@@ -84,9 +84,9 @@ function GeneralTab({
   )
 
   return (
-    <div className="grid gap-6 xl:grid-cols-2">
+    <div className="stats-grid">
       <PodiumCard
-        title="Jugadores más valorados"
+        title="Valor de mercado"
         description="Valor de mercado calculado a partir de las puntuaciones"
       >
         <PodiumList
@@ -99,7 +99,7 @@ function GeneralTab({
       </PodiumCard>
 
       <PodiumCard
-        title="Jugadores más goleadores"
+        title="Goleadores"
         description="Goles marcados en partidos puntuados"
       >
         <PodiumList
@@ -110,7 +110,7 @@ function GeneralTab({
       </PodiumCard>
 
       <PodiumCard
-        title="Mejor estado de forma actual"
+        title="Estado de forma"
         description="Quién llega más fuerte a la próxima jornada"
       >
         <PodiumList
@@ -122,7 +122,7 @@ function GeneralTab({
 
       {defensiveMetric ? (
         <PodiumCard
-          title="Top jugadores defensivos"
+          title="Defensa"
           description={`Media de ${defensiveMetric.label} en la escala 0-99`}
         >
           <PodiumList
@@ -247,7 +247,7 @@ export function StatsPage() {
         </TabsContent>
 
         <TabsContent value="palmares" className="mt-6">
-          <div className="flex flex-col gap-9">
+          <div className="stats-grid">
             {attributes.map((attribute) => {
               const holders = byAttribute(attribute.code)
 

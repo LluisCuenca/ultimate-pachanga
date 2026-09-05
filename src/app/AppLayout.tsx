@@ -57,9 +57,9 @@ const ADMIN_NAVIGATION: NavigationItem[] = [
 
 function navigationLinkClasses({ isActive }: { isActive: boolean }): string {
   return cn(
-    'motion-nav-link group flex min-h-13 items-center gap-3 border border-transparent px-3.5 py-2 font-heading text-xl leading-none font-semibold uppercase transition-all',
+    'motion-nav-link group flex min-h-11 items-center gap-3 border border-transparent px-3 py-2 font-heading text-lg leading-none font-semibold uppercase transition-colors',
     isActive
-      ? 'border-primary/70 bg-primary text-primary-foreground shadow-[0_12px_26px_rgb(234_175_53/0.18)]'
+      ? 'border-primary bg-primary text-primary-foreground'
       : 'text-muted-foreground hover:border-primary/35 hover:bg-accent/70 hover:text-foreground',
   )
 }
@@ -135,7 +135,7 @@ function BrandLockup({
             ? 'size-10 shrink-0'
             : iconOnly
               ? 'h-12 w-auto max-w-none'
-              : 'h-auto w-full max-w-60',
+              : 'h-auto w-full max-w-28',
         )}
       />
       {compact && !iconOnly ? (
@@ -155,10 +155,10 @@ function DesktopSidebar({
   isAuthenticated: boolean
 }) {
   return (
-    <aside className="sticky top-0 hidden h-svh w-72 shrink-0 flex-col overflow-y-auto border-r border-border bg-[#090909] px-4 py-5 lg:flex">
+    <aside className="sticky top-0 hidden h-svh w-52 shrink-0 flex-col overflow-y-auto border-r border-border bg-card px-3 py-4 lg:flex">
       <BrandLockup />
 
-      <div className="mt-7 border-t border-primary/35 pt-6">
+      <div className="mt-4 border-t border-primary/35 pt-3">
         <p className="technical mb-3 px-3 text-[0.625rem] font-semibold text-muted-foreground uppercase">
           Competición
         </p>
@@ -230,10 +230,10 @@ export function AppLayout() {
       />
 
       <div className="min-w-0 flex-1">
-        <header className="liquid-panel sticky top-0 z-40 grid h-18 grid-cols-[3.25rem_minmax(0,1fr)_3.25rem] items-center border-b border-border px-3 lg:hidden">
+        <header className="liquid-panel sticky top-0 z-40 grid h-14 grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center border-b border-primary/40 px-3 lg:hidden">
           <BrandLogoDialog
             className="justify-self-start"
-            imageClassName="h-13 w-13"
+            imageClassName="size-11"
           />
 
           <Link
@@ -305,9 +305,37 @@ export function AppLayout() {
           </Sheet>
         </header>
 
-        <main className="app-main mx-auto w-full max-w-[1680px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10 xl:px-14">
+        <main className="app-main mx-auto w-full max-w-[1600px] px-3 pt-4 pb-24 sm:px-5 lg:px-7 lg:py-6">
           <Outlet />
         </main>
+        <nav
+          aria-label="Navegación principal móvil"
+          className="mobile-dock lg:hidden"
+        >
+          {[
+            ...NAVIGATION,
+            ...(isAuthenticated
+              ? PROFILE_NAVIGATION
+              : [{ to: '/login', label: 'Entrar', icon: LogIn }]),
+          ].map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                cn('dock-link', isActive && 'is-active')
+              }
+            >
+              <Icon className="size-5" aria-hidden="true" />
+              <span>
+                {label === 'Estadísticas'
+                  ? 'Stats'
+                  : label === 'Mi perfil'
+                    ? 'Perfil'
+                    : label}
+              </span>
+            </NavLink>
+          ))}
+        </nav>
       </div>
     </div>
   )

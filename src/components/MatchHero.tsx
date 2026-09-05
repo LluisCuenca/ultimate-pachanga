@@ -32,8 +32,8 @@ export function MatchHero({ match }: { match: MatchRow }) {
     : `Imagen del recinto ${match.location}`
 
   return (
-    <header className="motion-enter grid overflow-hidden border border-primary/25 bg-card text-card-foreground shadow-[0_20px_44px_rgb(0_0_0/0.38)] sm:grid-cols-[44%_1fr]">
-      <div className="relative min-h-64 sm:min-h-full">
+    <header className="match-hero motion-enter">
+      <div className="match-hero-art">
         <VenuePhoto
           match={match}
           className="absolute inset-0"
@@ -41,7 +41,7 @@ export function MatchHero({ match }: { match: MatchRow }) {
         />
       </div>
 
-      <div className="flex flex-col gap-4 px-6 py-7 sm:px-9 sm:py-9">
+      <div className="match-hero-body">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="technical min-w-0 text-xs font-semibold text-primary uppercase">
             {match.title}

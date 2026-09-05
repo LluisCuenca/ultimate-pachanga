@@ -22,16 +22,13 @@ function MatchSection({
   if (matches.length === 0) return null
 
   return (
-    <section className="flex flex-col gap-5">
+    <section className="flex flex-col gap-2">
       <div>
-        <p className="section-kicker">Calendario</p>
-        <h2 className="mt-3 font-heading text-4xl leading-none font-bold uppercase">
-          {title}
-        </h2>
+        <h2 className="section-title">{title}</h2>
       </div>
       {/* Two columns at most: the cards are wide so the venue photograph reads
           as a place rather than a texture. */}
-      <div className="grid gap-4 xl:grid-cols-2 xl:gap-6">
+      <div className="grid gap-2 md:grid-cols-2">
         {matches.map((match) => (
           <MatchCard key={match.id} match={match} />
         ))}

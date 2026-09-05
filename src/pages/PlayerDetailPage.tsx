@@ -72,36 +72,36 @@ function PlayerStatusSummary({ player }: { player: PlayerCardData }) {
   const boundedConfidence = Math.min(100, Math.max(0, player.confidencePct))
 
   return (
-    <div className="mt-5 grid grid-cols-2 gap-4">
-      <div className="border border-primary/25 bg-black/20 p-4">
+    <div className="player-status mt-3 grid grid-cols-2 gap-2">
+      <div className="border border-primary/25 bg-black/20 p-2">
         <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
           Confianza
         </p>
-        <div className="mt-3 flex items-center gap-3">
+        <div className="mt-2 flex items-center gap-2">
           <span
             aria-hidden="true"
-            className="size-12 rounded-full border border-primary/60 p-1"
+            className="size-7 shrink-0 rounded-full border border-primary/60 p-1"
             style={{
               background: `conic-gradient(var(--primary) ${boundedConfidence}%, rgb(0 0 0 / 0.75) 0)`,
             }}
           >
             <span className="block size-full rounded-full bg-card" />
           </span>
-          <span className="numeric text-4xl leading-none text-primary">
+          <span className="numeric text-xl leading-none text-primary">
             {Math.round(boundedConfidence)}%
           </span>
         </div>
       </div>
-      <div className="border border-primary/25 bg-black/20 p-4">
+      <div className="border border-primary/25 bg-black/20 p-2">
         <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
           Estado actual
         </p>
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-2 flex items-center gap-2">
           <stateDetails.Icon
-            className={`size-8 ${stateDetails.className}`}
+            className={`size-5 shrink-0 ${stateDetails.className}`}
             aria-hidden="true"
           />
-          <span className="font-heading text-2xl leading-none font-bold uppercase">
+          <span className="font-heading text-base leading-tight font-bold uppercase">
             {stateDetails.label}
           </span>
         </div>
@@ -123,8 +123,8 @@ function SummaryRow({
     <div
       className={
         featured
-          ? 'flex min-h-28 flex-col justify-between border-b border-primary/30 py-4'
-          : 'flex min-h-14 items-baseline justify-between gap-4 border-b border-border/70 py-3 last:border-b-0'
+          ? 'flex flex-col gap-2 border-b border-primary/30 py-3'
+          : 'flex flex-wrap items-baseline justify-between gap-1 border-b border-border/70 py-2 last:border-b-0'
       }
     >
       <dt className="technical text-[0.6875rem] font-medium text-muted-foreground uppercase">
@@ -203,7 +203,7 @@ export function PlayerDetailPage() {
   )
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/players">
           <ArrowLeft className="size-4" aria-hidden="true" />
@@ -211,18 +211,17 @@ export function PlayerDetailPage() {
         </Link>
       </Button>
 
-      <section className="grid items-stretch gap-6 lg:grid-cols-2">
+      <section className="player-detail-top">
         <PlayerCard
           player={player}
           metrics={metrics}
           showcase
-          className="h-full lg:min-h-[34rem]"
+          className="h-full"
         />
 
         <Card className="h-full border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0e0e0e_100%)]">
           <CardHeader className="border-b border-primary/20">
-            <p className="section-kicker text-primary">Ficha de jugador</p>
-            <CardTitle className="mt-3 text-5xl leading-none uppercase">
+            <CardTitle className="leading-none uppercase">
               <h1>{player.displayName}</h1>
             </CardTitle>
             <p className="technical text-xs text-muted-foreground uppercase">
@@ -231,7 +230,7 @@ export function PlayerDetailPage() {
             </p>
           </CardHeader>
           <CardContent className="pt-4">
-            <dl className="grid gap-x-8 md:grid-cols-2">
+            <dl className="player-summary">
               <SummaryRow label="Valor de mercado" featured>
                 <MarketValue
                   value={player.marketValueGbp}
@@ -430,22 +429,22 @@ export function PlayerDetailPage() {
             Medias por métrica y reconocimientos obtenidos en la competición.
           </p>
         </CardHeader>
-        <CardContent className="grid gap-8 pt-7 xl:grid-cols-[0.8fr_1.2fr]">
+        <CardContent className="grid gap-4 md:grid-cols-[0.8fr_1.2fr]">
           <div className="flex flex-col justify-center border-r-0 border-primary/20 xl:border-r xl:pr-8">
             <p className="section-kicker text-primary">Estado de forma</p>
             <PlayerStatusSummary player={player} />
-            <p className="section-kicker mt-8 text-primary">Distinciones</p>
+            <p className="section-kicker mt-4 text-primary">Distinciones</p>
             {earnedAttributes.length > 0 ? (
-              <ol className="mt-6 flex flex-col divide-y divide-primary/20 border-y border-primary/20">
+              <ol className="mt-2 flex flex-col divide-y divide-primary/20 border-y border-primary/20">
                 {earnedAttributes.map((attribute) => (
                   <li
                     key={attribute.code}
-                    className="flex items-center justify-between gap-4 py-4"
+                    className="flex items-center justify-between gap-3 py-2"
                   >
-                    <span className="font-heading text-3xl leading-none font-bold uppercase">
+                    <span className="font-heading text-lg leading-none font-bold uppercase">
                       {attribute.label}
                     </span>
-                    <span className="numeric text-4xl leading-none text-primary">
+                    <span className="numeric text-lg leading-none text-primary">
                       ×{player.attributeCounts[attribute.code]}
                     </span>
                   </li>
@@ -460,7 +459,7 @@ export function PlayerDetailPage() {
           <MetricRadarChart
             player={player}
             metrics={metrics}
-            className="h-[28rem] lg:h-[34rem]"
+            className="h-72 lg:h-96"
           />
         </CardContent>
       </Card>

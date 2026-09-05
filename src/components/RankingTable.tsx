@@ -38,7 +38,7 @@ export function RankingTable({
   renderContext,
 }: RankingTableProps) {
   return (
-    <div className="overflow-x-auto rounded-md border border-border bg-card">
+    <div className="competition-ranking overflow-x-auto rounded-sm border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow>

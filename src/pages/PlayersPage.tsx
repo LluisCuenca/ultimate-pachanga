@@ -1,6 +1,17 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Search, UserRound } from 'lucide-react'
+import { LayoutGrid, List, Search, UserRound } from 'lucide-react'
+import { Link } from 'react-router'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { MarketValue } from '@/components/MarketValue'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -60,6 +71,7 @@ export function PlayersPage() {
   const [position, setPosition] = useState<string>(ALL_POSITIONS)
   const [sortBy, setSortBy] = useState<SortKey>('rating')
   const [showInactive, setShowInactive] = useState(false)
+  const [view, setView] = useState<'cards' | 'table'>('cards')
 
   const {
     data: players,
@@ -101,19 +113,49 @@ export function PlayersPage() {
   ).length
 
   return (
-    <div className="flex flex-col gap-7">
-      <div>
-        <h1 className="page-title">Jugadores</h1>
-        <p className="mt-3 text-lg text-muted-foreground">
-          {isPending
-            ? 'Cargando plantilla…'
-            : hasActiveFilters
-              ? `${visiblePlayers.length} resultados de ${totalPlayers}`
-              : `${totalPlayers} jugadores`}
-        </p>
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="page-title">Jugadores</h1>
+          <p className="mt-3 text-lg text-muted-foreground">
+            {isPending
+              ? 'Cargando plantilla…'
+              : hasActiveFilters
+                ? `${visiblePlayers.length} resultados de ${totalPlayers}`
+                : `${totalPlayers} jugadores`}
+          </p>
+        </div>
+        <div
+          className="flex gap-1"
+          role="group"
+          aria-label="Vista de jugadores"
+        >
+          <Button
+            type="button"
+            variant={view === 'cards' ? 'default' : 'outline'}
+            size="icon"
+            title="Ver cromos"
+            aria-label="Ver cromos"
+            aria-pressed={view === 'cards'}
+            onClick={() => setView('cards')}
+          >
+            <LayoutGrid className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant={view === 'table' ? 'default' : 'outline'}
+            size="icon"
+            title="Comparar en tabla"
+            aria-label="Comparar en tabla"
+            aria-pressed={view === 'table'}
+            onClick={() => setView('table')}
+          >
+            <List className="size-4" />
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-4 border-y border-border py-5 sm:flex-row sm:items-end">
+      <div className="roster-toolbar">
         <div className="flex-1">
           <Label htmlFor="player-search" className="sr-only">
             Buscar jugador
@@ -128,7 +170,7 @@ export function PlayersPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar por nombre, apodo o código"
-              className="h-12 pl-10 text-base"
+              className="h-10 pl-10 text-base"
             />
           </div>
         </div>
@@ -201,6 +243,58 @@ export function PlayersPage() {
           title="Ningún jugador coincide"
           description="Prueba con otro nombre o quita los filtros."
         />
+      ) : view === 'table' ? (
+        <Table className="roster-table">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Jugador</TableHead>
+              <TableHead className="text-right">VAL</TableHead>
+              {metrics.map((metric) => (
+                <TableHead
+                  key={metric.code}
+                  className="text-right"
+                  title={metric.label}
+                >
+                  {metric.label.slice(0, 3)}
+                </TableHead>
+              ))}
+              <TableHead className="text-right">Valor</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {visiblePlayers.map((player) => (
+              <TableRow key={player.id}>
+                <TableCell>
+                  <Link
+                    className="flex min-h-8 max-w-24 flex-col justify-center hover:text-primary sm:max-w-48"
+                    to={`/players/${player.id}`}
+                  >
+                    <span
+                      className="truncate font-semibold"
+                      title={player.displayName}
+                    >
+                      {player.displayName}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {player.preferredPosition} · {player.matchesPlayed} PJ
+                    </span>
+                  </Link>
+                </TableCell>
+                <TableCell className="numeric text-right font-bold text-primary">
+                  {player.cardRating}
+                </TableCell>
+                {metrics.map((metric) => (
+                  <TableCell key={metric.code} className="numeric text-right">
+                    {player.metricCardStats[metric.code] ?? '—'}
+                  </TableCell>
+                ))}
+                <TableCell className="text-right">
+                  <MarketValue value={player.marketValueGbp} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       ) : (
         <PlayerCardGrid players={visiblePlayers} metrics={metrics} />
       )}

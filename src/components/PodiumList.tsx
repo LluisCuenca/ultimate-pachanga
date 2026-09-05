@@ -56,7 +56,7 @@ export function PodiumList({
   }
 
   return (
-    <ol className="flex flex-col gap-1">
+    <ol className="competition-podium flex flex-col gap-1">
       {players.map((player, position) => {
         const avatarUrl = getAvatarUrl(player.avatarPath)
 

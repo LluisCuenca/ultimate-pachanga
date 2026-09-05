@@ -128,6 +128,7 @@ export function PlayerCard({
       data-testid="player-card"
       data-tier={tier}
       data-compact={compact ? 'true' : undefined}
+      data-showcase={showcase ? 'true' : undefined}
       className={cn(
         'relative flex h-full flex-col overflow-hidden',
         CARD_EDGE,
@@ -138,7 +139,9 @@ export function PlayerCard({
         // so it needs the ratio declared and becomes the query container its
         // own type is measured against; the grid card gets its height from the
         // metric and value bands below.
-        compact ? '@container aspect-[4/5] rounded-lg' : 'rounded-xl',
+        compact
+          ? '@container aspect-[4/5] rounded-sm'
+          : 'player-sticker rounded-sm',
         !compact && 'motion-card transition-all duration-200',
         !player.isActive && 'opacity-60 saturate-50',
         className,
@@ -298,7 +301,7 @@ function FullFace({
     <>
       {/* Rating and position ride in the corner rather than taking a column of
           their own, which leaves the photograph the whole width. */}
-      <div className="absolute top-2.5 left-3 z-10 flex flex-col items-center leading-none">
+      <div className="sticker-rating absolute top-2.5 left-3 z-10 flex flex-col items-center leading-none">
         <span
           className={cn(
             'numeric font-black',
@@ -318,14 +321,11 @@ function FullFace({
         <FormStateIcon state={player.formState} className="size-4" />
       </div>
 
-      <div className="relative z-1 flex flex-1 items-center justify-center px-3 pt-3 pb-1">
+      <div className="sticker-portrait relative z-1 flex items-center justify-center">
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
-          className={cn(
-            'h-auto border-2 shadow-[0_0_28px_rgb(234_175_53/0.2)]',
-            showcase ? 'w-[72%]' : 'w-[66%]',
-          )}
+          className={cn('sticker-photo h-auto w-full rounded-none border-0')}
           fallbackClassName={showcase ? 'text-4xl' : 'text-2xl'}
         />
       </div>
@@ -333,7 +333,7 @@ function FullFace({
       {/* The name band, ruled off the way a card prints it. */}
       <div
         className={cn(
-          'flex min-h-12 flex-col justify-center border-t px-3 py-1.5 text-center',
+          'sticker-name flex min-h-10 flex-col justify-center border-t px-2 py-1 text-left',
           TIER_RULES[tier],
         )}
       >
@@ -358,7 +358,7 @@ function FullFace({
 
       <div
         className={cn(
-          'grid grid-cols-4 gap-1 border-t px-2 py-2',
+          'sticker-metrics grid grid-cols-4 gap-1 border-t px-2 py-1.5',
           TIER_RULES[tier],
         )}
       >
@@ -373,7 +373,7 @@ function FullFace({
 
       <div
         className={cn(
-          'flex items-center justify-between border-t px-3 py-2 text-[0.6875rem]',
+          'sticker-footer flex flex-wrap items-center justify-between gap-1 border-t px-2 py-1.5 text-[0.6875rem]',
           TIER_RULES[tier],
         )}
       >

@@ -120,25 +120,26 @@ export function ProfilePage() {
         </p>
       </div>
 
-      <div className="grid items-stretch gap-6 lg:grid-cols-2">
+      <div className="player-detail-top">
         <PlayerCard
           player={player}
           metrics={metrics}
           showcase
-          className="h-full lg:min-h-[38rem]"
+          className="h-full"
         />
 
-        <Card className="border-primary/25 bg-[linear-gradient(145deg,#181818_0%,#0d0d0d_100%)] lg:min-h-[38rem]">
+        <Card className="border-primary/25">
           <CardHeader className="border-b border-primary/20">
             <p className="section-kicker text-primary">Tu ficha</p>
             <CardTitle className="mt-3 text-5xl leading-none uppercase">
               Tus datos
             </CardTitle>
             <CardDescription>
-              {player.preferredPosition} · {formatPosition(player.preferredPosition)}
+              {player.preferredPosition} ·{' '}
+              {formatPosition(player.preferredPosition)}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex h-full flex-col items-start gap-6 pt-6">
+          <CardContent className="flex h-full flex-col items-start gap-3">
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => setIsFormOpen(true)}>
                 <Pencil className="size-4" aria-hidden="true" />
@@ -154,7 +155,7 @@ export function ProfilePage() {
               </Button>
             </div>
 
-            <div className="grid w-full gap-4 border-y border-border py-5 sm:grid-cols-2">
+            <div className="grid w-full grid-cols-2 gap-3 border-y border-border py-3">
               <div>
                 <p className="technical text-[0.6875rem] text-muted-foreground uppercase">
                   Valoración actual
