@@ -39,11 +39,29 @@ const TIER_FACES: Record<CardTier, string> = {
   bronze: 'from-tier-bronze-face to-tier-bronze-face-deep',
 }
 
+type CardFace = CardTier | 'blue' | 'black' | 'legend' | 'purple'
+
+const CARD_FACES: Record<CardFace, string> = {
+  ...TIER_FACES,
+  blue: 'from-sky-400 to-blue-950 text-white',
+  black: 'from-zinc-500 via-zinc-950 to-black text-white',
+  legend: 'from-white via-zinc-100 to-zinc-400 text-zinc-950',
+  purple: 'from-fuchsia-500 to-violet-950 text-white',
+}
+
 /** The bright metal edge that gives the card its contour. */
 const TIER_EDGES: Record<CardTier, string> = {
   gold: 'border-tier-gold/70',
   silver: 'border-tier-silver/70',
   bronze: 'border-tier-bronze/70',
+}
+
+const CARD_EDGES: Record<CardFace, string> = {
+  ...TIER_EDGES,
+  blue: 'border-sky-300/70',
+  black: 'border-zinc-100/80',
+  legend: 'border-white/95',
+  purple: 'border-fuchsia-200/80',
 }
 
 const TIER_ACCENTS: Record<CardTier, string> = {
@@ -52,11 +70,27 @@ const TIER_ACCENTS: Record<CardTier, string> = {
   bronze: 'text-tier-bronze',
 }
 
+const CARD_ACCENTS: Record<CardFace, string> = {
+  ...TIER_ACCENTS,
+  blue: 'text-sky-50',
+  black: 'text-zinc-50',
+  legend: 'text-zinc-950',
+  purple: 'text-fuchsia-50',
+}
+
 /** Hairlines separating the card's bands, in the tier's own metal. */
 const TIER_RULES: Record<CardTier, string> = {
   gold: 'border-tier-gold/25',
   silver: 'border-tier-silver/25',
   bronze: 'border-tier-bronze/25',
+}
+
+const CARD_RULES: Record<CardFace, string> = {
+  ...TIER_RULES,
+  blue: 'border-sky-100/35',
+  black: 'border-white/20',
+  legend: 'border-zinc-600/25',
+  purple: 'border-fuchsia-100/35',
 }
 
 /**
@@ -103,6 +137,12 @@ interface PlayerCardProps {
   linkTo?: string
   /** The smaller card used on the pitch. */
   compact?: boolean
+  /** Presentation-only rating, used by special views without changing player data. */
+  ratingOverride?: number
+  /** Presentation-only stats, used by special views without changing player data. */
+  metricCardStatsOverride?: Record<string, number>
+  /** Presentation-only face colour, used by special views. */
+  faceOverride?: CardFace
   className?: string
 }
 
@@ -111,9 +151,13 @@ export function PlayerCard({
   metrics,
   linkTo,
   compact,
+  ratingOverride,
+  metricCardStatsOverride,
+  faceOverride,
   className,
 }: PlayerCardProps) {
   const tier = toCardTier(player.cardRating)
+  const face = faceOverride ?? tier
   const avatarUrl = getAvatarUrl(player.avatarPath)
 
   const initials = toInitials(
@@ -130,8 +174,8 @@ export function PlayerCard({
       className={cn(
         'relative flex flex-col overflow-hidden',
         CARD_EDGE,
-        TIER_FACES[tier],
-        TIER_EDGES[tier],
+        CARD_FACES[face],
+        CARD_EDGES[face],
         // Portrait, like a printed card. The pitch card is sized by its slot,
         // so it needs the ratio declared and becomes the query container its
         // own type is measured against; the grid card gets its height from the
@@ -146,17 +190,20 @@ export function PlayerCard({
       {compact ? (
         <CompactFace
           player={player}
-          tier={tier}
+          face={face}
           avatarUrl={avatarUrl}
           initials={initials}
+          rating={ratingOverride ?? player.cardRating}
         />
       ) : (
         <FullFace
           player={player}
           metrics={metrics}
-          tier={tier}
+          face={face}
           avatarUrl={avatarUrl}
           initials={initials}
+          rating={ratingOverride ?? player.cardRating}
+          metricCardStats={metricCardStatsOverride ?? player.metricCardStats}
         />
       )}
     </article>
@@ -177,9 +224,10 @@ export function PlayerCard({
 
 interface FaceProps {
   player: PlayerCardData
-  tier: CardTier
+  face: CardFace
   avatarUrl: string | null
   initials: string
+  rating: number
 }
 
 /**
@@ -188,7 +236,7 @@ interface FaceProps {
  * The rating and position stack on the left, while confidence and form stack on
  * the right so match cards keep their status signals in one corner.
  */
-function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
+function CompactFace({ player, face, avatarUrl, initials, rating }: FaceProps) {
   const fullName = formatFullName(player.firstName, player.lastName)
 
   return (
@@ -210,10 +258,10 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
           className={cn(
             'numeric font-black',
             COMPACT_SIZES.rating,
-            TIER_ACCENTS[tier],
+            CARD_ACCENTS[face],
           )}
         >
-          {player.cardRating}
+          {rating}
         </span>
         <span
           className={cn(
@@ -238,7 +286,7 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
       <div
         className={cn(
           'border-t px-[5cqi] py-[3cqi] text-center leading-tight',
-          TIER_RULES[tier],
+          CARD_RULES[face],
         )}
       >
         <h3
@@ -264,15 +312,18 @@ function CompactFace({ player, tier, avatarUrl, initials }: FaceProps) {
 
 interface FullFaceProps extends FaceProps {
   metrics: readonly LeagueMetricRow[]
+  metricCardStats: Record<string, number>
 }
 
 /** The squad and detail card: the compact face plus the stats it has room for. */
 function FullFace({
   player,
   metrics,
-  tier,
+  face,
   avatarUrl,
   initials,
+  rating,
+  metricCardStats,
 }: FullFaceProps) {
   const fullName = formatFullName(player.firstName, player.lastName)
 
@@ -281,8 +332,8 @@ function FullFace({
       {/* Rating and position ride in the corner rather than taking a column of
           their own, which leaves the photograph the whole width. */}
       <div className="absolute top-2.5 left-3 z-10 flex flex-col items-center leading-none">
-        <span className={cn('numeric text-2xl font-black', TIER_ACCENTS[tier])}>
-          {player.cardRating}
+        <span className={cn('numeric text-2xl font-black', CARD_ACCENTS[face])}>
+          {rating}
         </span>
         <span className="text-[0.625rem] font-bold tracking-wider opacity-80">
           {player.preferredPosition}
@@ -304,7 +355,7 @@ function FullFace({
       </div>
 
       {/* The name band, ruled off the way a card prints it. */}
-      <div className={cn('border-t px-3 py-1.5 text-center', TIER_RULES[tier])}>
+      <div className={cn('border-t px-3 py-1.5 text-center', CARD_RULES[face])}>
         <h3 className="truncate text-sm font-bold" title={player.displayName}>
           {player.displayName}
         </h3>
@@ -318,14 +369,14 @@ function FullFace({
       <div
         className={cn(
           'grid grid-cols-4 gap-1 border-t px-2 py-2',
-          TIER_RULES[tier],
+          CARD_RULES[face],
         )}
       >
         {metrics.map((metric) => (
           <MetricBadge
             key={metric.code}
             label={toShortMetricLabel(metric)}
-            value={player.metricCardStats[metric.code] ?? null}
+            value={metricCardStats[metric.code] ?? null}
           />
         ))}
       </div>
@@ -333,7 +384,7 @@ function FullFace({
       <div
         className={cn(
           'flex items-center justify-between border-t px-3 py-2 text-[0.6875rem]',
-          TIER_RULES[tier],
+          CARD_RULES[face],
         )}
       >
         <MarketValue value={player.marketValueGbp} className="text-xs" />
