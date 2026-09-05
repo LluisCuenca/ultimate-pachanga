@@ -1,7 +1,15 @@
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Award, CalendarDays, TrendingUp, Trophy, Users } from 'lucide-react'
+import {
+  Award,
+  CalendarDays,
+  Sparkles,
+  TrendingUp,
+  Trophy,
+  Users,
+} from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AttributeBadge } from '@/components/AttributeBadge'
@@ -72,6 +80,28 @@ function LeaderboardCard({
             {renderValue(player)}
           </Link>
         ))}
+      </CardContent>
+    </Card>
+  )
+}
+
+function IdealSevenCallout() {
+  return (
+    <Card className="bg-gradient-to-r from-sky-500/10 via-card to-fuchsia-500/10">
+      <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="flex items-center gap-2 text-base font-bold">
+            <Sparkles className="size-4 text-primary" aria-hidden="true" />7
+            ideal
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            El mejor equipo 2-3-1 de la liga, con cartas especiales y notas del
+            mejor partido de cada jugador.
+          </p>
+        </div>
+        <Button asChild className="shrink-0">
+          <Link to="/league/ideal-seven">Ver 7 ideal</Link>
+        </Button>
       </CardContent>
     </Card>
   )
@@ -220,6 +250,8 @@ export function LeaguePage() {
           ) : null}
         </div>
       ) : null}
+
+      <IdealSevenCallout />
 
       {arePlayersPending ? (
         <div className="grid gap-4 md:grid-cols-2">

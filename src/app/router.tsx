@@ -29,6 +29,11 @@ const LeaguePage = lazy(() =>
     default: module.LeaguePage,
   })),
 )
+const IdealSevenPage = lazy(() =>
+  import('@/pages/IdealSevenPage').then((module) => ({
+    default: module.IdealSevenPage,
+  })),
+)
 const ProfilePage = lazy(() =>
   import('@/pages/ProfilePage').then((module) => ({
     default: module.ProfilePage,
@@ -117,6 +122,7 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <Navigate to="/league" replace /> },
               { path: '/league', element: <LeaguePage /> },
+              { path: '/league/ideal-seven', element: <IdealSevenPage /> },
               { path: '/profile', element: <ProfilePage /> },
               { path: '/players', element: <PlayersPage /> },
               { path: '/players/:playerId', element: <PlayerDetailPage /> },
