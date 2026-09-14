@@ -56,7 +56,7 @@ export function RankingTable({
             const avatarUrl = getAvatarUrl(player.avatarPath)
 
             return (
-              <TableRow key={player.id}>
+              <TableRow key={player.id} className="leaderboard-row">
                 <TableCell
                   className={cn(
                     'numeric text-right font-bold',

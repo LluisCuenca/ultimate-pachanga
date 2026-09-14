@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import { screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { AppLayout } from '@/app/AppLayout'
 import { renderWithProviders } from '@/test/render'
 
@@ -9,7 +8,14 @@ vi.mock('@/features/league/useLeague', () => ({
   useIsAdmin: () => false,
 }))
 vi.mock('@/features/auth/api', () => ({ signOut: vi.fn() }))
-vi.mock('@/lib/env', () => ({ APP_NAME: 'Ultimate Pachangas' }))
+vi.mock('@/lib/supabase', () => ({ getAvatarUrl: () => null }))
+vi.mock('@/features/players/useMyPlayer', () => ({
+  useMyPlayerId: () => ({ data: null }),
+}))
+vi.mock('@/features/players/api', () => ({
+  fetchPlayerCard: vi.fn(),
+  playerKeys: { card: (id: string) => ['player', id] },
+}))
 
 describe('AppLayout navigation', () => {
   it('marks only the ideal seven destination active on its nested route', () => {
@@ -27,19 +33,23 @@ describe('AppLayout navigation', () => {
     expect(nav.getAllByRole('link')).toHaveLength(5)
   })
 
-  it('keeps profile accessible from the mobile menu without exposing administration to members', async () => {
-    const user = userEvent.setup()
+  it('links the header logo to Liga and the avatar to profile without a mobile drawer', () => {
     renderWithProviders(<AppLayout />)
-    await user.click(screen.getByRole('button', { name: 'Abrir menú' }))
-    const menu = within(
-      screen.getByRole('navigation', { name: 'Menú de cuenta' }),
+    expect(screen.getByRole('link', { name: 'Ir a Liga' })).toHaveAttribute(
+      'href',
+      '/league',
     )
-    expect(menu.getByRole('link', { name: 'Mi perfil' })).toHaveAttribute(
+    const header = within(screen.getByRole('banner'))
+    expect(header.getByRole('link', { name: 'Mi perfil' })).toHaveAttribute(
       'href',
       '/profile',
     )
+    expect(header.getByText('ULTIMATE PACHANGAS')).toBeInTheDocument()
     expect(
-      menu.queryByRole('link', { name: 'Gestionar jugadores' }),
+      screen.queryByRole('button', { name: 'Abrir menú' }),
+    ).not.toBeInTheDocument()
+    expect(
+      header.queryByRole('button', { name: 'Salir' }),
     ).not.toBeInTheDocument()
   })
 })

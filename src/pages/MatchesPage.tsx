@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarDays, Plus } from 'lucide-react'
@@ -39,6 +42,9 @@ function MatchSection({
 
 export function MatchesPage() {
   const { data: membership } = useMembership()
+  const [search, setSearch] = useState('')
+  const [year, setYear] = useState('all')
+  const [shown, setShown] = useState(12)
 
   const {
     data: matches,
@@ -62,6 +68,19 @@ export function MatchesPage() {
 
   const past = (matches ?? []).filter((match) => !isUpcomingMatch(match.status))
 
+  const years = [
+    ...new Set(
+      (matches ?? []).map((match) => new Date(match.played_at).getFullYear()),
+    ),
+  ].sort((a, b) => b - a)
+  const filtered = past.filter(
+    (match) =>
+      (year === 'all' ||
+        String(new Date(match.played_at).getFullYear()) === year) &&
+      `${match.title} ${match.home_team_name} ${match.away_team_name} ${match.location}`
+        .toLocaleLowerCase('es')
+        .includes(search.trim().toLocaleLowerCase('es')),
+  )
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -99,20 +118,79 @@ export function MatchesPage() {
         />
       ) : (
         <>
-          <nav className="fixture-strip" aria-label="Ir a un partido">
-            {(matches ?? []).map((match) => (
-              <Link
-                key={match.id}
-                to={`/matches/${match.id}`}
-                className="fixture-chip"
-              >
-                <CalendarDays aria-hidden="true" className="size-4" />
-                <span>{match.title}</span>
-              </Link>
-            ))}
-          </nav>
-          <MatchSection title="Próximos" matches={upcoming} />
-          <MatchSection title="Jugados" matches={past} />
+          <MatchSection
+            title="Próximo partido"
+            matches={upcoming.slice(0, 1)}
+          />
+          <section
+            className="ranking-panel flex flex-col gap-3"
+            aria-label="Buscar partidos de esta liga"
+          >
+            <h2 className="flex items-center gap-2 font-bold">
+              <CalendarDays
+                className="size-4 text-tier-gold"
+                aria-hidden="true"
+              />
+              Archivo de partidos
+            </h2>
+            <div className="flex gap-3">
+              <div className="min-w-0 flex-1">
+                <Label htmlFor="match-search">Buscar</Label>
+                <Input
+                  id="match-search"
+                  type="search"
+                  placeholder="Jornada, equipo o campo"
+                  value={search}
+                  onChange={(event) => {
+                    setSearch(event.target.value)
+                    setShown(12)
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="match-year">Año</Label>
+                <select
+                  id="match-year"
+                  className="match-year"
+                  value={year}
+                  onChange={(event) => {
+                    setYear(event.target.value)
+                    setShown(12)
+                  }}
+                >
+                  <option value="all">Todos</option>
+                  {years.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {filtered.length} partidos en esta liga
+            </p>
+          </section>
+          <MatchSection
+            title="Más próximos partidos"
+            matches={upcoming.slice(1)}
+          />
+          {filtered.length ? (
+            <MatchSection title="Jugados" matches={filtered.slice(0, shown)} />
+          ) : (
+            <EmptyState
+              title="No hay partidos que coincidan"
+              description="Prueba otro año o cambia la búsqueda."
+            />
+          )}
+          {shown < filtered.length ? (
+            <Button
+              variant="outline"
+              onClick={() => setShown((value) => value + 12)}
+            >
+              Ver más partidos ({filtered.length - shown})
+            </Button>
+          ) : null}
         </>
       )}
     </div>

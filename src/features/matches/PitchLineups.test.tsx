@@ -300,7 +300,9 @@ describe('PitchLineups', () => {
       const user = userEvent.setup()
       renderLineups()
 
-      expect(screen.getByText(/Toca un jugador y luego otro/)).toBeVisible()
+      expect(
+        screen.queryByText(/Toca un jugador y luego otro/),
+      ).not.toBeInTheDocument()
 
       await user.click(screen.getByLabelText(/^Defensa Uno,/))
 
@@ -317,7 +319,9 @@ describe('PitchLineups', () => {
       await user.click(screen.getByRole('button', { name: 'Cancelar' }))
 
       expect(screen.queryByRole('status')).not.toBeInTheDocument()
-      expect(screen.getByText(/Toca un jugador y luego otro/)).toBeVisible()
+      expect(
+        screen.queryByText(/Toca un jugador y luego otro/),
+      ).not.toBeInTheDocument()
       expect(onLineupChange).not.toHaveBeenCalled()
     })
 

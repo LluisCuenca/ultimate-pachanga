@@ -1,6 +1,6 @@
 # Ultimate Pachangas · Rediseño visual
 
-Rama: `design/ultimate-premium`. Base: `cbd1b95` (origin/main comprobado el 14 de septiembre de 2026).
+Primera entrega: `design/ultimate-premium`, posteriormente incorporada a `main` por petición del usuario. Base: `cbd1b95` (origin/main comprobado el 14 de septiembre de 2026).
 
 ## Dirección
 
@@ -31,4 +31,4 @@ Compilación, lint y pruebas automatizadas ejecutados localmente. El navegador b
 
 Por tanto, quedan pendientes la inspección visual a 390 y 1440 px, la comprobación de overflow real en navegador y la revisión de pantallas con una sesión autenticada y datos reales. Las pruebas unitarias no sustituyen esas comprobaciones; no debe considerarse una revisión visual final aprobada.
 
-Publicar esta rama no actualiza GitHub Pages: el flujo existente despliega `main`. No se modifica ese flujo ni se mezcla la rama de diseño con producción.
+El flujo existente publica `main` en el fork de LluisCuenca. El usuario pidió posteriormente incorporar directamente los cambios a su `main`, sin abrir un pull request. La segunda ronda se detalla en [feedback-round-2.md](feedback-round-2.md).

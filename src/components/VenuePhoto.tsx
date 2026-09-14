@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { getMatchPhotoUrl } from '@/lib/supabase'
+import { toPhotoUrl } from '@/lib/matchPhoto'
 import { getVenueImage } from '@/lib/venues'
 import type { MatchRow } from '@/types/domain'
 
@@ -30,11 +30,6 @@ interface VenuePhotoProps {
  * the old image from cache — for an hour, to whoever just corrected it. The
  * match's own timestamp moves on every edit and settles the question.
  */
-function toPhotoUrl(match: MatchRow): string | null {
-  const url = getMatchPhotoUrl(match.photo_path)
-
-  return url && `${url}?v=${Date.parse(match.updated_at)}`
-}
 
 export function VenuePhoto({
   match,

@@ -1,3 +1,6 @@
+import { Link } from 'react-router'
+import { PlayerAvatar } from '@/components/PlayerAvatar'
+import { ScoreStrip } from '@/components/ScoreStrip'
 import { PlayerCard } from '@/components/PlayerCard'
 import { MarketValue } from '@/components/MarketValue'
 import {
@@ -45,21 +48,22 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="ideal-summary">
         <div>
-          <h2 className="text-lg font-bold">7 ideal</h2>
-          <p className="text-sm text-muted-foreground">
-            Formación 2-3-1 + portero
-          </p>
+          <span>Formación</span>
+          <strong>2-3-1</strong>
+          <small>+ portero</small>
         </div>
-        <div className="flex flex-wrap gap-3 text-sm">
-          <span>
-            Media{' '}
-            <span className="numeric font-bold">{lineup.totalRating}</span>
-          </span>
-          <span>
-            Valor <MarketValue value={lineup.totalMarketValueGbp} />
-          </span>
+        <div>
+          <span>Media</span>
+          <strong>{lineup.totalRating}</strong>
+          <small>valoración</small>
+        </div>
+        <div className="ideal-summary-value">
+          <span>Valor del equipo</span>
+          <strong>
+            <MarketValue value={lineup.totalMarketValueGbp} />
+          </strong>
         </div>
       </div>
 
@@ -106,19 +110,49 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
         })}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {selected.map((entry) => (
-          <PlayerCard
-            key={entry.player.id}
-            player={entry.player}
-            metrics={metrics}
-            linkTo={`/players/${entry.player.id}`}
-            ratingOverride={entry.displayRating}
-            metricCardStatsOverride={entry.bestMetricCardStats}
-            faceOverride={CARD_FACE[entry.cardStyle]}
-          />
-        ))}
-      </div>
+      <section className="ranking-panel">
+        <h2 className="mb-3 text-lg font-bold">Los elegidos</h2>
+        <ol className="ideal-selection">
+          {selected.map((entry) => (
+            <li key={entry.player.id} data-face={CARD_FACE[entry.cardStyle]}>
+              <Link to={`/players/${entry.player.id}`} className="block p-3">
+                <div className="flex items-center gap-3">
+                  <PlayerAvatar
+                    name={entry.player.displayName}
+                    path={entry.player.avatarPath}
+                    className="size-11"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-bold">
+                      {entry.player.displayName}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {entry.player.preferredPosition} ·{' '}
+                      {entry.cardStyle === 'silver'
+                        ? 'Leyenda'
+                        : entry.cardStyle === 'purple'
+                          ? 'MVP'
+                          : entry.cardStyle === 'black'
+                            ? 'Defensa'
+                            : '7 ideal'}
+                    </span>
+                  </span>
+                  <span className="numeric text-xl font-black text-tier-gold">
+                    {entry.displayRating}
+                  </span>
+                </div>
+                <ScoreStrip
+                  metrics={metrics}
+                  values={entry.bestMetricCardStats}
+                />
+                <p className="mt-2 text-right text-sm">
+                  <MarketValue value={entry.player.marketValueGbp} />
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
     </section>
   )
 }

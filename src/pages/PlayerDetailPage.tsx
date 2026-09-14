@@ -4,14 +4,7 @@ import { ArrowLeft, History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { PlayerHistory } from '@/components/PlayerHistory'
 import { AttributeBadge } from '@/components/AttributeBadge'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -28,7 +21,6 @@ import {
   useLeagueMetrics,
 } from '@/features/league/useLeague'
 import {
-  formatMatchDate,
   formatPosition,
   formatScore,
   formatVictories,
@@ -130,7 +122,7 @@ export function PlayerDetailPage() {
         <PlayerCard
           player={player}
           metrics={metrics}
-          className="mx-auto h-fit w-full max-w-72"
+          className="player-detail-card h-fit w-full"
         />
 
         <div className="flex flex-col gap-4">
@@ -177,11 +169,6 @@ export function PlayerDetailPage() {
                     {formatScore(player.latestScore)}
                   </span>
                 </SummaryRow>
-                <SummaryRow label="Código">
-                  <span className="numeric text-sm text-muted-foreground">
-                    {player.playerCode}
-                  </span>
-                </SummaryRow>
               </dl>
             </CardContent>
           </Card>
@@ -204,7 +191,7 @@ export function PlayerDetailPage() {
                   <h2>Atributos</h2>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
+              <CardContent className="player-awards flex flex-wrap gap-2">
                 {earnedAttributes.map((attribute) => (
                   <AttributeBadge
                     key={attribute.code}
@@ -242,69 +229,7 @@ export function PlayerDetailPage() {
               className="border-0 py-6"
             />
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Partido</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    {metrics.map((metric) => (
-                      <TableHead key={metric.code} className="text-right">
-                        {metric.label}
-                      </TableHead>
-                    ))}
-                    <TableHead className="text-right">Goles</TableHead>
-                    <TableHead className="text-right">Victoria</TableHead>
-                    <TableHead className="text-right">Base</TableHead>
-                    <TableHead>Atributos</TableHead>
-                    <TableHead className="text-right">Final</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {history.map((entry) => (
-                    <TableRow key={entry.matchId}>
-                      <TableCell className="font-medium">
-                        {entry.matchTitle}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-muted-foreground">
-                        {formatMatchDate(entry.playedAt)}
-                      </TableCell>
-                      {metrics.map((metric) => (
-                        <TableCell
-                          key={metric.code}
-                          className="numeric text-right"
-                        >
-                          {formatScore(entry.metricScores[metric.code] ?? null)}
-                        </TableCell>
-                      ))}
-                      <TableCell className="numeric text-right">
-                        {entry.goals}
-                      </TableCell>
-                      <TableCell className="numeric text-right">
-                        {formatVictories(entry.victory)}
-                      </TableCell>
-                      <TableCell className="numeric text-right">
-                        {formatScore(entry.baseScore)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {entry.attributes.map((attribute) => (
-                            <AttributeBadge
-                              key={attribute.code}
-                              label={attribute.label}
-                              points={attribute.points}
-                            />
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell className="numeric text-right font-bold">
-                        {formatScore(entry.finalScore)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <PlayerHistory history={history} metrics={metrics} />
           )}
         </CardContent>
       </Card>

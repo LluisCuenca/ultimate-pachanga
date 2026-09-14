@@ -74,7 +74,7 @@ describe('LeaguePage', () => {
   it('keeps the general dashboard and links to the 7 ideal page', async () => {
     renderPage()
 
-    expect(await screen.findByText('Jugadores activos')).toBeInTheDocument()
+    expect(screen.queryByText('Jugadores activos')).not.toBeInTheDocument()
     expect(
       await screen.findByText('Mayor valor de mercado'),
     ).toBeInTheDocument()

@@ -173,7 +173,7 @@ export function PlayerCard({
       data-face={face}
       data-compact={compact ? 'true' : undefined}
       className={cn(
-        'player-face relative flex flex-col overflow-hidden',
+        'player-face relative flex h-full flex-col overflow-hidden',
         CARD_EDGE,
         CARD_FACES[face],
         CARD_EDGES[face],
@@ -215,7 +215,7 @@ export function PlayerCard({
   return (
     <Link
       to={linkTo}
-      className="rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="player-card-link block h-full min-w-0 rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
       aria-label={`Ver ficha de ${player.displayName}`}
     >
       {card}

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorState } from '@/components/ErrorState'
+import { ProfileActions } from '@/components/ProfileActions'
 import { PlayerCard } from '@/components/PlayerCard'
 import { PlayerFormDialog } from '@/features/players/PlayerFormDialog'
 import {
@@ -98,14 +99,22 @@ export function ProfilePage() {
   // data undefined too, and a skeleton that never resolves is the least
   // diagnosable thing this page could show.
   if (error) {
-    return <ErrorState error={error} onRetry={() => void refetch()} />
+    return (
+      <>
+        <ErrorState error={error} onRetry={() => void refetch()} />
+        <ProfileActions />
+      </>
+    )
   }
 
   if (isPending || !player) {
     return (
-      <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
-        <Skeleton className="h-96 rounded-xl" />
-        <Skeleton className="h-48 rounded-xl" />
+      <div>
+        <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
+          <Skeleton className="h-96 rounded-xl" />
+          <Skeleton className="h-48 rounded-xl" />
+        </div>
+        <ProfileActions />
       </div>
     )
   }
@@ -127,8 +136,7 @@ export function ProfilePage() {
           <CardHeader>
             <CardTitle>Tus datos</CardTitle>
             <CardDescription>
-              Código de importación {player.playerCode} · posición{' '}
-              {formatPosition(player.preferredPosition)}
+              Posición {formatPosition(player.preferredPosition)}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-start gap-3">
@@ -149,7 +157,7 @@ export function ProfilePage() {
 
             <p className="text-sm text-muted-foreground">
               Puedes cambiar tu nombre, apellidos, apodo, posición preferida y
-              foto. Para cualquier otra cosa —tu código, las convocatorias o las
+              foto. Para cualquier otra cosa —las convocatorias o las
               puntuaciones— habla con un administrador.
             </p>
 
@@ -162,6 +170,7 @@ export function ProfilePage() {
         </Card>
       </div>
 
+      <ProfileActions />
       <input
         ref={avatarInputRef}
         type="file"

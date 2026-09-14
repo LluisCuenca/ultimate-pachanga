@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Trophy } from 'lucide-react'
+import { Trophy, TrendingUp, Target, Flame, Shield, Award } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -48,7 +48,16 @@ function PodiumCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {title.includes('valorados') ? (
+            <TrendingUp className="size-4 text-primary" aria-hidden="true" />
+          ) : title.includes('goleadores') ? (
+            <Target className="size-4 text-primary" aria-hidden="true" />
+          ) : title.includes('defensivos') ? (
+            <Shield className="size-4 text-primary" aria-hidden="true" />
+          ) : (
+            <Flame className="size-4 text-primary" aria-hidden="true" />
+          )}
           <h2>{title}</h2>
         </CardTitle>
         <p className="text-sm text-muted-foreground">{description}</p>
@@ -238,8 +247,14 @@ export function StatsPage() {
               const holders = byAttribute(attribute.code)
 
               return (
-                <section key={attribute.code} className="flex flex-col gap-2">
-                  <h2 className="text-sm font-semibold">{attribute.label}</h2>
+                <section
+                  key={attribute.code}
+                  className="ranking-panel flex flex-col gap-3"
+                >
+                  <h2 className="flex items-center gap-2 text-base font-bold">
+                    <Award className="size-4 text-primary" aria-hidden="true" />
+                    {attribute.label}
+                  </h2>
                   {holders.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       Nadie lo ha recibido todavía.

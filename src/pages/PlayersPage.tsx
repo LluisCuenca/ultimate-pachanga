@@ -100,11 +100,6 @@ export function PlayersPage() {
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-bold">Jugadores</h1>
-        <p className="text-sm text-muted-foreground">
-          {isPending
-            ? 'Cargando plantilla…'
-            : `${visiblePlayers.length} de ${players?.length ?? 0} jugadores`}
-        </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">

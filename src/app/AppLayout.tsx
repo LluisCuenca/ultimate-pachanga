@@ -1,38 +1,17 @@
-import { useState } from 'react'
-import { Link, NavLink, Outlet, useNavigate } from 'react-router'
+import { Link, NavLink, Outlet } from 'react-router'
+import { useQuery } from '@tanstack/react-query'
 import {
   BarChart3,
   CalendarDays,
-  LogOut,
-  Menu,
-  Settings,
   Shield,
-  ShieldCheck,
   Trophy,
-  UserCog,
   UserRound,
   Users,
 } from 'lucide-react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
-import { AdminOnly } from '@/components/AdminOnly'
-import { signOut } from '@/features/auth/api'
-import { useLeague } from '@/features/league/useLeague'
 import { Brand } from '@/components/Brand'
-import { APP_NAME } from '@/lib/env'
+import { PlayerAvatar } from '@/components/PlayerAvatar'
+import { useMyPlayerId } from '@/features/players/useMyPlayer'
+import { fetchPlayerCard, playerKeys } from '@/features/players/api'
 import { cn } from '@/lib/utils'
 
 interface NavigationItem {
@@ -48,12 +27,6 @@ const NAVIGATION: NavigationItem[] = [
   { to: '/matches', label: 'Partidos', icon: CalendarDays },
   { to: '/stats', label: 'Estadísticas', icon: BarChart3 },
   { to: '/league/ideal-seven', label: '7 ideal', icon: Trophy },
-]
-
-const ADMIN_NAVIGATION: NavigationItem[] = [
-  { to: '/admin/players', label: 'Gestionar jugadores', icon: Users },
-  { to: '/admin/members', label: 'Miembros', icon: UserCog },
-  { to: '/admin/settings', label: 'Ajustes de la liga', icon: Settings },
 ]
 
 function navigationLinkClasses({ isActive }: { isActive: boolean }): string {
@@ -90,57 +63,13 @@ function NavigationLinks({
   )
 }
 
-/**
- * Admin destinations, collapsed into a menu on desktop so the main bar stays
- * short. The mobile sheet lists them inline instead — a dropdown inside a
- * slide-over is awkward on a phone.
- */
-function AdminMenu() {
-  return (
-    <AdminOnly>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            <ShieldCheck className="size-4" aria-hidden="true" />
-            Administración
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuLabel>Administración</DropdownMenuLabel>
-          {ADMIN_NAVIGATION.map(({ to, label, icon: Icon }) => (
-            <DropdownMenuItem key={to} asChild>
-              <Link to={to}>
-                <Icon className="size-4" aria-hidden="true" />
-                {label}
-              </Link>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </AdminOnly>
-  )
-}
-
-/**
- * Shell for every signed-in page: sidebar on desktop, persistent bottom
- * navigation and account sheet on mobile.
- */
 export function AppLayout() {
-  const { data: league } = useLeague()
-  const navigate = useNavigate()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  async function handleSignOut() {
-    try {
-      await signOut()
-      navigate('/login', { replace: true })
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'No se pudo cerrar sesión',
-      )
-    }
-  }
-
+  const { data: myPlayerId } = useMyPlayerId()
+  const { data: player } = useQuery({
+    queryKey: playerKeys.card(myPlayerId ?? ''),
+    enabled: Boolean(myPlayerId),
+    queryFn: () => fetchPlayerCard(myPlayerId!),
+  })
   return (
     <div className="min-h-svh">
       <a href="#main-content" className="skip-link">
@@ -153,80 +82,30 @@ export function AppLayout() {
             <span>Ultimate</span>Pachangas
           </div>
         </Link>
-        <div>
-          <p className="section-kicker mb-4 px-3">Tu competición</p>
-          <nav
-            aria-label="Navegación principal"
-            className="flex flex-col gap-2"
-          >
-            <NavigationLinks items={NAVIGATION} />
-          </nav>
-        </div>
-        <div className="mt-auto flex flex-col gap-3">
+        <nav aria-label="Navegación principal" className="flex flex-col gap-2">
+          <NavigationLinks items={NAVIGATION} />
+        </nav>
+        <div className="mt-auto">
           <NavigationLinks
             items={[{ to: '/profile', label: 'Mi perfil', icon: UserRound }]}
           />
-          <AdminMenu />
-          <p className="px-3 text-xs text-muted-foreground">
-            El fútbol es mejor con los tuyos.
-          </p>
         </div>
       </aside>
       <header className="app-topbar">
-        <div className="app-topbar-inner">
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                aria-label="Abrir menú"
-              >
-                <Menu className="size-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 overflow-y-auto p-4">
-              <SheetTitle className="mb-4 text-base">{APP_NAME}</SheetTitle>
-              <nav aria-label="Menú de cuenta" className="flex flex-col gap-1">
-                <NavigationLinks
-                  items={[
-                    ...NAVIGATION,
-                    { to: '/profile', label: 'Mi perfil', icon: UserRound },
-                  ]}
-                  onNavigate={() => setIsMenuOpen(false)}
-                />
-                <AdminOnly>
-                  <p className="mt-4 px-3 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Administración
-                  </p>
-                  <NavigationLinks
-                    items={ADMIN_NAVIGATION}
-                    onNavigate={() => setIsMenuOpen(false)}
-                  />
-                </AdminOnly>
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          <Link to="/league" className="flex min-w-0 items-center gap-2">
-            <Brand className="size-9 lg:hidden" />
-            <span className="truncate font-bold">
-              {league?.title ?? APP_NAME}
-            </span>
+        <div className="app-topbar-inner mobile-brand-header">
+          <Link to="/league" aria-label="Ir a Liga" className="header-icon">
+            <Brand />
           </Link>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSignOut}
-            className="ml-auto"
-          >
-            <LogOut className="size-4" aria-hidden="true" />
-            <span className="sr-only sm:not-sr-only">Salir</span>
-          </Button>
+          <span className="header-title">ULTIMATE PACHANGAS</span>
+          <Link to="/profile" aria-label="Mi perfil" className="header-icon">
+            <PlayerAvatar
+              name={player?.displayName ?? 'Mi perfil'}
+              path={player?.avatarPath}
+              className="size-10"
+            />
+          </Link>
         </div>
       </header>
-
       <main id="main-content" tabIndex={-1} className="app-main">
         <Outlet />
       </main>

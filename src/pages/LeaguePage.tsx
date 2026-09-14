@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AttributeBadge } from '@/components/AttributeBadge'
+import { Brand } from '@/components/Brand'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { MarketValue } from '@/components/MarketValue'
@@ -31,21 +31,6 @@ import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import type { MatchRow, PlayerCardData } from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
-
-function StatTile({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <Card className="stat-tile gap-2 p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-2xl font-bold">{children}</p>
-    </Card>
-  )
-}
 
 function LeaderboardCard({
   title,
@@ -96,21 +81,25 @@ function LeaderboardCard({
 
 function IdealSevenCallout() {
   return (
-    <Card className="ideal-callout">
-      <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="flex items-center gap-2 text-base font-bold">
-            <Sparkles className="size-4 text-primary" aria-hidden="true" />7
-            ideal
+    <Card className="ideal-callout ideal-promo">
+      <CardContent className="ideal-promo-content">
+        <div>
+          <p className="section-kicker">El equipo de la liga</p>
+          <h2>
+            <Sparkles aria-hidden="true" />7 ideal
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            El mejor equipo 2-3-1 de la liga, con cartas especiales y notas del
-            mejor partido de cada jugador.
+          <p>
+            El mejor equipo 2-3-1 de la liga. Siete jugadores, una alineación
+            para recordar.
           </p>
+          <Button asChild>
+            <Link to="/league/ideal-seven">Ver 7 ideal</Link>
+          </Button>
         </div>
-        <Button asChild className="shrink-0">
-          <Link to="/league/ideal-seven">Ver 7 ideal</Link>
-        </Button>
+        <div className="ideal-promo-art" aria-hidden="true">
+          <span>7</span>
+          <Brand />
+        </div>
       </CardContent>
     </Card>
   )
@@ -174,10 +163,6 @@ export function LeaguePage() {
     .filter((match) => isUpcomingMatch(match.status))
     .at(-1)
 
-  const scoredMatchCount = (matches ?? []).filter(
-    (match) => match.status === 'scored',
-  ).length
-
   // Award holders, most-decorated first, so the dashboard shows who is actually
   // collecting them rather than an arbitrary slice of the roster.
   const awardHolders = attributes
@@ -198,41 +183,12 @@ export function LeaguePage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="league-heading flex flex-wrap items-center gap-3">
-        <p className="section-kicker w-full">Ultimate Pachangas · Tu liga</p>
         <h1 className="text-2xl font-bold">{league?.title ?? 'Liga'}</h1>
         {league ? (
           <Badge variant={league.status === 'active' ? 'default' : 'secondary'}>
             {league.status === 'active' ? 'Activa' : 'Inactiva'}
           </Badge>
         ) : null}
-      </div>
-
-      <div className="league-summary grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile label="Jugadores activos">
-          <span className="numeric">
-            {arePlayersPending ? '—' : activePlayers.length}
-          </span>
-        </StatTile>
-        <StatTile label="Partidos puntuados">
-          <span className="numeric">
-            {areMatchesPending ? '—' : scoredMatchCount}
-          </span>
-        </StatTile>
-        <StatTile label="Valor total">
-          {arePlayersPending ? (
-            '—'
-          ) : (
-            <MarketValue
-              value={activePlayers.reduce(
-                (total, player) => total + player.marketValueGbp,
-                0,
-              )}
-            />
-          )}
-        </StatTile>
-        <StatTile label="Tu rol">
-          {membership?.role === 'admin' ? 'Admin' : 'Miembro'}
-        </StatTile>
       </div>
 
       {areMatchesPending ? (
@@ -317,40 +273,27 @@ export function LeaguePage() {
       )}
 
       {awardHolders.length > 0 ? (
-        <Card className="league-secondary">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Award className="size-4 text-primary" aria-hidden="true" />
-              <h2>Palmarés</h2>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
+        <section className="league-secondary flex flex-col gap-3">
+          <h2 className="flex items-center gap-2 text-lg font-bold">
+            <Award aria-hidden="true" className="size-5 text-tier-gold" />
+            Palmarés
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
             {awardHolders.map(({ attribute, holders }) => (
-              <div
+              <LeaderboardCard
                 key={attribute.code}
-                className="flex flex-wrap items-center gap-2"
-              >
-                <AttributeBadge
-                  label={attribute.label}
-                  points={attribute.points}
-                />
-                {holders.map((player) => (
-                  <Link
-                    key={player.id}
-                    to={`/players/${player.id}`}
-                    className="text-sm hover:underline"
-                  >
-                    {player.displayName}
-                    <span className="numeric text-muted-foreground">
-                      {' '}
-                      ×{player.attributeCounts[attribute.code]}
-                    </span>
-                  </Link>
-                ))}
-              </div>
+                title={attribute.label}
+                icon={Award}
+                players={holders}
+                renderValue={(player) => (
+                  <span className="numeric font-bold text-tier-gold">
+                    ×{player.attributeCounts[attribute.code]}
+                  </span>
+                )}
+              />
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       ) : null}
     </div>
   )

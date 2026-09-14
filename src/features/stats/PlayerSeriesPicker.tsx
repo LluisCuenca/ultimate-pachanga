@@ -1,3 +1,4 @@
+import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { useState } from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -93,6 +94,10 @@ export function PlayerSeriesPicker({
                       style={{
                         backgroundColor: color ?? 'var(--color-muted)',
                       }}
+                    />
+                    <PlayerAvatar
+                      name={player.displayName}
+                      path={player.avatarPath}
                     />
                     <span className="min-w-0 flex-1 truncate">
                       {player.displayName}

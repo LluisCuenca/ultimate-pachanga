@@ -5,6 +5,10 @@ import { PlayerSeriesPicker } from '@/features/stats/PlayerSeriesPicker'
 import { renderWithProviders } from '@/test/render'
 import { buildPlayerCard } from '@/test/factories'
 
+vi.mock('@/lib/supabase', () => ({
+  getAvatarUrl: (path: string) => `https://example.test/${path}`,
+}))
+
 const PLAYERS = [
   buildPlayerCard({ id: 'p1', displayName: 'Charly' }),
   buildPlayerCard({ id: 'p2', displayName: 'David Castelló' }),

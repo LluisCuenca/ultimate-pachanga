@@ -108,12 +108,12 @@ describe('IdealSevenPage', () => {
     expect(
       await screen.findByRole('heading', { name: '7 ideal' }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Liga' })).toHaveAttribute(
-      'href',
-      '/league',
-    )
+    expect(screen.queryByRole('link', { name: 'Liga' })).not.toBeInTheDocument()
     expect(await screen.findAllByTestId('ideal-seven-slot')).toHaveLength(7)
-    expect(screen.getAllByTestId('player-card')).toHaveLength(14)
+    expect(screen.getAllByTestId('player-card')).toHaveLength(7)
+    expect(
+      screen.getByRole('heading', { name: 'Los elegidos' }),
+    ).toBeInTheDocument()
     expect(screen.getAllByText('90').length).toBeGreaterThan(0)
     expect(screen.getAllByText('80').length).toBeGreaterThan(0)
     expect(screen.getAllByText('70').length).toBeGreaterThan(0)

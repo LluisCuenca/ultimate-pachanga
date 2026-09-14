@@ -119,6 +119,7 @@ export function EvolutionSection({
           {
             playerId: player.id,
             name: player.displayName,
+            avatarPath: player.avatarPath,
             color: SERIES_COLORS[entry.slot],
           },
         ]

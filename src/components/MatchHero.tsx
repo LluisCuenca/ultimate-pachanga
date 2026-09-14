@@ -1,6 +1,16 @@
-import { CalendarDays, MapPin } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { getVenueImage } from '@/lib/venues'
+import { CalendarDays, MapPin, Expand } from 'lucide-react'
 import { MatchStatusBadge } from '@/components/MatchStatusBadge'
 import { VenuePhoto } from '@/components/VenuePhoto'
+import { toPhotoUrl } from '@/lib/matchPhoto'
 import { formatMatchDateTime, formatMatchRelative } from '@/lib/formatting'
 import type { MatchRow } from '@/types/domain'
 
@@ -14,11 +24,38 @@ import type { MatchRow } from '@/types/domain'
 export function MatchHero({ match }: { match: MatchRow }) {
   return (
     <header className="match-hero grid overflow-hidden rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 sm:grid-cols-[42%_1fr]">
-      <VenuePhoto
-        match={match}
-        className="h-32 sm:h-auto sm:min-h-40"
-        overlayClassName="bg-gradient-to-b from-transparent to-card sm:bg-gradient-to-r sm:from-transparent sm:via-card/40 sm:to-card"
-      />
+      <div className="match-photo-wrap">
+        <VenuePhoto
+          match={match}
+          className="h-32 sm:h-auto sm:min-h-40"
+          overlayClassName="bg-gradient-to-b from-transparent to-card sm:bg-gradient-to-r sm:from-transparent sm:via-card/40 sm:to-card"
+        />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              className="expand-photo"
+              variant="outline"
+              size="icon"
+              aria-label="Ampliar imagen del partido"
+            >
+              <Expand aria-hidden="true" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="match-photo-dialog">
+            <DialogTitle className="pr-8">
+              {match.title} · Imagen del partido
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Fotografía completa del campo o del partido.
+            </DialogDescription>
+            <img
+              src={toPhotoUrl(match) ?? getVenueImage(match.location)}
+              alt={`Campo de ${match.title}`}
+              className="max-h-[75dvh] w-full object-contain"
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <div className="flex flex-col gap-2 p-5">
         <div className="flex flex-wrap items-center gap-3">

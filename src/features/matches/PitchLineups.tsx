@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Info, MousePointerClick } from 'lucide-react'
+import { MousePointerClick } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -303,13 +303,7 @@ export function PitchLineups({
               Cancelar
             </Button>
           </div>
-        ) : (
-          <p className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-            Toca un jugador y luego otro para intercambiarlos, o arrástralo
-            encima. Funciona entre equipos y con el banquillo.
-          </p>
-        )
+        ) : null
       ) : null}
 
       {/* The audit, in one line: what the two sides on the pitch are worth and

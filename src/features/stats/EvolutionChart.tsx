@@ -1,3 +1,4 @@
+import { PlayerAvatar } from '@/components/PlayerAvatar'
 import {
   CartesianGrid,
   Line,
@@ -13,6 +14,7 @@ import type { EvolutionRow } from '@/features/stats/evolution'
 export interface EvolutionSeries {
   playerId: string
   name: string
+  avatarPath?: string | null
   /** A CSS colour, kept with the player rather than with their position. */
   color: string
 }
@@ -79,7 +81,7 @@ export function EvolutionChart({
   const chartRows = toChartRows(rows, series)
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="ranking-panel flex flex-col gap-3">
       <div className="h-80 w-full" data-testid="evolution-chart">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -116,6 +118,9 @@ export function EvolutionChart({
                       series.find(
                         (candidate) => candidate.playerId === entry.dataKey,
                       )?.name ?? '',
+                    avatarPath: series.find(
+                      (candidate) => candidate.playerId === entry.dataKey,
+                    )?.avatarPath,
                     color: String(entry.color ?? ''),
                     value: typeof entry.value === 'number' ? entry.value : null,
                   }))
@@ -137,6 +142,11 @@ export function EvolutionChart({
                             aria-hidden="true"
                             className="size-2 shrink-0 rounded-full"
                             style={{ backgroundColor: entry.color }}
+                          />
+                          <PlayerAvatar
+                            name={entry.name}
+                            path={entry.avatarPath}
+                            className="size-7"
                           />
                           <span className="flex-1 truncate">{entry.name}</span>
                           <span className="numeric font-semibold">
@@ -170,7 +180,10 @@ export function EvolutionChart({
         </ResponsiveContainer>
       </div>
 
-      <ul className="flex flex-wrap gap-2" aria-label={`Series: ${valueLabel}`}>
+      <ul
+        className="grid gap-1 sm:grid-cols-2"
+        aria-label={`Series: ${valueLabel}`}
+      >
         {series.map((entry) => {
           const latest = toLatestValue(rows, entry.playerId)
 
@@ -181,14 +194,15 @@ export function EvolutionChart({
                 onClick={() => onRemove(entry.playerId)}
                 data-testid={`evolution-legend-${entry.playerId}`}
                 title={`Quitar ${entry.name}`}
-                className="flex items-center gap-1.5 rounded-4xl border px-2 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
+                className="leaderboard-row flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
               >
                 <span
                   aria-hidden="true"
                   className="size-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 />
-                <span className="max-w-32 truncate font-medium">
+                <PlayerAvatar name={entry.name} path={entry.avatarPath} />
+                <span className="min-w-0 flex-1 truncate text-left font-medium">
                   {entry.name}
                 </span>
                 <span className="numeric text-muted-foreground">
