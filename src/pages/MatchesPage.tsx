@@ -99,6 +99,18 @@ export function MatchesPage() {
         />
       ) : (
         <>
+          <nav className="fixture-strip" aria-label="Ir a un partido">
+            {(matches ?? []).map((match) => (
+              <Link
+                key={match.id}
+                to={`/matches/${match.id}`}
+                className="fixture-chip"
+              >
+                <CalendarDays aria-hidden="true" className="size-4" />
+                <span>{match.title}</span>
+              </Link>
+            ))}
+          </nav>
           <MatchSection title="Próximos" matches={upcoming} />
           <MatchSection title="Jugados" matches={past} />
         </>

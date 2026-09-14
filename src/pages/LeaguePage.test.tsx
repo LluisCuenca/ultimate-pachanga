@@ -30,6 +30,8 @@ vi.mock('@/features/matches/api', () => ({
 vi.mock('@/lib/supabase', () => ({
   getMatchPhotoUrl: (path: string | null) =>
     path ? `https://example.test/${path}` : null,
+  getAvatarUrl: (path: string | null) =>
+    path ? `https://example.test/${path}` : null,
   supabase: {},
 }))
 

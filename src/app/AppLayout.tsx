@@ -8,6 +8,7 @@ import {
   Settings,
   Shield,
   ShieldCheck,
+  Trophy,
   UserCog,
   UserRound,
   Users,
@@ -30,6 +31,7 @@ import {
 import { AdminOnly } from '@/components/AdminOnly'
 import { signOut } from '@/features/auth/api'
 import { useLeague } from '@/features/league/useLeague'
+import { Brand } from '@/components/Brand'
 import { APP_NAME } from '@/lib/env'
 import { cn } from '@/lib/utils'
 
@@ -45,7 +47,7 @@ const NAVIGATION: NavigationItem[] = [
   { to: '/players', label: 'Jugadores', icon: Users },
   { to: '/matches', label: 'Partidos', icon: CalendarDays },
   { to: '/stats', label: 'Estadísticas', icon: BarChart3 },
-  { to: '/profile', label: 'Mi perfil', icon: UserRound },
+  { to: '/league/ideal-seven', label: '7 ideal', icon: Trophy },
 ]
 
 const ADMIN_NAVIGATION: NavigationItem[] = [
@@ -56,7 +58,7 @@ const ADMIN_NAVIGATION: NavigationItem[] = [
 
 function navigationLinkClasses({ isActive }: { isActive: boolean }): string {
   return cn(
-    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+    'nav-link flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
     isActive
       ? 'bg-accent text-accent-foreground'
       : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
@@ -76,6 +78,7 @@ function NavigationLinks({
         <NavLink
           key={to}
           to={to}
+          end={to === '/league'}
           onClick={onNavigate}
           className={navigationLinkClasses}
         >
@@ -119,8 +122,8 @@ function AdminMenu() {
 }
 
 /**
- * Shell for every signed-in page: a horizontal nav on desktop, a slide-over
- * sheet on mobile.
+ * Shell for every signed-in page: sidebar on desktop, persistent bottom
+ * navigation and account sheet on mobile.
  */
 export function AppLayout() {
   const { data: league } = useLeague()
@@ -139,15 +142,44 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4">
+    <div className="min-h-svh">
+      <a href="#main-content" className="skip-link">
+        Saltar al contenido
+      </a>
+      <aside className="app-sidebar">
+        <Link to="/league" className="flex items-center gap-3">
+          <Brand />
+          <div className="brand-wordmark">
+            <span>Ultimate</span>Pachangas
+          </div>
+        </Link>
+        <div>
+          <p className="section-kicker mb-4 px-3">Tu competición</p>
+          <nav
+            aria-label="Navegación principal"
+            className="flex flex-col gap-2"
+          >
+            <NavigationLinks items={NAVIGATION} />
+          </nav>
+        </div>
+        <div className="mt-auto flex flex-col gap-3">
+          <NavigationLinks
+            items={[{ to: '/profile', label: 'Mi perfil', icon: UserRound }]}
+          />
+          <AdminMenu />
+          <p className="px-3 text-xs text-muted-foreground">
+            El fútbol es mejor con los tuyos.
+          </p>
+        </div>
+      </aside>
+      <header className="app-topbar">
+        <div className="app-topbar-inner">
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="lg:hidden"
                 aria-label="Abrir menú"
               >
                 <Menu className="size-5" />
@@ -155,9 +187,12 @@ export function AppLayout() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64 overflow-y-auto p-4">
               <SheetTitle className="mb-4 text-base">{APP_NAME}</SheetTitle>
-              <nav className="flex flex-col gap-1">
+              <nav aria-label="Menú de cuenta" className="flex flex-col gap-1">
                 <NavigationLinks
-                  items={NAVIGATION}
+                  items={[
+                    ...NAVIGATION,
+                    { to: '/profile', label: 'Mi perfil', icon: UserRound },
+                  ]}
                   onNavigate={() => setIsMenuOpen(false)}
                 />
                 <AdminOnly>
@@ -174,18 +209,11 @@ export function AppLayout() {
           </Sheet>
 
           <Link to="/league" className="flex min-w-0 items-center gap-2">
-            <span className="grid size-7 shrink-0 place-items-center rounded-md bg-primary/15 font-black text-primary">
-              R
-            </span>
+            <Brand className="size-9 lg:hidden" />
             <span className="truncate font-bold">
               {league?.title ?? APP_NAME}
             </span>
           </Link>
-
-          <nav className="ml-4 hidden items-center gap-1 md:flex">
-            <NavigationLinks items={NAVIGATION} />
-            <AdminMenu />
-          </nav>
 
           <Button
             variant="ghost"
@@ -199,9 +227,22 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main id="main-content" tabIndex={-1} className="app-main">
         <Outlet />
       </main>
+      <nav className="app-bottom-nav" aria-label="Navegación principal móvil">
+        {NAVIGATION.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/league'}
+            className="bottom-link"
+          >
+            <Icon aria-hidden="true" />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   )
 }

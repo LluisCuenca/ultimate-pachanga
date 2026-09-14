@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { signIn, signUp } from '@/features/auth/api'
 import { useAuth } from '@/features/auth/useAuth'
+import { Brand } from '@/components/Brand'
 import { APP_NAME } from '@/lib/env'
 
 const credentialsSchema = z.object({
@@ -123,32 +124,57 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-xl">
-            <h1>{APP_NAME}</h1>
-          </CardTitle>
-          <CardDescription>Liga de verano roco · Fútbol 7</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={mode} onValueChange={(value) => setMode(value as Mode)}>
-            <TabsList className="mb-4 grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Registrarse</TabsTrigger>
-            </TabsList>
-            <TabsContent value="signin">
-              <CredentialsForm mode="signin" onSubmitted={() => {}} />
-            </TabsContent>
-            <TabsContent value="signup">
-              <CredentialsForm
-                mode="signup"
-                onSubmitted={() => setMode('signin')}
-              />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <main className="auth-layout">
+      <section
+        className="auth-story"
+        aria-label="Bienvenido a Ultimate Pachangas"
+      >
+        <Brand />
+        <div className="section-kicker">Fútbol entre amigos</div>
+        <h2>
+          Tu gente.
+          <br />
+          Tu liga.
+          <br />
+          <span>Tu partido.</span>
+        </h2>
+        <p>
+          Cada pachanga cuenta. Convocatorias, jugadores y toda la emoción de
+          vuestra liga, en un solo lugar.
+        </p>
+      </section>
+      <div className="auth-form">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-xl">
+              <h1>{APP_NAME}</h1>
+            </CardTitle>
+            <CardDescription>
+              Entra en tu liga. Nos vemos en el campo.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              value={mode}
+              onValueChange={(value) => setMode(value as Mode)}
+            >
+              <TabsList className="mb-4 grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Entrar</TabsTrigger>
+                <TabsTrigger value="signup">Registrarse</TabsTrigger>
+              </TabsList>
+              <TabsContent value="signin">
+                <CredentialsForm mode="signin" onSubmitted={() => {}} />
+              </TabsContent>
+              <TabsContent value="signup">
+                <CredentialsForm
+                  mode="signup"
+                  onSubmitted={() => setMode('signin')}
+                />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </main>
   )
 }

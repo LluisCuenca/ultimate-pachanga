@@ -64,7 +64,7 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
       </div>
 
       <div
-        className="relative w-full overflow-hidden rounded-xl border"
+        className="pitch-surface relative w-full overflow-hidden rounded-xl border"
         style={{ aspectRatio: '1000 / 1250' }}
       >
         <img

@@ -43,7 +43,7 @@ function SummaryRow({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 py-2">
+    <div className="player-summary-stat flex flex-col gap-1 py-3">
       <dt className="text-sm text-muted-foreground">{label}</dt>
       <dd className="font-semibold">{children}</dd>
     </div>
@@ -127,7 +127,11 @@ export function PlayerDetailPage() {
       <h1 className="text-2xl font-bold">{player.displayName}</h1>
 
       <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
-        <PlayerCard player={player} metrics={metrics} className="h-fit" />
+        <PlayerCard
+          player={player}
+          metrics={metrics}
+          className="mx-auto h-fit w-full max-w-72"
+        />
 
         <div className="flex flex-col gap-4">
           <Card>
@@ -137,7 +141,7 @@ export function PlayerDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="divide-y divide-border/50">
+              <dl className="grid grid-cols-2 gap-x-5 gap-y-1">
                 <SummaryRow label="Valor de mercado">
                   <MarketValue value={player.marketValueGbp} exact />
                 </SummaryRow>

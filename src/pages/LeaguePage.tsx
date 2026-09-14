@@ -8,6 +8,8 @@ import {
   Trophy,
   Users,
 } from 'lucide-react'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { getAvatarUrl } from '@/lib/supabase'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,7 +40,7 @@ function StatTile({
   children: React.ReactNode
 }) {
   return (
-    <Card className="gap-1 p-4">
+    <Card className="stat-tile gap-2 p-4">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="text-2xl font-bold">{children}</p>
     </Card>
@@ -69,12 +71,19 @@ function LeaderboardCard({
           <Link
             key={player.id}
             to={`/players/${player.id}`}
-            className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent/50"
+            className="leaderboard-row flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent/50"
           >
             <span className="numeric w-4 text-sm text-muted-foreground">
               {index + 1}
             </span>
-            <span className="flex-1 truncate text-sm font-medium">
+            <Avatar className="size-9 shrink-0">
+              <AvatarImage
+                src={getAvatarUrl(player.avatarPath) ?? undefined}
+                alt=""
+              />
+              <AvatarFallback>{player.displayName.slice(0, 2)}</AvatarFallback>
+            </Avatar>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium">
               {player.displayName}
             </span>
             {renderValue(player)}
@@ -87,7 +96,7 @@ function LeaderboardCard({
 
 function IdealSevenCallout() {
   return (
-    <Card className="bg-gradient-to-r from-sky-500/10 via-card to-fuchsia-500/10">
+    <Card className="ideal-callout">
       <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h2 className="flex items-center gap-2 text-base font-bold">
@@ -188,7 +197,8 @@ export function LeaguePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="league-heading flex flex-wrap items-center gap-3">
+        <p className="section-kicker w-full">Ultimate Pachangas · Tu liga</p>
         <h1 className="text-2xl font-bold">{league?.title ?? 'Liga'}</h1>
         {league ? (
           <Badge variant={league.status === 'active' ? 'default' : 'secondary'}>
@@ -197,7 +207,7 @@ export function LeaguePage() {
         ) : null}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="league-summary grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label="Jugadores activos">
           <span className="numeric">
             {arePlayersPending ? '—' : activePlayers.length}
@@ -231,7 +241,7 @@ export function LeaguePage() {
           <Skeleton className="h-40 rounded-xl" />
         </div>
       ) : latestMatch || nextMatch ? (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="league-fixtures grid gap-4 sm:grid-cols-2">
           {latestMatch ? (
             <section className="flex flex-col gap-2">
               <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
@@ -241,8 +251,8 @@ export function LeaguePage() {
             </section>
           ) : null}
           {nextMatch ? (
-            <section className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+            <section className="order-first flex flex-col gap-2">
+              <h2 className="text-sm font-semibold tracking-wide text-primary uppercase">
                 Próximo partido
               </h2>
               <MatchCard match={nextMatch} />
@@ -251,10 +261,12 @@ export function LeaguePage() {
         </div>
       ) : null}
 
-      <IdealSevenCallout />
+      <div className="league-secondary">
+        <IdealSevenCallout />
+      </div>
 
       {arePlayersPending ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="league-secondary grid gap-4 md:grid-cols-2">
           <Skeleton className="h-56 rounded-xl" />
           <Skeleton className="h-56 rounded-xl" />
         </div>
@@ -276,7 +288,7 @@ export function LeaguePage() {
           description="Las estadísticas y los valores de mercado aparecerán tras el primer partido."
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="league-secondary grid gap-4 md:grid-cols-2">
           <LeaderboardCard
             title="Mayor valor de mercado"
             icon={TrendingUp}
@@ -305,7 +317,7 @@ export function LeaguePage() {
       )}
 
       {awardHolders.length > 0 ? (
-        <Card>
+        <Card className="league-secondary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Award className="size-4 text-primary" aria-hidden="true" />

@@ -60,7 +60,7 @@ export function TeamPitch({
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl border"
+      className="pitch-surface relative w-full overflow-hidden rounded-xl border"
       // Matches the pitch image, so the percentage coordinates below land where
       // they should at any width.
       style={{ aspectRatio: '1000 / 1250' }}

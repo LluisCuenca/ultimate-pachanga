@@ -547,6 +547,19 @@ export function MatchDetailPage() {
       </Button>
 
       <MatchHero match={match} />
+      <nav className="fixture-strip" aria-label="Secciones del partido">
+        <a className="fixture-chip" href="#match-lineups">
+          Alineaciones
+        </a>
+        <a className="fixture-chip" href="#match-squad">
+          Convocados
+        </a>
+        {resultRows.length > 0 ? (
+          <a className="fixture-chip" href="#match-results">
+            Resultados
+          </a>
+        ) : null}
+      </nav>
 
       <div className="flex flex-wrap gap-2">
         {canJoin ? (
@@ -670,7 +683,7 @@ export function MatchDetailPage() {
       <Card>
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <CardTitle>
-            <h2>Alineaciones</h2>
+            <h2 id="match-lineups">Alineaciones</h2>
           </CardTitle>
           {isUpcoming ? (
             <BalanceTeamsButton
@@ -721,7 +734,7 @@ export function MatchDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle>
-            <h2>Convocados ({squad.length})</h2>
+            <h2 id="match-squad">Convocados ({squad.length})</h2>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -783,7 +796,7 @@ export function MatchDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              <h2>Resultados</h2>
+              <h2 id="match-results">Resultados</h2>
             </CardTitle>
             {isAdmin ? (
               <p className="text-sm text-muted-foreground">

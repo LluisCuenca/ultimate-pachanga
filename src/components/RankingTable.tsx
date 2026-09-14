@@ -38,7 +38,7 @@ export function RankingTable({
   renderContext,
 }: RankingTableProps) {
   return (
-    <div className="overflow-x-auto rounded-xl border">
+    <div className="ranking-table overflow-x-auto rounded-xl border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -70,7 +70,7 @@ export function RankingTable({
                     to={`/players/${player.id}`}
                     className="flex min-w-0 items-center gap-2 hover:underline"
                   >
-                    <Avatar className="size-7 shrink-0">
+                    <Avatar className="size-9 shrink-0">
                       {avatarUrl ? (
                         <AvatarImage
                           src={avatarUrl}

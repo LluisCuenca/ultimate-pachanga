@@ -13,7 +13,7 @@ import type { MatchRow } from '@/types/domain'
  */
 export function MatchHero({ match }: { match: MatchRow }) {
   return (
-    <header className="grid overflow-hidden rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 sm:grid-cols-[42%_1fr]">
+    <header className="match-hero grid overflow-hidden rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 sm:grid-cols-[42%_1fr]">
       <VenuePhoto
         match={match}
         className="h-32 sm:h-auto sm:min-h-40"

@@ -12,10 +12,13 @@ export function MatchCard({ match }: { match: MatchRow }) {
       to={`/matches/${match.id}`}
       className="rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
     >
-      <Card className="grid min-h-32 grid-cols-[38%_1fr] gap-0 py-0 transition-shadow hover:ring-primary/40 sm:grid-cols-[42%_1fr]">
-        <VenuePhoto match={match} />
+      <Card className="match-card grid min-h-32 grid-cols-[38%_1fr] gap-0 py-0 transition-shadow hover:ring-primary/40 sm:grid-cols-[42%_1fr]">
+        <VenuePhoto
+          match={match}
+          overlayClassName="bg-gradient-to-b from-transparent to-card/80"
+        />
 
-        <div className="flex min-w-0 flex-col gap-1.5 py-3.5 pr-4 pl-3">
+        <div className="match-card-body flex min-w-0 flex-col gap-1.5 py-3.5 pr-4 pl-3">
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               {match.title}
@@ -23,7 +26,7 @@ export function MatchCard({ match }: { match: MatchRow }) {
             <MatchStatusBadge status={match.status} />
           </div>
 
-          <p className="flex min-w-0 flex-col text-sm leading-tight font-bold">
+          <p className="match-card-teams flex min-w-0 flex-col text-sm leading-tight font-bold">
             <span className="truncate">{match.home_team_name}</span>
             <span className="truncate">
               <span className="font-normal text-muted-foreground">vs </span>

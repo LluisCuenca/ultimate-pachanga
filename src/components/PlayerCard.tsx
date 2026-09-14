@@ -170,9 +170,10 @@ export function PlayerCard({
     <article
       data-testid="player-card"
       data-tier={tier}
+      data-face={face}
       data-compact={compact ? 'true' : undefined}
       className={cn(
-        'relative flex flex-col overflow-hidden',
+        'player-face relative flex flex-col overflow-hidden',
         CARD_EDGE,
         CARD_FACES[face],
         CARD_EDGES[face],
@@ -425,7 +426,7 @@ function ConfidenceDonut({
         aria-hidden="true"
         className="block size-full rounded-full"
         style={{
-          background: `conic-gradient(#38bdf8 ${bounded}%, rgb(15 23 42 / 0.72) 0)`,
+          background: `conic-gradient(var(--tier-silver) ${bounded}%, var(--background) 0)`,
         }}
       />
     </span>
