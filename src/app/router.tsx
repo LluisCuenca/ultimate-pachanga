@@ -103,7 +103,7 @@ function RouteFallback() {
  * behind the admin guard. React Router ranks static segments above dynamic
  * ones, so the static route still wins — pinned by router.test.tsx.
  */
-const router = createBrowserRouter([
+const routes = [
   { path: '/login', element: <LoginPage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
   {
@@ -151,7 +151,11 @@ const router = createBrowserRouter([
     ],
   },
   { path: '*', element: <NotFoundPage /> },
-])
+]
+
+const router = createBrowserRouter(routes, {
+  basename: import.meta.env.BASE_URL.replace(/\/$/, ''),
+})
 
 export function AppRouter() {
   return (

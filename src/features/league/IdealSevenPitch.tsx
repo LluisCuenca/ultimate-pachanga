@@ -68,7 +68,7 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
         style={{ aspectRatio: '1000 / 1250' }}
       >
         <img
-          src="/pitch.webp"
+          src={`${import.meta.env.BASE_URL}pitch.webp`}
           alt=""
           className="absolute inset-0 size-full object-cover"
           draggable={false}
