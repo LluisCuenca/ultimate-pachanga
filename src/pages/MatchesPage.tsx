@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { MatchArchive } from '@/components/MatchArchive'
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarDays, Plus } from 'lucide-react'
@@ -11,7 +10,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { MatchCard } from '@/components/MatchCard'
 import { fetchMatches, matchKeys } from '@/features/matches/api'
-import { useMembership } from '@/features/league/useLeague'
+import { useMembership, useLeague } from '@/features/league/useLeague'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import type { MatchRow } from '@/types/domain'
 
@@ -42,8 +41,11 @@ function MatchSection({
 
 export function MatchesPage() {
   const { data: membership } = useMembership()
-  const [search, setSearch] = useState('')
-  const [year, setYear] = useState('all')
+  const {
+    data: league,
+    error: leagueError,
+    refetch: refetchLeague,
+  } = useLeague()
   const [shown, setShown] = useState(12)
 
   const {
@@ -68,30 +70,10 @@ export function MatchesPage() {
 
   const past = (matches ?? []).filter((match) => !isUpcomingMatch(match.status))
 
-  const years = [
-    ...new Set(
-      (matches ?? []).map((match) => new Date(match.played_at).getFullYear()),
-    ),
-  ].sort((a, b) => b - a)
-  const filtered = past.filter(
-    (match) =>
-      (year === 'all' ||
-        String(new Date(match.played_at).getFullYear()) === year) &&
-      `${match.title} ${match.home_team_name} ${match.away_team_name} ${match.location}`
-        .toLocaleLowerCase('es')
-        .includes(search.trim().toLocaleLowerCase('es')),
-  )
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Partidos</h1>
-          <p className="text-sm text-muted-foreground">
-            {isPending
-              ? 'Cargando partidos…'
-              : `${upcoming.length} próximos · ${past.length} jugados`}
-          </p>
-        </div>
+      <div className="page-heading-actions flex flex-wrap items-center justify-between gap-3">
+        <h1 className="page-heading text-2xl font-bold">Partidos</h1>
         <AdminOnly>
           <Button asChild>
             <Link to="/matches/new">
@@ -122,73 +104,32 @@ export function MatchesPage() {
             title="Próximo partido"
             matches={upcoming.slice(0, 1)}
           />
-          <section
-            className="ranking-panel flex flex-col gap-3"
-            aria-label="Buscar partidos de esta liga"
-          >
-            <h2 className="flex items-center gap-2 font-bold">
-              <CalendarDays
-                className="size-4 text-tier-gold"
-                aria-hidden="true"
-              />
-              Archivo de partidos
-            </h2>
-            <div className="flex gap-3">
-              <div className="min-w-0 flex-1">
-                <Label htmlFor="match-search">Buscar</Label>
-                <Input
-                  id="match-search"
-                  type="search"
-                  placeholder="Jornada, equipo o campo"
-                  value={search}
-                  onChange={(event) => {
-                    setSearch(event.target.value)
-                    setShown(12)
-                  }}
-                />
-              </div>
-              <div>
-                <Label htmlFor="match-year">Año</Label>
-                <select
-                  id="match-year"
-                  className="match-year"
-                  value={year}
-                  onChange={(event) => {
-                    setYear(event.target.value)
-                    setShown(12)
-                  }}
-                >
-                  <option value="all">Todos</option>
-                  {years.map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {filtered.length} partidos en esta liga
-            </p>
-          </section>
+          {leagueError ? (
+            <ErrorState
+              error={leagueError}
+              onRetry={() => void refetchLeague()}
+            />
+          ) : (
+            <MatchArchive matches={past} league={league} />
+          )}
           <MatchSection
             title="Más próximos partidos"
             matches={upcoming.slice(1)}
           />
-          {filtered.length ? (
-            <MatchSection title="Jugados" matches={filtered.slice(0, shown)} />
+          {past.length ? (
+            <MatchSection title="Jugados" matches={past.slice(0, shown)} />
           ) : (
             <EmptyState
-              title="No hay partidos que coincidan"
-              description="Prueba otro año o cambia la búsqueda."
+              title="Todavía no hay partidos jugados"
+              description="Los encuentros terminados aparecerán aquí."
             />
           )}
-          {shown < filtered.length ? (
+          {shown < past.length ? (
             <Button
               variant="outline"
               onClick={() => setShown((value) => value + 12)}
             >
-              Ver más partidos ({filtered.length - shown})
+              Ver más partidos ({past.length - shown})
             </Button>
           ) : null}
         </>

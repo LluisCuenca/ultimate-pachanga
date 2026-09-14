@@ -96,7 +96,7 @@ export function TeamPitch({
             style={{
               left: `${slot.x}%`,
               top: `${slot.y}%`,
-              width: `${CARD_WIDTH_PERCENT}%`,
+              width: `calc(${CARD_WIDTH_PERCENT}% * var(--pitch-card-scale, 1))`,
               transform: 'translate(-50%, -50%)',
             }}
           >

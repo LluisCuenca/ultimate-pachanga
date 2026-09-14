@@ -37,8 +37,10 @@ function LeaderboardCard({
   icon: Icon,
   players,
   renderValue,
+  headingAs: Heading = 'h2',
 }: {
   title: string
+  headingAs?: 'h2' | 'h3'
   icon: typeof Trophy
   players: readonly PlayerCardData[]
   renderValue: (player: PlayerCardData) => React.ReactNode
@@ -48,7 +50,7 @@ function LeaderboardCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Icon className="size-4 text-primary" aria-hidden="true" />
-          <h2>{title}</h2>
+          <Heading>{title}</Heading>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
@@ -182,8 +184,10 @@ export function LeaguePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="league-heading flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">{league?.title ?? 'Liga'}</h1>
+      <div className="league-heading desktop-page-heading flex flex-wrap items-center gap-3">
+        <h1 className="page-heading text-2xl font-bold">
+          {league?.title ?? 'Liga'}
+        </h1>
         {league ? (
           <Badge variant={league.status === 'active' ? 'default' : 'secondary'}>
             {league.status === 'active' ? 'Activa' : 'Inactiva'}
@@ -273,7 +277,7 @@ export function LeaguePage() {
       )}
 
       {awardHolders.length > 0 ? (
-        <section className="league-secondary flex flex-col gap-3">
+        <section className="league-secondary awards-group flex flex-col gap-3">
           <h2 className="flex items-center gap-2 text-lg font-bold">
             <Award aria-hidden="true" className="size-5 text-tier-gold" />
             Palmarés
@@ -282,6 +286,7 @@ export function LeaguePage() {
             {awardHolders.map(({ attribute, holders }) => (
               <LeaderboardCard
                 key={attribute.code}
+                headingAs="h3"
                 title={attribute.label}
                 icon={Award}
                 players={holders}

@@ -9,6 +9,7 @@ const { fetchMatches } = vi.hoisted(() => ({ fetchMatches: vi.fn() }))
 vi.mock('@/features/league/useLeague', () => ({
   useMembership: () => ({ data: { leagueId: TEST_LEAGUE_ID } }),
   useIsAdmin: () => false,
+  useLeague: () => ({ data: { id: TEST_LEAGUE_ID, title: 'Liga de verano' } }),
 }))
 vi.mock('@/features/matches/api', () => ({
   fetchMatches,
@@ -53,16 +54,37 @@ describe('MatchesPage archive', () => {
       '/matches/future-1',
     )
     expect(fetchMatches).toHaveBeenCalledWith(TEST_LEAGUE_ID)
-    await user.selectOptions(screen.getByLabelText('Año'), '2025')
-    expect(screen.getByText('Jornada 1')).toBeInTheDocument()
-    expect(screen.queryByText('Jornada 18')).not.toBeInTheDocument()
+    await user.selectOptions(screen.getByLabelText('1. Año'), '2025')
+    await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
+    expect(
+      screen.getByRole('option', { name: /Jornada 1 ·/ }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('option', { name: /Jornada 18 ·/ }),
+    ).not.toBeInTheDocument()
     expect(screen.getByText('Jornada 19')).toBeInTheDocument()
-    await user.selectOptions(screen.getByLabelText('Año'), 'all')
-    await user.type(screen.getByLabelText('Buscar'), 'Jornada 18')
-    expect(screen.getByText('Jornada 18')).toBeInTheDocument()
-    expect(screen.queryByText('Jornada 1')).not.toBeInTheDocument()
+    await user.selectOptions(screen.getByLabelText('3. Jornada'), 'past-1')
+    expect(screen.getByRole('link', { name: 'Ver Jornada 1' })).toHaveAttribute(
+      'href',
+      '/matches/past-1',
+    )
+    await user.selectOptions(screen.getByLabelText('1. Año'), 'all')
+    expect(
+      screen.queryByRole('link', { name: 'Ver Jornada 1' }),
+    ).not.toBeInTheDocument()
+    await user.type(
+      screen.getByLabelText(/Nombre, equipo o campo/),
+      'Jornada 18',
+    )
+    await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
+    expect(
+      screen.getByRole('option', { name: /Jornada 18 ·/ }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('option', { name: /Jornada 1 ·/ }),
+    ).not.toBeInTheDocument()
   })
-  it('loads long histories in batches, resets when filtering and explains no results', async () => {
+  it('keeps all played matches below the archive, paginates and explains no search results', async () => {
     const user = userEvent.setup()
     fetchMatches.mockResolvedValue(
       Array.from({ length: 15 }, (_, index) =>
@@ -78,11 +100,14 @@ describe('MatchesPage archive', () => {
     expect(screen.getAllByRole('link')).toHaveLength(12)
     await user.click(screen.getByRole('button', { name: /Ver más partidos/ }))
     expect(screen.getAllByRole('link')).toHaveLength(15)
-    await user.type(screen.getByLabelText('Buscar'), 'inexistente')
+    await user.type(
+      screen.getByLabelText(/Nombre, equipo o campo/),
+      'inexistente',
+    )
+    await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
       screen.getByText('No hay partidos que coincidan'),
     ).toBeInTheDocument()
-    await user.clear(screen.getByLabelText('Buscar'))
-    expect(screen.getAllByRole('link')).toHaveLength(12)
+    expect(screen.getAllByRole('link')).toHaveLength(15)
   })
 })

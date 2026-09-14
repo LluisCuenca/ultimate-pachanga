@@ -122,7 +122,7 @@ export function ProfilePage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-bold">Mi perfil</h1>
+        <h1 className="page-heading text-2xl font-bold">Mi perfil</h1>
         <p className="text-sm text-muted-foreground">
           Tu cuenta juega como {player.displayName}. Tus puntuaciones y tu valor
           de mercado los calcula la liga; el resto lo decides tú.

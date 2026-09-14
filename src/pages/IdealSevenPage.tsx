@@ -21,7 +21,7 @@ const COLOR_LEGEND = [
     description: 'Leyenda: mejor valoración total del 7 ideal.',
   },
   {
-    label: 'Morada',
+    label: 'Champán',
     className: 'border-chart-7 bg-card',
     description:
       'MVP: más MVPs entre los que no son Leyenda. Empata la mejor valoración.',
@@ -32,7 +32,7 @@ const COLOR_LEGEND = [
     description: 'Defensa: mejor defensa entre los que no son Leyenda ni MVP.',
   },
   {
-    label: 'Azul',
+    label: 'Marfil',
     className: 'border-chart-4 bg-card',
     description: 'Resto de jugadores elegidos para el equipo.',
   },
@@ -130,7 +130,7 @@ export function IdealSevenPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-bold">7 ideal</h1>
+      <h1 className="page-heading text-2xl font-bold">7 ideal</h1>
       {isPending ? (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <Skeleton className="h-[32rem] rounded-xl" />

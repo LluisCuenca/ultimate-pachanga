@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 import { Medal } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getAvatarUrl } from '@/lib/supabase'
-import { formatPosition, toInitials } from '@/lib/formatting'
+import { toInitials } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
 import type { PlayerCardData } from '@/types/domain'
 
@@ -70,7 +70,7 @@ export function PodiumList({
 
             <Link
               to={`/players/${player.id}`}
-              className="flex min-w-0 flex-1 items-center gap-2 hover:underline"
+              className="flex min-w-0 flex-1 items-center gap-3 hover:underline"
             >
               <Avatar className="size-9 shrink-0">
                 {avatarUrl ? (
@@ -92,9 +92,6 @@ export function PodiumList({
               <span className="min-w-0">
                 <span className="block truncate text-sm font-medium">
                   {player.displayName}
-                </span>
-                <span className="block truncate text-xs text-muted-foreground">
-                  {formatPosition(player.preferredPosition)}
                 </span>
               </span>
             </Link>

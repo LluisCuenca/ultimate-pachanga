@@ -7,13 +7,17 @@ vi.mock('@/features/league/useLeague', () => ({
   useLeague: () => ({ data: { title: 'Liga de prueba' } }),
   useIsAdmin: () => false,
 }))
+vi.mock('@/features/matches/api', () => ({
+  fetchMatch: vi.fn().mockResolvedValue({ title: 'Jornada 8' }),
+  matchKeys: { detail: (id: string) => ['match', id] },
+}))
 vi.mock('@/features/auth/api', () => ({ signOut: vi.fn() }))
 vi.mock('@/lib/supabase', () => ({ getAvatarUrl: () => null }))
 vi.mock('@/features/players/useMyPlayer', () => ({
   useMyPlayerId: () => ({ data: null }),
 }))
 vi.mock('@/features/players/api', () => ({
-  fetchPlayerCard: vi.fn(),
+  fetchPlayerCard: vi.fn().mockResolvedValue({ displayName: 'Luis Iniesta' }),
   playerKeys: { card: (id: string) => ['player', id] },
 }))
 
@@ -44,12 +48,41 @@ describe('AppLayout navigation', () => {
       'href',
       '/profile',
     )
-    expect(header.getByText('ULTIMATE PACHANGAS')).toBeInTheDocument()
+    expect(header.getByRole('heading', { name: 'La Liga' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Abrir menú' }),
     ).not.toBeInTheDocument()
     expect(
       header.queryByRole('button', { name: 'Salir' }),
     ).not.toBeInTheDocument()
+  })
+  it.each([
+    ['/league', 'La Liga'],
+    ['/players', 'Jugadores'],
+    ['/matches', 'Partidos'],
+    ['/stats', 'Estadísticas'],
+    ['/league/ideal-seven', '7 ideal'],
+    ['/profile', 'Mi perfil'],
+    ['/matches/new', 'Nuevo partido'],
+  ])('uses the contextual heading on %s', (route, title) => {
+    renderWithProviders(<AppLayout />, { route })
+    expect(
+      within(screen.getByRole('banner')).getByRole('heading', { name: title }),
+    ).toBeInTheDocument()
+  })
+  it('uses the actual player and match names on detail routes', async () => {
+    const view = renderWithProviders(<AppLayout />, { route: '/players/p1' })
+    expect(
+      await within(screen.getByRole('banner')).findByRole('heading', {
+        name: 'Luis Iniesta',
+      }),
+    ).toBeInTheDocument()
+    view.unmount()
+    renderWithProviders(<AppLayout />, { route: '/matches/m8' })
+    expect(
+      await within(screen.getByRole('banner')).findByRole('heading', {
+        name: 'Jornada 8',
+      }),
+    ).toBeInTheDocument()
   })
 })

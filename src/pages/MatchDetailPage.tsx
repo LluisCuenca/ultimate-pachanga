@@ -1,5 +1,5 @@
 import { PlayerAvatar } from '@/components/PlayerAvatar'
-import { ScoreStrip, ScoreExtras } from '@/components/ScoreStrip'
+import { MatchResultsGrid } from '@/components/MatchResultsGrid'
 import {
   Popover,
   PopoverContent,
@@ -11,7 +11,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ArrowLeft,
   Info,
-  Check,
   Download,
   Pencil,
   Upload,
@@ -19,15 +18,10 @@ import {
   Users,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+
 import { AdminOnly } from '@/components/AdminOnly'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -71,11 +65,7 @@ import {
   useMembership,
 } from '@/features/league/useLeague'
 import { buildScoreTemplate, downloadCsv, toTemplateFilename } from '@/lib/csv'
-import {
-  formatMarketValue,
-  formatPosition,
-  formatScore,
-} from '@/lib/formatting'
+import { formatMarketValue, formatPosition } from '@/lib/formatting'
 import { isUpcomingMatch } from '@/lib/matchLifecycle'
 import { balanceTeams } from '@/lib/teamBalance'
 import type { MatchRow, TeamSide } from '@/types/domain'
@@ -550,67 +540,38 @@ export function MatchDetailPage() {
           ) : null}
         </CardHeader>
         <CardContent>
-          <ol className="result-list">
-            {resultRows.map((row) => (
-              <li key={row.playerId} className="result-row">
-                <div className="result-player">
-                  <Link
-                    to={`/players/${row.playerId}`}
-                    className="flex min-w-0 flex-1 items-center gap-3"
-                  >
-                    <PlayerAvatar
-                      name={row.displayName}
-                      path={
-                        players.find((player) => player.id === row.playerId)
-                          ?.avatarPath
-                      }
-                    />
-                    <span className="min-w-0">
-                      <span className="block truncate font-semibold">
-                        {row.displayName}
-                      </span>
-                      <span className="block truncate text-xs text-muted-foreground">
-                        {row.teamName}
-                      </span>
-                    </span>
-                  </Link>
-                  <strong className="final-score" title="Puntuación final">
-                    {formatScore(row.score?.finalScore ?? null)}
-                  </strong>
-                </div>
-                <ScoreStrip
-                  metrics={metrics}
-                  values={row.score?.metricScores ?? {}}
-                  goals={row.score?.goals ?? null}
-                />
-                <div className="flex items-center justify-between gap-2">
-                  <ScoreExtras
-                    base={row.score?.baseScore ?? null}
-                    victory={row.score?.victory ?? null}
-                    attributes={row.score?.attributes ?? []}
-                  />
-                  {isAdmin ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      data-testid={`edit-score-${row.playerCode}`}
-                      onClick={() => setScoreTarget(toScoreTarget(row))}
-                    >
-                      <Pencil className="size-4" aria-hidden="true" />
-                      {row.score ? 'Editar' : 'Puntuar'}
-                    </Button>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ol>
+          <MatchResultsGrid
+            metrics={metrics}
+            rows={resultRows.map((row) => ({
+              ...row,
+              avatarPath: players.find((player) => player.id === row.playerId)
+                ?.avatarPath,
+              action: isAdmin ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label={`${row.score ? 'Editar' : 'Puntuar'} a ${row.displayName}`}
+                  data-testid={`edit-score-${row.playerCode}`}
+                  onClick={() => setScoreTarget(toScoreTarget(row))}
+                >
+                  <Pencil className="size-4" aria-hidden="true" />
+                  {row.score ? 'Editar' : 'Puntuar'}
+                </Button>
+              ) : undefined,
+            }))}
+          />
         </CardContent>
       </Card>
     ) : null
 
   return (
     <div className="flex flex-col gap-5">
-      <Button asChild variant="ghost" size="sm" className="w-fit">
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="desktop-page-heading w-fit"
+      >
         <Link to="/matches">
           <ArrowLeft className="size-4" aria-hidden="true" />
           Partidos
@@ -618,84 +579,48 @@ export function MatchDetailPage() {
       </Button>
 
       <MatchHero match={match} />
-      <nav className="fixture-strip" aria-label="Secciones del partido">
-        {!isUpcoming && resultRows.length > 0 ? (
-          <a className="fixture-chip" href="#match-results">
-            Resultados
-          </a>
-        ) : null}
-        <a className="fixture-chip" href="#match-lineups">
-          Alineaciones
-        </a>
-        <a className="fixture-chip" href="#match-squad">
-          Convocados
-        </a>
-        {isUpcoming && resultRows.length > 0 ? (
-          <a className="fixture-chip" href="#match-results">
-            Resultados
-          </a>
-        ) : null}
-      </nav>
 
-      <div className="flex flex-wrap gap-2">
-        {canJoin ? (
-          <Button onClick={() => join.mutate()} disabled={join.isPending}>
-            <UserPlus className="size-4" aria-hidden="true" />
-            Apuntarme
-          </Button>
-        ) : null}
-
-        {/* A status rather than a control: there is no self-removal, and saying
-            so where the sign-up button was avoids the hunt for one. */}
-        {isUpcoming && isAlreadyCalledUp ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge
-                variant="secondary"
-                className="h-9 gap-1.5 px-3"
-                tabIndex={0}
-              >
-                <Check className="size-4" aria-hidden="true" />
-                Estás convocado
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              Solo un administrador puede quitar a alguien de la convocatoria.
-            </TooltipContent>
-          </Tooltip>
-        ) : null}
-
-        <AdminOnly>
-          <Button
-            variant="outline"
-            onClick={() => setIsEditing((open) => !open)}
-          >
-            <Pencil className="size-4" aria-hidden="true" />
-            {isEditing ? 'Cerrar edición' : 'Editar partido'}
-          </Button>
-          {/* Once a match has been played its squad is closed to everybody, so
-              there is nothing behind this button but a rejected write. */}
-          {canManageSquad ? (
-            <Button variant="outline" onClick={openSquadSelector}>
-              <Users className="size-4" aria-hidden="true" />
-              Convocatoria
+      {canJoin || isAdmin ? (
+        <div className="flex flex-wrap gap-2">
+          {canJoin ? (
+            <Button onClick={() => join.mutate()} disabled={join.isPending}>
+              <UserPlus className="size-4" aria-hidden="true" />
+              Apuntarme
             </Button>
           ) : null}
-          <Button variant="outline" onClick={handleDownloadTemplate}>
-            <Download className="size-4" aria-hidden="true" />
-            Descargar CSV
-          </Button>
-          <Button
-            onClick={() => setIsUploadOpen(true)}
-            disabled={squad.length === 0}
-          >
-            <Upload className="size-4" aria-hidden="true" />
-            {match.status === 'scored'
-              ? 'Corregir resultados'
-              : 'Subir resultados'}
-          </Button>
-        </AdminOnly>
-      </div>
+
+          <AdminOnly>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing((open) => !open)}
+            >
+              <Pencil className="size-4" aria-hidden="true" />
+              {isEditing ? 'Cerrar edición' : 'Editar partido'}
+            </Button>
+            {/* Once a match has been played its squad is closed to everybody, so
+              there is nothing behind this button but a rejected write. */}
+            {canManageSquad ? (
+              <Button variant="outline" onClick={openSquadSelector}>
+                <Users className="size-4" aria-hidden="true" />
+                Convocatoria
+              </Button>
+            ) : null}
+            <Button variant="outline" onClick={handleDownloadTemplate}>
+              <Download className="size-4" aria-hidden="true" />
+              Descargar CSV
+            </Button>
+            <Button
+              onClick={() => setIsUploadOpen(true)}
+              disabled={squad.length === 0}
+            >
+              <Upload className="size-4" aria-hidden="true" />
+              {match.status === 'scored'
+                ? 'Corregir resultados'
+                : 'Subir resultados'}
+            </Button>
+          </AdminOnly>
+        </div>
+      ) : null}
 
       {isEditing ? (
         <Card className="max-w-2xl">

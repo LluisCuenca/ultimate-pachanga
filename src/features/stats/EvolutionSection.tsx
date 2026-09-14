@@ -121,6 +121,16 @@ export function EvolutionSection({
             name: player.displayName,
             avatarPath: player.avatarPath,
             color: SERIES_COLORS[entry.slot],
+            dash: [
+              '',
+              '7 3',
+              '2 3',
+              '10 3 2 3',
+              '12 4',
+              '4 3',
+              '1 3',
+              '8 2 1 2',
+            ][entry.slot],
           },
         ]
       }),

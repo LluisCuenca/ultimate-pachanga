@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { getAvatarUrl } from '@/lib/supabase'
-import { formatPosition, toInitials } from '@/lib/formatting'
+import { toInitials } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
 import type { PlayerCardData } from '@/types/domain'
 
@@ -44,7 +44,6 @@ export function RankingTable({
           <TableRow>
             <TableHead className="w-12 text-right">#</TableHead>
             <TableHead>Jugador</TableHead>
-            <TableHead className="hidden sm:table-cell">Posición</TableHead>
             {contextLabel && renderContext ? (
               <TableHead className="text-right">{contextLabel}</TableHead>
             ) : null}
@@ -68,7 +67,7 @@ export function RankingTable({
                 <TableCell>
                   <Link
                     to={`/players/${player.id}`}
-                    className="flex min-w-0 items-center gap-2 hover:underline"
+                    className="flex min-w-0 items-center gap-3 hover:underline"
                   >
                     <Avatar className="size-9 shrink-0">
                       {avatarUrl ? (
@@ -91,9 +90,6 @@ export function RankingTable({
                       {player.displayName}
                     </span>
                   </Link>
-                </TableCell>
-                <TableCell className="hidden text-sm text-muted-foreground sm:table-cell">
-                  {formatPosition(player.preferredPosition)}
                 </TableCell>
                 {contextLabel && renderContext ? (
                   <TableCell className="numeric text-right text-sm text-muted-foreground">

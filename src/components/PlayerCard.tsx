@@ -448,7 +448,7 @@ function FormStateIcon({
     return (
       <Flame
         aria-label="En racha"
-        className={cn(iconClassName, 'text-red-400')}
+        className={cn(iconClassName, 'text-tier-gold')}
       />
     )
   }
@@ -456,7 +456,7 @@ function FormStateIcon({
     return (
       <Snowflake
         aria-label="Enfriándose"
-        className={cn(iconClassName, 'text-cyan-200')}
+        className={cn(iconClassName, 'text-tier-silver')}
       />
     )
   }
@@ -464,7 +464,7 @@ function FormStateIcon({
     return (
       <ArrowDown
         aria-label="Por debajo de su media"
-        className={cn(iconClassName, 'text-rose-300')}
+        className={cn(iconClassName, 'text-tier-silver')}
       />
     )
   }
@@ -472,7 +472,7 @@ function FormStateIcon({
   return (
     <ArrowUp
       aria-label="Por encima de su media"
-      className={cn(iconClassName, 'text-emerald-300')}
+      className={cn(iconClassName, 'text-tier-gold')}
     />
   )
 }

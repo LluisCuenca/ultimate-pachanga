@@ -17,6 +17,7 @@ export interface EvolutionSeries {
   avatarPath?: string | null
   /** A CSS colour, kept with the player rather than with their position. */
   color: string
+  dash?: string
 }
 
 interface EvolutionChartProps {
@@ -65,9 +66,8 @@ function toLatestValue(
 /**
  * The evolution of a chosen measure across the season's jornadas.
  *
- * The legend is not decoration: three of the light-mode series colours sit below
- * the 3:1 contrast ratio a mark needs to be read by colour alone, so every line
- * is also named and carries its latest figure in words. It doubles as the
+ * Gold and neutral lines also use stable dash patterns. Each series is named
+ * and carries its latest figure, so hue is never the only way to identify it. It doubles as the
  * remove control, which is where a reader looks when a line is in the way.
  */
 export function EvolutionChart({
@@ -166,6 +166,7 @@ export function EvolutionChart({
                 dataKey={entry.playerId}
                 name={entry.name}
                 stroke={entry.color}
+                strokeDasharray={entry.dash}
                 strokeWidth={2}
                 dot={false}
                 activeDot={{ r: 4 }}
@@ -196,11 +197,21 @@ export function EvolutionChart({
                 title={`Quitar ${entry.name}`}
                 className="leaderboard-row flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
               >
-                <span
+                <svg
+                  className="evolution-pattern"
+                  viewBox="0 0 24 12"
                   aria-hidden="true"
-                  className="size-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: entry.color }}
-                />
+                >
+                  <line
+                    x1="0"
+                    y1="6"
+                    x2="24"
+                    y2="6"
+                    stroke={entry.color}
+                    strokeWidth="2"
+                    strokeDasharray={entry.dash}
+                  />
+                </svg>
                 <PlayerAvatar name={entry.name} path={entry.avatarPath} />
                 <span className="min-w-0 flex-1 truncate text-left font-medium">
                   {entry.name}

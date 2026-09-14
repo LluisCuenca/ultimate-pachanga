@@ -166,7 +166,7 @@ export function AdminSettingsPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-bold">Ajustes de la liga</h1>
+      <h1 className="page-heading text-2xl font-bold">Ajustes de la liga</h1>
 
       <Card>
         <CardHeader>
@@ -262,19 +262,19 @@ export function AdminSettingsPage() {
 
               <div className="mt-5 w-full max-w-[32rem] space-y-3">
                 <FormLegend
-                  icon={<Flame className="size-4 text-red-400" />}
+                  icon={<Flame className="size-4 text-tier-gold" />}
                   label="Racha de 3 partidos mejorando puntuación"
                 />
                 <FormLegend
-                  icon={<Snowflake className="size-4 text-cyan-200" />}
+                  icon={<Snowflake className="size-4 text-tier-silver" />}
                   label="Racha de 3 partidos empeorando puntuación"
                 />
                 <FormLegend
-                  icon={<ArrowUp className="size-4 text-emerald-300" />}
+                  icon={<ArrowUp className="size-4 text-tier-gold" />}
                   label="Mejor forma que su media histórica"
                 />
                 <FormLegend
-                  icon={<ArrowDown className="size-4 text-rose-300" />}
+                  icon={<ArrowDown className="size-4 text-tier-silver" />}
                   label="Peor forma que su media histórica"
                 />
               </div>

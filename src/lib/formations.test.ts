@@ -266,3 +266,27 @@ describe('describeSlot', () => {
     expect(describeSlot('2-3-1', 1)).toBe('Defensa, posición 1 de 2')
   })
 })
+
+// Both the actual pitch and its compact cards have a 4:5 aspect ratio, so
+// their proportional widths and heights are equal in pitch coordinates.
+describe('mobile pitch enlargement', () => {
+  it.each(FORMATIONS)(
+    '%s keeps the 10% larger cards inside the pitch and disjoint',
+    (formation) => {
+      const size = CARD_WIDTH_PERCENT * 1.1
+      const slots = getPitchSlots(formation)
+      for (const [index, slot] of slots.entries()) {
+        expect(slot.x - size / 2).toBeGreaterThanOrEqual(0)
+        expect(slot.x + size / 2).toBeLessThanOrEqual(100)
+        expect(slot.y - size / 2).toBeGreaterThanOrEqual(0)
+        expect(slot.y + size / 2).toBeLessThanOrEqual(100)
+        for (const other of slots.slice(index + 1)) {
+          expect(
+            Math.abs(slot.x - other.x) >= size ||
+              Math.abs(slot.y - other.y) >= size,
+          ).toBe(true)
+        }
+      }
+    },
+  )
+})

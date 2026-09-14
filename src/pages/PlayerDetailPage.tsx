@@ -116,7 +116,7 @@ export function PlayerDetailPage() {
         </Button>
       </div>
 
-      <h1 className="text-2xl font-bold">{player.displayName}</h1>
+      <h1 className="page-heading text-2xl font-bold">{player.displayName}</h1>
 
       <div className="grid gap-4 md:grid-cols-[18rem_1fr]">
         <PlayerCard

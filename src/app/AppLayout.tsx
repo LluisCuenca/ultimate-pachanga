@@ -1,4 +1,5 @@
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, useLocation } from 'react-router'
+import { fetchMatch, matchKeys } from '@/features/matches/api'
 import { useQuery } from '@tanstack/react-query'
 import {
   BarChart3,
@@ -63,7 +64,47 @@ function NavigationLinks({
   )
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  '/': 'La Liga',
+  '/league': 'La Liga',
+  '/players': 'Jugadores',
+  '/matches': 'Partidos',
+  '/stats': 'Estadísticas',
+  '/rankings': 'Estadísticas',
+  '/league/ideal-seven': '7 ideal',
+  '/profile': 'Mi perfil',
+  '/matches/new': 'Nuevo partido',
+  '/admin/players': 'Gestión de jugadores',
+  '/admin/settings': 'Ajustes de la liga',
+  '/admin/members': 'Miembros',
+}
+
 export function AppLayout() {
+  const { pathname } = useLocation()
+  const path = pathname.replace(/\/$/, '') || '/'
+  const detailPlayerId = path.match(/^\/players\/([^/]+)$/)?.[1]
+  const detailMatchId =
+    path !== '/matches/new'
+      ? path.match(/^\/matches\/([^/]+)$/)?.[1]
+      : undefined
+  const { data: detailPlayer } = useQuery({
+    queryKey: playerKeys.card(detailPlayerId ?? ''),
+    enabled: Boolean(detailPlayerId),
+    queryFn: () => fetchPlayerCard(detailPlayerId!),
+  })
+  const { data: detailMatch } = useQuery({
+    queryKey: matchKeys.detail(detailMatchId ?? ''),
+    enabled: Boolean(detailMatchId),
+    queryFn: () => fetchMatch(detailMatchId!),
+  })
+  const pageTitle =
+    PAGE_TITLES[path] ??
+    (detailPlayerId
+      ? (detailPlayer?.displayName ?? 'Jugador')
+      : detailMatchId
+        ? (detailMatch?.title ?? 'Partido')
+        : 'Ultimate Pachangas')
+
   const { data: myPlayerId } = useMyPlayerId()
   const { data: player } = useQuery({
     queryKey: playerKeys.card(myPlayerId ?? ''),
@@ -96,7 +137,12 @@ export function AppLayout() {
           <Link to="/league" aria-label="Ir a Liga" className="header-icon">
             <Brand />
           </Link>
-          <span className="header-title">ULTIMATE PACHANGAS</span>
+          <h1 className="header-title mobile-page-title" title={pageTitle}>
+            {pageTitle}
+          </h1>
+          <span className="header-title desktop-brand-title">
+            ULTIMATE PACHANGAS
+          </span>
           <Link to="/profile" aria-label="Mi perfil" className="header-icon">
             <PlayerAvatar
               name={player?.displayName ?? 'Mi perfil'}

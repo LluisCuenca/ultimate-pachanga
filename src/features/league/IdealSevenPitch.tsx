@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import { formatScore } from '@/lib/formatting'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { ScoreStrip } from '@/components/ScoreStrip'
 import { PlayerCard } from '@/components/PlayerCard'
@@ -49,21 +50,19 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
   return (
     <section className="flex flex-col gap-4">
       <div className="ideal-summary">
-        <div>
-          <span>Formación</span>
-          <strong>2-3-1</strong>
-          <small>+ portero</small>
-        </div>
-        <div>
-          <span>Media</span>
-          <strong>{lineup.totalRating}</strong>
-          <small>valoración</small>
-        </div>
         <div className="ideal-summary-value">
           <span>Valor del equipo</span>
           <strong>
             <MarketValue value={lineup.totalMarketValueGbp} />
           </strong>
+        </div>
+        <div>
+          <span>Formación</span>
+          <strong>2-3-1</strong>
+        </div>
+        <div>
+          <span>Media</span>
+          <strong>{formatScore(lineup.totalRating / selected.length)}</strong>
         </div>
       </div>
 
@@ -90,7 +89,7 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
               style={{
                 left: `${slot.x}%`,
                 top: `${slot.y}%`,
-                width: `${CARD_WIDTH_PERCENT}%`,
+                width: `calc(${CARD_WIDTH_PERCENT}% * var(--pitch-card-scale, 1))`,
                 transform: 'translate(-50%, -50%)',
               }}
             >
@@ -115,39 +114,32 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
         <ol className="ideal-selection">
           {selected.map((entry) => (
             <li key={entry.player.id} data-face={CARD_FACE[entry.cardStyle]}>
-              <Link to={`/players/${entry.player.id}`} className="block p-3">
+              <Link
+                to={`/players/${entry.player.id}`}
+                className="ideal-selection-link block p-3"
+              >
                 <div className="flex items-center gap-3">
                   <PlayerAvatar
                     name={entry.player.displayName}
                     path={entry.player.avatarPath}
-                    className="size-11"
+                    className="size-9"
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-bold">
                       {entry.player.displayName}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {entry.player.preferredPosition} ·{' '}
-                      {entry.cardStyle === 'silver'
-                        ? 'Leyenda'
-                        : entry.cardStyle === 'purple'
-                          ? 'MVP'
-                          : entry.cardStyle === 'black'
-                            ? 'Defensa'
-                            : '7 ideal'}
                     </span>
                   </span>
                   <span className="numeric text-xl font-black text-tier-gold">
                     {entry.displayRating}
                   </span>
                 </div>
-                <ScoreStrip
-                  metrics={metrics}
-                  values={entry.bestMetricCardStats}
-                />
-                <p className="mt-2 text-right text-sm">
+                <div className="ideal-selection-data">
+                  <ScoreStrip
+                    metrics={metrics}
+                    values={entry.bestMetricCardStats}
+                  />
                   <MarketValue value={entry.player.marketValueGbp} />
-                </p>
+                </div>
               </Link>
             </li>
           ))}

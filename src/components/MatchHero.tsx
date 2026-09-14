@@ -59,7 +59,7 @@ export function MatchHero({ match }: { match: MatchRow }) {
 
       <div className="flex flex-col gap-2 p-5">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold">{match.title}</h1>
+          <h1 className="page-heading text-2xl font-bold">{match.title}</h1>
           <MatchStatusBadge status={match.status} />
         </div>
         <p className="text-lg leading-tight font-bold">
