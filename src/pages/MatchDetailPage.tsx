@@ -1,14 +1,9 @@
 import { BackButton } from '@/components/BackButton'
 import { MatchResultsGrid } from '@/components/MatchResultsGrid'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Info, Download, Pencil, Upload, UserPlus, Users } from 'lucide-react'
+import { Download, Pencil, Upload, UserPlus, Users } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -712,33 +707,6 @@ export function MatchDetailPage() {
       {!isUpcoming ? resultsPanel : null}
 
       <Card>
-        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-          <CardTitle>
-            <div className="flex items-center gap-2">
-              <h2 id="match-lineups">Alineaciones</h2>
-              {canArrangeLineup ? (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Ayuda de alineaciones"
-                    >
-                      <Info aria-hidden="true" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <p className="text-sm">
-                      Toca un jugador y luego otro para intercambiarlos, o
-                      arrástralo encima. Funciona entre equipos y con el
-                      banquillo.
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              ) : null}
-            </div>
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           {squadError && squad.length === 0 ? (
             <ErrorState

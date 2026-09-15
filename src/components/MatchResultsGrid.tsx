@@ -25,7 +25,7 @@ export function MatchResultsGrid({
     <div className="match-score-grid">
       <table aria-label="Puntuaciones de los jugadores">
         <colgroup>
-          <col style={{ width: '32%' }} />
+          <col style={{ width: '14%' }} />
           {metrics.map((metric) => (
             <col key={metric.code} />
           ))}
@@ -36,7 +36,7 @@ export function MatchResultsGrid({
         </colgroup>
         <thead>
           <tr>
-            <th scope="col">Jugador</th>
+            <th scope="col">Foto</th>
             {metrics.map((metric) => (
               <th scope="col" key={metric.code}>
                 <abbr title={metric.label}>{metricInitial(metric)}</abbr>
@@ -66,9 +66,8 @@ export function MatchResultsGrid({
                   <PlayerAvatar
                     name={row.displayName}
                     path={row.avatarPath}
-                    className="size-7"
+                    className="size-9"
                   />
-                  <span>{row.displayName}</span>
                 </Link>
                 {row.action}
               </th>
