@@ -88,7 +88,7 @@ export const GOALKEEPER_SLOT = 0
  * width sets their height, and four rows of them have to fit between the top of
  * the pitch and the goal line without touching or being clipped.
  *
- * With a card 18% of the pitch wide it stands 22.5% tall (4:5 over a 4:5
+ * With a card 18% of the pitch wide it stands 21.6% tall (2:3 over a 4:5
  * pitch), which leaves roughly two percent of clearance between rows. Enlarging
  * the card without moving these bands is what put the goalkeeper through the
  * bottom edge, so `formations.test.ts` asserts the arithmetic instead of
@@ -100,8 +100,8 @@ export const GOALKEEPER_SLOT = 0
  */
 export const CARD_WIDTH_PERCENT = 18
 
-/** Card height as a percentage of pitch height, from the 4:5 card on a 4:5 pitch. */
-export const CARD_HEIGHT_PERCENT = CARD_WIDTH_PERCENT * 1.25
+/** Card height as a percentage of pitch height, from the 2:3 card on a 4:5 pitch. */
+export const CARD_HEIGHT_PERCENT = CARD_WIDTH_PERCENT * (1.5 / 1.25)
 
 const OUTFIELD_TOP = 13
 const OUTFIELD_BOTTOM = 61

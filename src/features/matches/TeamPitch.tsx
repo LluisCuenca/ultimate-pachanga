@@ -146,7 +146,7 @@ export function TeamPitch({
                 className={cn(
                   // Same footprint as a card, so an empty position reads as a
                   // gap in the formation rather than a smaller thing.
-                  'flex aspect-[4/5] items-center justify-center rounded-lg border border-dashed border-white/30 bg-black/40 text-center text-[0.5625rem] leading-tight font-medium text-white/70',
+                  'flex aspect-[2/3] items-center justify-center rounded-lg border border-dashed border-white/30 bg-black/40 text-center text-[0.5625rem] leading-tight font-medium text-white/70',
                   interactive && 'cursor-pointer touch-none select-none',
                   interactive &&
                     'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',

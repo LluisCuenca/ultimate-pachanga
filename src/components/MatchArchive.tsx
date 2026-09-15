@@ -14,21 +14,19 @@ export function MatchArchive({
   matches: readonly MatchRow[]
   league?: { id: string; title: string }
 }) {
-  const [year, setYear] = usePageState('archive-year', 'all')
   const [query, setQuery] = usePageState('archive-query', '')
   const [searched, setSearched] = usePageState('archive-searched', false)
   const scoped = matches.filter((match) => match.league_id === league?.id)
-  const years = [
-    ...new Set(scoped.map((match) => new Date(match.played_at).getFullYear())),
-  ].sort((a, b) => b - a)
-  const filtered = scoped.filter(
-    (match) =>
-      (year === 'all' ||
-        String(new Date(match.played_at).getFullYear()) === year) &&
-      `${match.title} ${match.home_team_name} ${match.away_team_name} ${match.location}`
-        .toLocaleLowerCase('es')
-        .includes(query.trim().toLocaleLowerCase('es')),
-  )
+  const search = query.trim().toLocaleLowerCase('es')
+  const filtered = scoped.filter((match) => {
+    if (/^\d+$/.test(search)) {
+      const round = match.title.match(/(?:\bjornada\s*|\bJ\s*)(\d+)/i)
+      return round !== null && Number(round[1]) === Number(search)
+    }
+    return `${match.title} ${match.home_team_name} ${match.away_team_name} ${match.location}`
+      .toLocaleLowerCase('es')
+      .includes(search)
+  })
   function resetSearch() {
     setSearched(false)
   }
@@ -47,43 +45,12 @@ export function MatchArchive({
           setSearched(true)
         }}
       >
-        <div className="archive-selectors">
-          <div className="archive-field">
-            <Label htmlFor="archive-year">1. Año</Label>
-            <select
-              id="archive-year"
-              value={year}
-              onChange={(event) => {
-                setYear(event.target.value)
-                resetSearch()
-              }}
-            >
-              <option value="all">Todos los años</option>
-              {years.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="archive-field">
-            <span className="text-sm font-medium">2. Liga</span>
-            <p className="archive-league-label">
-              {league?.title ?? 'Cargando liga…'}
-            </p>
-          </div>
-        </div>
         <div className="archive-field">
-          <Label htmlFor="archive-query">
-            Nombre, equipo o campo{' '}
-            <span className="font-normal text-muted-foreground">
-              (opcional)
-            </span>
-          </Label>
+          <Label htmlFor="archive-query">Buscar jornada</Label>
           <Input
             id="archive-query"
             type="search"
-            placeholder="Buscar una jornada"
+            placeholder="Número de jornada, p. ej. 5"
             value={query}
             onChange={(event) => {
               setQuery(event.target.value)
@@ -105,9 +72,7 @@ export function MatchArchive({
           </p>
           {filtered.length ? (
             <div>
-              <h3 className="mb-2 text-sm font-semibold">
-                3. Elige una jornada
-              </h3>
+              <h3 className="mb-2 text-sm font-semibold">Elige una jornada</h3>
               <ul className="archive-match-list">
                 {filtered.map((match) => (
                   <li key={match.id}>
@@ -135,7 +100,7 @@ export function MatchArchive({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Prueba otro año o cambia la búsqueda.
+              Prueba otro número o nombre de jornada.
             </p>
           )}
         </div>

@@ -893,35 +893,51 @@
 .player-face[data-compact] {
   background: var(--card);
 }
-.player-face[data-compact] > .player-rating-band {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-  padding: 5cqi;
-}
-.player-face[data-compact] > .player-rating-band > span:first-child {
-  font-size: clamp(0.75rem, 22cqi, 1.25rem);
-  text-shadow: 0 1px 3px var(--background);
-}
 .player-face[data-compact] > .player-photo-band {
-  padding: 8cqi 0 2cqi;
-  align-items: end;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 .player-face[data-compact] > .player-photo-band [data-slot='avatar'] {
-  width: 90%;
-  height: auto;
+  width: 100%;
+  height: 100%;
   max-height: none;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+.player-face[data-compact] > .player-photo-band [data-slot='avatar']::after {
+  display: none;
+}
+.player-face[data-compact] [data-slot='avatar-image'] {
+  border-radius: 0;
+  object-fit: contain;
+}
+.player-face[data-compact] [data-slot='avatar-fallback'] {
+  border-radius: 0;
 }
 .player-face[data-compact] > .player-name-band {
-  padding: 4cqi 3cqi;
+  flex: none;
+  padding: 3cqi 3cqi 0;
+  border-top: 1px solid var(--border);
   background: var(--background);
+  text-align: center;
 }
 .player-face[data-compact] > .player-name-band h3 {
   font-size: clamp(0.625rem, 14cqi, 0.875rem);
+  line-height: 1.15;
 }
-.player-face[data-compact] > .player-name-band p {
-  display: none;
+.player-face[data-compact] > .player-rating-band {
+  flex: none;
+  padding: 2cqi 3cqi 4cqi;
+  background: var(--background);
+  color: var(--tier-gold);
+  text-align: center;
+  line-height: 1;
+}
+.player-face[data-compact] > .player-rating-band > span {
+  font-size: clamp(1rem, 27cqi, 1.75rem);
 }
 .player-face[data-face='legend'],
 .player-face[data-face='purple'],

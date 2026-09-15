@@ -5,7 +5,7 @@ import { MatchArchive } from './MatchArchive'
 import { renderWithProviders } from '@/test/render'
 import { buildMatch, TEST_LEAGUE_ID } from '@/test/factories'
 describe('MatchArchive league scope', () => {
-  it('only offers years and matches belonging to the available league', async () => {
+  it('only offers matches belonging to the available league', async () => {
     renderWithProviders(
       <MatchArchive
         league={{ id: TEST_LEAGUE_ID, title: 'Verano' }}
@@ -33,4 +33,34 @@ describe('MatchArchive league scope', () => {
       screen.queryByRole('link', { name: /Otra liga/ }),
     ).not.toBeInTheDocument()
   })
+})
+
+it('finds an exact round number across years without year or league selectors', async () => {
+  sessionStorage.setItem('up:view:archive-year', JSON.stringify('1999'))
+  renderWithProviders(
+    <MatchArchive
+      league={{ id: TEST_LEAGUE_ID, title: 'Verano' }}
+      matches={[
+        buildMatch({ id: 'five', title: 'Jornada 5', played_at: '2026-08-01' }),
+        buildMatch({
+          id: 'fifteen',
+          title: 'Jornada 15',
+          played_at: '2025-08-01',
+        }),
+      ]}
+    />,
+  )
+  expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+  await userEvent.type(
+    screen.getByRole('searchbox', { name: 'Buscar jornada' }),
+    '5',
+  )
+  await userEvent.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
+  expect(screen.getByRole('link', { name: 'Ver Jornada 5' })).toHaveAttribute(
+    'href',
+    '/matches/five',
+  )
+  expect(
+    screen.queryByRole('link', { name: 'Ver Jornada 15' }),
+  ).not.toBeInTheDocument()
 })

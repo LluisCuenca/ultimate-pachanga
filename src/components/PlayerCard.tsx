@@ -183,7 +183,7 @@ export function PlayerCard({
         // so it needs the ratio declared and becomes the query container its
         // own type is measured against; the grid card gets its height from the
         // metric and value bands below.
-        compact ? '@container aspect-[4/5] rounded-lg' : 'rounded-xl',
+        compact ? '@container aspect-[2/3] rounded-lg' : 'rounded-xl',
         !compact &&
           'transition-transform duration-200 motion-safe:hover:-translate-y-1',
         !player.isActive && 'opacity-60 saturate-50',
@@ -247,49 +247,30 @@ interface FaceProps {
   rating: number
 }
 
-/**
- * The pitch card: four pieces of type and a face, nothing overlapping.
- *
- * The rating and position stack on the left, while confidence and form stack on
- * the right so match cards keep their status signals in one corner.
- */
-function CompactFace({ player, face, avatarUrl, initials, rating }: FaceProps) {
+/** Photo, nickname and rating share one vertical hierarchy on every pitch. */
+function CompactFace({ player, avatarUrl, initials, rating }: FaceProps) {
   return (
     <>
-      <div className="player-rating-band flex flex-col items-start gap-[1cqi] px-[6cqi] pt-[4cqi] leading-none">
-        <span
-          className={cn(
-            'numeric font-black',
-            COMPACT_SIZES.rating,
-            CARD_ACCENTS[face],
-          )}
-        >
-          {rating}
-        </span>
-      </div>
-
-      {/* Centred in whatever the two bands leave, and never taller than that. */}
-      <div className="player-photo-band flex min-h-0 flex-1 items-center justify-center py-[3cqi]">
+      <div className="player-photo-band">
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
-          className={cn('max-h-full w-auto', COMPACT_SIZES.photo)}
+          className="size-full"
           fallbackClassName={COMPACT_SIZES.initials}
         />
       </div>
-
-      <div
-        className={cn(
-          'player-name-band border-t px-[5cqi] py-[3cqi] text-center leading-tight',
-          CARD_RULES[face],
-        )}
-      >
-        <h3
-          className={cn('truncate font-bold', COMPACT_SIZES.alias)}
-          title={player.displayName}
-        >
+      <div className="player-name-band">
+        <h3 className="truncate font-bold" title={player.displayName}>
           {player.displayName}
         </h3>
+      </div>
+      <div className="player-rating-band">
+        <span
+          className="numeric font-black"
+          aria-label={`Valoración ${rating}`}
+        >
+          {rating}
+        </span>
       </div>
     </>
   )

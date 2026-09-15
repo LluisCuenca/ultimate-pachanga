@@ -21,7 +21,7 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 describe('MatchesPage archive', () => {
-  it('puts the nearest scheduled game first and filters the archive by year and text', async () => {
+  it('puts the nearest scheduled game first and filters the archive by round number and text', async () => {
     const user = userEvent.setup()
     fetchMatches.mockResolvedValue([
       buildMatch({
@@ -54,7 +54,7 @@ describe('MatchesPage archive', () => {
       '/matches/future-1',
     )
     expect(fetchMatches).toHaveBeenCalledWith(TEST_LEAGUE_ID)
-    await user.selectOptions(screen.getByLabelText('1. Año'), '2025')
+    await user.type(screen.getByLabelText('Buscar jornada'), '1')
     await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
       screen.getByRole('link', { name: 'Ver Jornada 1' }),
@@ -67,14 +67,11 @@ describe('MatchesPage archive', () => {
       'href',
       '/matches/past-1',
     )
-    await user.selectOptions(screen.getByLabelText('1. Año'), 'all')
+    await user.clear(screen.getByLabelText('Buscar jornada'))
     expect(
       screen.queryByRole('link', { name: 'Ver Jornada 1' }),
     ).not.toBeInTheDocument()
-    await user.type(
-      screen.getByLabelText(/Nombre, equipo o campo/),
-      'Jornada 18',
-    )
+    await user.type(screen.getByLabelText('Buscar jornada'), 'Jornada 18')
     await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
       screen.getByRole('link', { name: 'Ver Jornada 18' }),
@@ -99,10 +96,7 @@ describe('MatchesPage archive', () => {
     expect(screen.getAllByRole('link')).toHaveLength(12)
     await user.click(screen.getByRole('button', { name: /Ver más partidos/ }))
     expect(screen.getAllByRole('link')).toHaveLength(15)
-    await user.type(
-      screen.getByLabelText(/Nombre, equipo o campo/),
-      'inexistente',
-    )
+    await user.type(screen.getByLabelText('Buscar jornada'), 'inexistente')
     await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
       screen.getByText('No hay partidos que coincidan'),
