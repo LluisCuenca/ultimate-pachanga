@@ -874,7 +874,7 @@
 .player-detail-card {
   max-width: none;
 }
-.player-detail-card > div:nth-of-type(3) [data-slot='avatar'] {
+.player-detail-card > .player-photo-band [data-slot='avatar'] {
   width: min(60%, 12rem);
 }
 .player-detail-card:not([data-compact]) h3 {

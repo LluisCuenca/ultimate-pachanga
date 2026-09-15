@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ArrowLeft, Loader2, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -40,9 +40,8 @@ import {
   type NewPlayerInput,
   type UnclaimedPlayer,
 } from '@/features/onboarding/api'
-import { getAvatarUrl } from '@/lib/supabase'
 import { APP_NAME } from '@/lib/env'
-import { formatPosition, toInitials } from '@/lib/formatting'
+import { formatPosition } from '@/lib/formatting'
 import { PLAYER_POSITIONS } from '@/types/domain'
 
 /**
@@ -161,7 +160,6 @@ function ClaimStep({
       <fieldset className="flex max-h-96 flex-col gap-2 overflow-y-auto">
         <legend className="sr-only">Elige tu jugador</legend>
         {players.map((player) => {
-          const avatarUrl = getAvatarUrl(player.avatarPath)
           const inputId = `player-${player.playerId}`
 
           return (
@@ -179,22 +177,11 @@ function ClaimStep({
                 htmlFor={inputId}
                 className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors peer-checked:border-primary peer-checked:bg-primary/5 peer-focus-visible:ring-2 peer-focus-visible:ring-ring hover:bg-accent/50"
               >
-                <Avatar className="size-9">
-                  {avatarUrl ? (
-                    <AvatarImage
-                      src={avatarUrl}
-                      alt=""
-                      className="object-cover"
-                    />
-                  ) : null}
-                  <AvatarFallback className="text-xs">
-                    {toInitials(
-                      player.firstName,
-                      player.lastName,
-                      player.displayName,
-                    )}
-                  </AvatarFallback>
-                </Avatar>
+                <PlayerAvatar
+                  name={`${player.firstName} ${player.lastName}`}
+                  path={player.avatarPath}
+                  className="size-9"
+                />
                 <span className="min-w-0">
                   <span className="block truncate font-medium">
                     {player.firstName} {player.lastName}

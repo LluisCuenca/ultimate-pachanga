@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -37,8 +37,7 @@ import {
   type AdminPlayerInput,
 } from '@/features/players/api'
 import { useMembership } from '@/features/league/useLeague'
-import { getAvatarUrl } from '@/lib/supabase'
-import { formatPosition, toInitials } from '@/lib/formatting'
+import { formatPosition } from '@/lib/formatting'
 import type { PlayerCardData } from '@/types/domain'
 
 function toErrorMessage(error: unknown, fallback: string): string {
@@ -177,27 +176,14 @@ export function AdminPlayersPage() {
             </TableHeader>
             <TableBody>
               {players.map((player) => {
-                const avatarUrl = getAvatarUrl(player.avatarPath)
-
                 return (
                   <TableRow key={player.id}>
                     <TableCell>
-                      <Avatar className="size-8">
-                        {avatarUrl ? (
-                          <AvatarImage
-                            src={avatarUrl}
-                            alt=""
-                            className="object-cover"
-                          />
-                        ) : null}
-                        <AvatarFallback className="text-xs">
-                          {toInitials(
-                            player.firstName,
-                            player.lastName,
-                            player.displayName,
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
+                      <PlayerAvatar
+                        name={`${player.firstName} ${player.lastName}`}
+                        path={player.avatarPath}
+                        className="size-8"
+                      />
                     </TableCell>
                     <TableCell className="font-medium">
                       {player.firstName} {player.lastName}
