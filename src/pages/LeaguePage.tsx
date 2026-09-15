@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { PlayerRow } from '@/components/PlayerRow'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Brand } from '@/components/Brand'
@@ -69,25 +68,28 @@ function LeaderboardCard({
 function IdealSevenCallout() {
   return (
     <Card className="ideal-callout ideal-promo">
-      <CardContent className="ideal-promo-content">
-        <div>
-          <p className="section-kicker">El equipo de la liga</p>
-          <h2>
-            <Sparkles aria-hidden="true" />7 ideal
-          </h2>
-          <p>
-            El mejor equipo 2-3-1 de la liga. Siete jugadores, una alineación
-            para recordar.
-          </p>
-          <Button asChild>
-            <Link to="/league/ideal-seven">Ver 7 ideal</Link>
-          </Button>
-        </div>
-        <div className="ideal-promo-art" aria-hidden="true">
-          <span>7</span>
-          <Brand />
-        </div>
-      </CardContent>
+      <Link
+        to="/league/ideal-seven"
+        className="block focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-inset"
+        aria-label="Abrir el siete ideal de la liga"
+      >
+        <CardContent className="ideal-promo-content">
+          <div>
+            <p className="section-kicker">El equipo de la liga</p>
+            <h2>
+              <Sparkles aria-hidden="true" />7 ideal
+            </h2>
+            <p>
+              El mejor equipo 2-3-1 de la liga. Siete jugadores, una alineación
+              para recordar.
+            </p>
+          </div>
+          <div className="ideal-promo-art" aria-hidden="true">
+            <span>7</span>
+            <Brand />
+          </div>
+        </CardContent>
+      </Link>
     </Card>
   )
 }

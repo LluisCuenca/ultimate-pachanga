@@ -79,7 +79,9 @@ describe('LeaguePage', () => {
       await screen.findByText('Mayor valor de mercado'),
     ).toBeInTheDocument()
 
-    const link = screen.getByRole('link', { name: 'Ver 7 ideal' })
+    const link = screen.getByRole('link', {
+      name: 'Abrir el siete ideal de la liga',
+    })
     expect(link).toHaveAttribute('href', '/league/ideal-seven')
     expect(
       screen.getByText(/El mejor equipo 2-3-1 de la liga/),

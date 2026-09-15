@@ -1,5 +1,4 @@
 import { BackButton } from '@/components/BackButton'
-import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { MatchResultsGrid } from '@/components/MatchResultsGrid'
 import {
   Popover,
@@ -868,14 +867,6 @@ export function MatchDetailPage() {
                             to={`/players/${member.playerId}`}
                             className="flex min-w-0 flex-1 items-center gap-3 hover:underline"
                           >
-                            <PlayerAvatar
-                              name={member.displayName}
-                              path={
-                                players.find(
-                                  (player) => player.id === member.playerId,
-                                )?.avatarPath
-                              }
-                            />
                             <span className="truncate">
                               {member.displayName}
                             </span>

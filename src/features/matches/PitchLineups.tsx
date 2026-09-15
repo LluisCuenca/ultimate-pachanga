@@ -304,7 +304,7 @@ export function PitchLineups({
                 ? saved
                   ? '✓ Alineación guardada'
                   : 'Selecciona dos jugadores para intercambiar.'
-                : 'Alineación prevista'}
+                : ''}
           </p>
           <Button
             variant="outline"
@@ -440,7 +440,7 @@ export function PitchLineups({
             Todos los convocados están en el campo.
           </p>
         ) : (
-          <ul className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-7">
+          <ul className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-7">
             {benchPlayers.map((player) => {
               const key = benchKeyFor(player.id)
               const isSelected = swapping.selectedKey === key

@@ -802,6 +802,9 @@
   gap: 1rem;
   padding: 1.5rem;
 }
+.ideal-promo-content > div:first-child {
+  text-align: center;
+}
 .ideal-promo h2 {
   display: flex;
   align-items: center;
@@ -1078,6 +1081,11 @@
   font-size: 0.8125rem;
   color: var(--muted-foreground);
 }
+.ideal-summary .ideal-summary-value span {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
 .ideal-summary strong {
   font-size: 1.875rem;
   letter-spacing: -0.04em;
@@ -1091,6 +1099,26 @@
 .ideal-summary-value strong span {
   font-size: 2.75rem;
   color: var(--tier-gold);
+}
+.ideal-pitch-card[data-ideal-card='silver'] .player-face {
+  box-shadow:
+    0 0 0 2px #d8dee8,
+    0 0 20px #d8dee866;
+}
+.ideal-pitch-card[data-ideal-card='purple'] .player-face {
+  box-shadow:
+    0 0 0 2px #dfa6c8,
+    0 0 20px #dfa6c866;
+}
+.ideal-pitch-card[data-ideal-card='black'] .player-face {
+  box-shadow:
+    0 0 0 2px #f0bd4a,
+    0 0 20px #f0bd4a66;
+}
+.ideal-pitch-card[data-ideal-card='blue'] .player-face {
+  box-shadow:
+    0 0 0 2px #f0ece0,
+    0 0 20px #f0ece066;
 }
 .ideal-selection {
   display: grid;
