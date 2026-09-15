@@ -3,7 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Award,
   CalendarDays,
+  CircleDot,
+  Medal,
+  Shield,
   Sparkles,
+  Star,
   TrendingUp,
   Trophy,
   Users,
@@ -30,13 +34,13 @@ import type { MatchRow, PlayerCardData } from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
 
-const AWARD_EMOJI: Record<string, string> = {
-  'jugador revelación': '🥇',
-  revelación: '🥇',
-  mvp: '⭐',
-  puskas: '⚽',
-  puskás: '⚽',
-  zamora: '🧤',
+const AWARD_ICONS: Record<string, typeof Award> = {
+  'jugador revelación': Medal,
+  revelación: Medal,
+  mvp: Star,
+  puskas: CircleDot,
+  puskás: CircleDot,
+  zamora: Shield,
 }
 
 function LeaderboardCard({
@@ -291,8 +295,10 @@ export function LeaguePage() {
               <LeaderboardCard
                 key={attribute.code}
                 headingAs="h3"
-                title={`${AWARD_EMOJI[attribute.label.trim().toLowerCase()] ?? '🏅'} ${attribute.label}`}
-                icon={Award}
+                title={attribute.label}
+                icon={
+                  AWARD_ICONS[attribute.label.trim().toLowerCase()] ?? Award
+                }
                 players={holders}
                 renderValue={(player) => (
                   <span className="numeric font-bold text-tier-gold">
