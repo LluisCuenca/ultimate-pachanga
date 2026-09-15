@@ -183,7 +183,7 @@ export function PlayerCard({
         // so it needs the ratio declared and becomes the query container its
         // own type is measured against; the grid card gets its height from the
         // metric and value bands below.
-        compact ? '@container aspect-[2/3] rounded-lg' : 'rounded-xl',
+        compact ? '@container aspect-[5/6] rounded-lg' : 'rounded-xl',
         !compact &&
           'transition-transform duration-200 motion-safe:hover:-translate-y-1',
         !player.isActive && 'opacity-60 saturate-50',
@@ -247,7 +247,7 @@ interface FaceProps {
   rating: number
 }
 
-/** Photo, nickname and rating share one vertical hierarchy on every pitch. */
+/** Compact pitch card: full-bleed portrait followed by name and rating. */
 function CompactFace({ player, avatarUrl, initials, rating }: FaceProps) {
   return (
     <>
@@ -266,7 +266,7 @@ function CompactFace({ player, avatarUrl, initials, rating }: FaceProps) {
       </div>
       <div className="player-rating-band">
         <span
-          className="numeric font-black"
+          className="numeric text-tier-gold"
           aria-label={`Valoración ${rating}`}
         >
           {rating}

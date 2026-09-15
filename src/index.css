@@ -907,20 +907,13 @@
   border: 0;
   border-radius: 0;
 }
-.player-face[data-compact] > .player-photo-band [data-slot='avatar']::after {
-  display: none;
-}
 .player-face[data-compact] [data-slot='avatar-image'] {
-  border-radius: 0;
-  object-fit: contain;
-}
-.player-face[data-compact] [data-slot='avatar-fallback'] {
+  object-fit: cover;
   border-radius: 0;
 }
 .player-face[data-compact] > .player-name-band {
   flex: none;
-  padding: 3cqi 3cqi 0;
-  border-top: 1px solid var(--border);
+  padding: 3cqi 3cqi 1cqi;
   background: var(--background);
   text-align: center;
 }
@@ -930,14 +923,14 @@
 }
 .player-face[data-compact] > .player-rating-band {
   flex: none;
-  padding: 2cqi 3cqi 4cqi;
+  padding: 1cqi 3cqi 3cqi;
   background: var(--background);
   color: var(--tier-gold);
   text-align: center;
   line-height: 1;
 }
 .player-face[data-compact] > .player-rating-band > span {
-  font-size: clamp(1rem, 27cqi, 1.75rem);
+  font-size: clamp(0.625rem, 14cqi, 0.875rem);
 }
 .player-face[data-face='legend'],
 .player-face[data-face='purple'],
