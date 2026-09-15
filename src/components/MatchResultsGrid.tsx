@@ -1,8 +1,7 @@
 import { Link } from 'react-router'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
-import { ScoreExtras } from '@/components/ScoreStrip'
+import { ScoreDetails } from '@/components/ScoreStrip'
 import { compactScore, metricInitial } from '@/lib/scorePresentation'
-import { formatScore } from '@/lib/formatting'
 import type { LeagueMetricRow } from '@/types/domain'
 import type { MatchScoreEntry } from '@/features/matches/api'
 
@@ -26,12 +25,14 @@ export function MatchResultsGrid({
     <div className="match-score-grid">
       <table aria-label="Puntuaciones de los jugadores">
         <colgroup>
-          <col style={{ width: '39%' }} />
+          <col style={{ width: '32%' }} />
           {metrics.map((metric) => (
             <col key={metric.code} />
           ))}
           <col />
-          <col style={{ width: '17%' }} />
+          <col />
+          <col />
+          <col style={{ width: '15%' }} />
         </colgroup>
         <thead>
           <tr>
@@ -43,6 +44,12 @@ export function MatchResultsGrid({
             ))}
             <th scope="col">
               <abbr title="Goles">G</abbr>
+            </th>
+            <th scope="col">
+              <abbr title="Base">B</abbr>
+            </th>
+            <th scope="col">
+              <abbr title="Victorias">V</abbr>
             </th>
             <th scope="col">Final</th>
           </tr>
@@ -63,6 +70,7 @@ export function MatchResultsGrid({
                   />
                   <span>{row.displayName}</span>
                 </Link>
+                {row.action}
               </th>
               {metrics.map((metric) => (
                 <td key={metric.code}>
@@ -70,22 +78,15 @@ export function MatchResultsGrid({
                 </td>
               ))}
               <td>{row.score?.goals ?? '—'}</td>
+              <td>{compactScore(row.score?.baseScore)}</td>
+              <td>{compactScore(row.score?.victory)}</td>
               <td>
-                <strong className="final-score">
-                  {formatScore(row.score?.finalScore ?? null)}
-                </strong>
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={metrics.length + 3} className="match-score-extras">
-                <div className="flex min-w-0 items-center justify-between gap-2">
-                  <ScoreExtras
-                    base={row.score?.baseScore ?? null}
-                    victory={row.score?.victory ?? null}
-                    attributes={row.score?.attributes ?? []}
-                  />
-                  {row.action}
-                </div>
+                <ScoreDetails
+                  final={row.score?.finalScore ?? null}
+                  base={row.score?.baseScore ?? null}
+                  victory={row.score?.victory ?? null}
+                  attributes={row.score?.attributes ?? []}
+                />
               </td>
             </tr>
           </tbody>
@@ -95,7 +96,7 @@ export function MatchResultsGrid({
         {metrics
           .map((metric) => `${metricInitial(metric)}: ${metric.label}`)
           .join(' · ')}{' '}
-        · G: goles.
+        · G: goles · B: base · V: victorias.
       </p>
     </div>
   )

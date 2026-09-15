@@ -1,3 +1,4 @@
+import { allowsMotion } from '@/lib/useAppMotion'
 import { cn } from '@/lib/utils'
 import { toPhotoUrl } from '@/lib/matchPhoto'
 import { getVenueImage } from '@/lib/venues'
@@ -41,6 +42,12 @@ export function VenuePhoto({
       <img
         src={toPhotoUrl(match) ?? getVenueImage(match.location)}
         alt=""
+        onLoad={(event) => {
+          if (allowsMotion())
+            event.currentTarget.animate?.([{ opacity: 0.4 }, { opacity: 1 }], {
+              duration: 220,
+            })
+        }}
         // Absolute rather than sized: the photograph fills whatever box the
         // parent grid gives it, which is the height of the text beside it.
         className="absolute inset-0 size-full object-cover object-[30%_60%]"

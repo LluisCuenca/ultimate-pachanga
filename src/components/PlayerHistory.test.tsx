@@ -27,13 +27,14 @@ describe('PlayerHistory', () => {
     const row = screen.getByRole('link', { name: /Ver Jornada 12/ })
     expect(row).toHaveAttribute('href', '/matches/actual-match-id')
     expect(within(row).getByText('J12')).toBeInTheDocument()
-    expect(within(row).getByText('9,25')).toBeInTheDocument()
-    expect(within(row).getByText('6')).toBeInTheDocument()
-    expect(within(row).getByText('7')).toBeInTheDocument()
-    expect(within(row).getAllByText('8')).toHaveLength(2)
-    expect(within(row).getByText('2')).toBeInTheDocument()
+    const cells = within(row.parentElement!)
+    expect(cells.getByText('9,25')).toBeInTheDocument()
+    expect(cells.getByText('6')).toBeInTheDocument()
+    expect(cells.getByText('7')).toBeInTheDocument()
+    expect(cells.getAllByText('8')).toHaveLength(2)
+    expect(cells.getByText('2')).toBeInTheDocument()
     await userEvent.click(
-      screen.getByRole('button', { name: 'Ver atributos: MVP' }),
+      screen.getByRole('button', { name: /Ver desglose y atributos: MVP/ }),
     )
     expect(screen.getByText('MVP')).toBeInTheDocument()
     expect(screen.queryByText('2026-08-01')).not.toBeInTheDocument()

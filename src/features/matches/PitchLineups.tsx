@@ -115,6 +115,7 @@ export function PitchLineups({
   const containerRef = useRef<HTMLDivElement>(null)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const saveLock = useRef(false)
   const canInteract = interactive && editing && !saving
 
@@ -239,9 +240,11 @@ export function PitchLineups({
 
       saveLock.current = true
       setSaving(true)
+      setSaved(false)
       setPendingPlacement(next)
       try {
         await onLineupChange(toChanges(next, entries))
+        setSaved(true)
       } catch {
         // The caller reports the failure. Restore the last server placement.
       } finally {
@@ -292,12 +295,15 @@ export function PitchLineups({
         <div className="flex items-center justify-between gap-3">
           <p
             role={saving ? 'status' : undefined}
+            aria-live="polite"
             className="text-sm text-muted-foreground"
           >
             {saving
               ? 'Guardando alineación…'
               : editing
-                ? 'Selecciona dos jugadores para intercambiar.'
+                ? saved
+                  ? '✓ Alineación guardada'
+                  : 'Selecciona dos jugadores para intercambiar.'
                 : 'Alineación prevista'}
           </p>
           <Button

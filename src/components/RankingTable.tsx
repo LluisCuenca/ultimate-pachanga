@@ -1,3 +1,4 @@
+import { useLayoutMotion } from '@/lib/useLayoutMotion'
 import { Link } from 'react-router'
 import { PlayerIdentity } from '@/components/PlayerRow'
 import {
@@ -35,8 +36,14 @@ export function RankingTable({
   contextLabel,
   renderContext,
 }: RankingTableProps) {
+  const motionRoot = useLayoutMotion(
+    players.map((player) => player.id).join('|'),
+  )
   return (
-    <div className="ranking-table overflow-x-auto rounded-xl border">
+    <div
+      ref={motionRoot}
+      className="ranking-table overflow-x-auto rounded-xl border"
+    >
       <Table>
         <TableHeader>
           <TableRow>
@@ -53,6 +60,7 @@ export function RankingTable({
             return (
               <TableRow
                 key={player.id}
+                data-motion-key={player.id}
                 className="leaderboard-row ranking-player-row"
               >
                 <TableCell

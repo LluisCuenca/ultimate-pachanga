@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -22,9 +23,29 @@ import type { MatchRow } from '@/types/domain'
  * side-by-side split would leave neither half enough room.
  */
 export function MatchHero({ match }: { match: MatchRow }) {
+  const preview = useRef<HTMLDivElement>(null)
+  const fullPhoto = useRef<HTMLImageElement>(null)
+  const setPhotoOrigin = () => {
+    const image = fullPhoto.current
+    const source = preview.current?.querySelector('img')
+    if (!image || !source) return
+    const from = source.getBoundingClientRect()
+    const to = image.getBoundingClientRect()
+    if (!to.width || !to.height) return
+    image.style.setProperty(
+      '--photo-x',
+      `${from.left + from.width / 2 - to.left - to.width / 2}px`,
+    )
+    image.style.setProperty(
+      '--photo-y',
+      `${from.top + from.height / 2 - to.top - to.height / 2}px`,
+    )
+    image.style.setProperty('--photo-scale-x', `${from.width / to.width}`)
+    image.style.setProperty('--photo-scale-y', `${from.height / to.height}`)
+  }
   return (
     <header className="match-hero grid overflow-hidden rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 sm:grid-cols-[42%_1fr]">
-      <div className="match-photo-wrap">
+      <div ref={preview} className="match-photo-wrap">
         <VenuePhoto
           match={match}
           className="h-32 sm:h-auto sm:min-h-40"
@@ -41,7 +62,10 @@ export function MatchHero({ match }: { match: MatchRow }) {
               <Expand aria-hidden="true" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="match-photo-dialog">
+          <DialogContent
+            className="match-photo-dialog"
+            onOpenAutoFocus={setPhotoOrigin}
+          >
             <DialogTitle className="pr-8">
               {match.title} · Imagen del partido
             </DialogTitle>
@@ -49,6 +73,8 @@ export function MatchHero({ match }: { match: MatchRow }) {
               Fotografía completa del campo o del partido.
             </DialogDescription>
             <img
+              ref={fullPhoto}
+              onLoad={setPhotoOrigin}
               src={toPhotoUrl(match) ?? getVenueImage(match.location)}
               alt={`Campo de ${match.title}`}
               className="max-h-[75dvh] w-full object-contain"

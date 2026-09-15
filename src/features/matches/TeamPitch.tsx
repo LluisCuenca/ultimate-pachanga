@@ -1,3 +1,4 @@
+import { useLayoutMotion } from '@/lib/useLayoutMotion'
 import { PlayerCard } from '@/components/PlayerCard'
 import { cn } from '@/lib/utils'
 import {
@@ -53,6 +54,9 @@ export function TeamPitch({
   interactive,
   getHandlers,
 }: TeamPitchProps) {
+  const motionRoot = useLayoutMotion(
+    `${formation}:${assignments.map((a) => `${a.slot}:${a.player?.id ?? ''}`).join('|')}`,
+  )
   const slots = getPitchSlots(formation)
   const bySlot = new Map(
     assignments.map((assignment) => [assignment.slot, assignment.player]),
@@ -60,6 +64,7 @@ export function TeamPitch({
 
   return (
     <div
+      ref={motionRoot}
       className="pitch-surface relative w-full overflow-hidden rounded-xl border"
       // Matches the pitch image, so the percentage coordinates below land where
       // they should at any width.
@@ -102,6 +107,7 @@ export function TeamPitch({
           >
             {player ? (
               <div
+                data-motion-key={player.id}
                 role={interactive ? 'button' : undefined}
                 tabIndex={interactive ? 0 : undefined}
                 aria-label={

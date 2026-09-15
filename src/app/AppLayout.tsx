@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import { fetchMatch, matchKeys } from '@/features/matches/api'
 import { useQuery } from '@tanstack/react-query'
@@ -8,10 +9,18 @@ import {
   Trophy,
   UserRound,
   Users,
+  Menu,
 } from 'lucide-react'
 import { Brand } from '@/components/Brand'
-import { PlayerAvatar } from '@/components/PlayerAvatar'
-import { useMyPlayerId } from '@/features/players/useMyPlayer'
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
+import { useAppMotion } from '@/lib/useAppMotion'
 import { fetchPlayerCard, playerKeys } from '@/features/players/api'
 import { cn } from '@/lib/utils'
 
@@ -80,7 +89,9 @@ const PAGE_TITLES: Record<string, string> = {
 }
 
 export function AppLayout() {
+  const [menuOpen, setMenuOpen] = useState(false)
   const { pathname } = useLocation()
+  useAppMotion(pathname)
   const path = pathname.replace(/\/$/, '') || '/'
   const detailPlayerId = path.match(/^\/players\/([^/]+)$/)?.[1]
   const detailMatchId =
@@ -105,12 +116,6 @@ export function AppLayout() {
         ? (detailMatch?.title ?? 'Partido')
         : 'Ultimate Pachangas')
 
-  const { data: myPlayerId } = useMyPlayerId()
-  const { data: player } = useQuery({
-    queryKey: playerKeys.card(myPlayerId ?? ''),
-    enabled: Boolean(myPlayerId),
-    queryFn: () => fetchPlayerCard(myPlayerId!),
-  })
   return (
     <div className="min-h-svh">
       <a href="#main-content" className="skip-link">
@@ -137,37 +142,50 @@ export function AppLayout() {
           <Link to="/league" aria-label="Ir a Liga" className="header-icon">
             <Brand />
           </Link>
-          <h1 className="header-title mobile-page-title" title={pageTitle}>
+          <h1
+            key={path}
+            className="header-title mobile-page-title"
+            title={pageTitle}
+          >
             {pageTitle}
           </h1>
           <span className="header-title desktop-brand-title">
             ULTIMATE PACHANGAS
           </span>
-          <Link to="/profile" aria-label="Mi perfil" className="header-icon">
-            <PlayerAvatar
-              name={player?.displayName ?? 'Mi perfil'}
-              path={player?.avatarPath}
-              className="size-10"
-            />
-          </Link>
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label="Abrir menú"
+                className="header-icon"
+              >
+                <Menu aria-hidden="true" className="size-6" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="top" className="mobile-navigation-sheet">
+              <SheetHeader>
+                <SheetTitle>Ultimate Pachangas</SheetTitle>
+                <SheetDescription>Tu liga, a un toque.</SheetDescription>
+              </SheetHeader>
+              <nav
+                aria-label="Navegación principal móvil"
+                className="grid gap-2 px-4 pb-4"
+              >
+                <NavigationLinks
+                  items={[
+                    ...NAVIGATION,
+                    { to: '/profile', label: 'Mi perfil', icon: UserRound },
+                  ]}
+                  onNavigate={() => setMenuOpen(false)}
+                />
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
       <main id="main-content" tabIndex={-1} className="app-main">
         <Outlet />
       </main>
-      <nav className="app-bottom-nav" aria-label="Navegación principal móvil">
-        {NAVIGATION.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/league'}
-            className="bottom-link"
-          >
-            <Icon aria-hidden="true" />
-            <span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
     </div>
   )
 }

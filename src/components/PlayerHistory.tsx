@@ -5,7 +5,7 @@ import {
   shortMatchTitle,
   compactScore,
 } from '@/lib/scorePresentation'
-import { ScoreExtras } from '@/components/ScoreStrip'
+import { ScoreDetails } from '@/components/ScoreStrip'
 import type { LeagueMetricRow } from '@/types/domain'
 import type { PlayerMatchHistoryEntry } from '@/features/players/api'
 
@@ -17,7 +17,7 @@ export function PlayerHistory({
   metrics: readonly LeagueMetricRow[]
 }) {
   const columns = {
-    gridTemplateColumns: `minmax(2.25rem,1.2fr) repeat(${metrics.length + 1}, minmax(0,1fr)) minmax(3.25rem,1.4fr)`,
+    gridTemplateColumns: `minmax(2.25rem,1.2fr) repeat(${metrics.length + 3}, minmax(0,1fr)) minmax(2.75rem,1.4fr)`,
   }
   return (
     <div className="player-history">
@@ -29,36 +29,37 @@ export function PlayerHistory({
           </abbr>
         ))}
         <abbr title="Goles">G</abbr>
+        <abbr title="Base">B</abbr>
+        <abbr title="Victorias">V</abbr>
         <span>Final</span>
       </div>
       <ol>
         {history.map((entry) => (
           <li key={entry.matchId}>
-            <Link
-              to={`/matches/${entry.matchId}`}
-              className="history-link"
-              aria-label={`Ver ${entry.matchTitle}, puntuación final ${formatScore(entry.finalScore)}`}
-            >
-              <div className="history-grid" style={columns}>
-                <span className="history-round" title={entry.matchTitle}>
-                  {shortMatchTitle(entry.matchTitle)}
+            <div className="history-grid history-single-row" style={columns}>
+              <Link
+                to={`/matches/${entry.matchId}`}
+                className="history-round history-round-link"
+                title={entry.matchTitle}
+                aria-label={`Ver ${entry.matchTitle}, puntuación final ${formatScore(entry.finalScore)}`}
+              >
+                {shortMatchTitle(entry.matchTitle)}
+              </Link>
+              {metrics.map((metric) => (
+                <span key={metric.code} title={metric.label}>
+                  {compactScore(entry.metricScores[metric.code] ?? null)}
                 </span>
-                {metrics.map((metric) => (
-                  <span key={metric.code} title={metric.label}>
-                    {compactScore(entry.metricScores[metric.code] ?? null)}
-                  </span>
-                ))}
-                <span>{entry.goals}</span>
-                <strong className="final-score">
-                  {formatScore(entry.finalScore)}
-                </strong>
-              </div>
-            </Link>
-            <ScoreExtras
-              base={entry.baseScore}
-              victory={entry.victory}
-              attributes={entry.attributes}
-            />
+              ))}
+              <span>{entry.goals}</span>
+              <span>{compactScore(entry.baseScore)}</span>
+              <span>{compactScore(entry.victory)}</span>
+              <ScoreDetails
+                final={entry.finalScore}
+                base={entry.baseScore}
+                victory={entry.victory}
+                attributes={entry.attributes}
+              />
+            </div>
           </li>
         ))}
       </ol>
@@ -66,7 +67,8 @@ export function PlayerHistory({
         {metrics
           .map((metric) => `${metricInitial(metric)}: ${metric.label}`)
           .join(' · ')}{' '}
-        · G: goles. Toca una jornada para ver el partido.
+        · G: goles · B: base · V: victorias. Toca una jornada para ver el
+        partido.
       </p>
     </div>
   )

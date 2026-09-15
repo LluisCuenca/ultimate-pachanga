@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+import { allowsMotion } from '@/lib/useAppMotion'
 import {
   Popover,
   PopoverContent,
@@ -73,5 +75,74 @@ export function ScoreExtras({
         </Popover>
       ) : null}
     </div>
+  )
+}
+
+/** The final remains readable while its breakdown is available in the same row. */
+export function ScoreDetails({
+  final,
+  base,
+  victory,
+  attributes,
+}: {
+  final: number | null
+  base: number | null
+  victory: number | null
+  attributes: readonly { label: string }[]
+}) {
+  const scoreRef = useRef<HTMLButtonElement>(null)
+  const previous = useRef(final)
+  useEffect(() => {
+    const changed = previous.current !== final
+    previous.current = final
+    if (!changed || !allowsMotion() || !scoreRef.current?.animate) return
+    const animation = scoreRef.current.animate(
+      [
+        { boxShadow: '0 0 0 2px var(--tier-gold)' },
+        { boxShadow: '0 0 0 0 transparent' },
+      ],
+      { duration: 500 },
+    )
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const cancel = () => animation.cancel()
+    media.addEventListener('change', cancel)
+    return () => {
+      cancel()
+      media.removeEventListener('change', cancel)
+    }
+  }, [final])
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          ref={scoreRef}
+          className="final-score score-detail-trigger"
+          aria-label={`Puntuación final ${formatScore(final)}. Ver desglose${attributes.length ? ` y atributos: ${attributes.map((a) => a.label).join(', ')}` : ''}`}
+        >
+          {formatScore(final)}
+          {attributes.length > 0 && (
+            <span className="score-award-dot" aria-hidden="true" />
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="text-sm">
+        <p className="mb-2 font-bold">Desglose de puntuación</p>
+        <p>
+          Base {formatScore(base)} · V{' '}
+          {victory === null ? '—' : formatVictories(victory)}
+        </p>
+        {attributes.length > 0 && (
+          <ul className="mt-3 space-y-2">
+            {attributes.map((attribute, index) => (
+              <li key={index}>{attribute.label}</li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-3 font-bold text-tier-gold">
+          Final {formatScore(final)}
+        </p>
+      </PopoverContent>
+    </Popover>
   )
 }

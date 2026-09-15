@@ -10,7 +10,7 @@ export function MatchCard({ match }: { match: MatchRow }) {
   return (
     <Link
       to={`/matches/${match.id}`}
-      className="rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+      className="match-card-link rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <Card className="match-card grid min-h-32 grid-cols-[38%_1fr] gap-0 py-0 transition-shadow hover:ring-primary/40 sm:grid-cols-[42%_1fr]">
         <VenuePhoto

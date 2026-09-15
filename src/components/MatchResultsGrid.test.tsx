@@ -28,17 +28,18 @@ describe('MatchResultsGrid', () => {
       <MatchResultsGrid rows={[row]} metrics={TEST_METRICS} />,
     )
     const table = within(screen.getByRole('table'))
+    expect(table.getAllByRole('row')).toHaveLength(2)
     expect(
       table.getAllByRole('columnheader').map((cell) => cell.textContent),
-    ).toEqual(['Jugador', 'A', 'D', 'T', 'F', 'G', 'Final'])
-    expect(table.getAllByRole('row')[1].textContent).toContain('678929,5')
+    ).toEqual(['Jugador', 'A', 'D', 'T', 'F', 'G', 'B', 'V', 'Final'])
+    expect(table.getAllByRole('row')[1].textContent).toContain('678927,519,5')
     expect(table.getByRole('link', { name: /Luis Iniesta/ })).toHaveAttribute(
       'href',
       '/players/p1',
     )
-    expect(table.getByText('Base 7,5')).toBeInTheDocument()
+    expect(table.getByText('7,5')).toBeInTheDocument()
     await userEvent.click(
-      table.getByRole('button', { name: 'Ver atributos: MVP' }),
+      table.getByRole('button', { name: /Ver desglose y atributos: MVP/ }),
     )
     expect(screen.getByText('MVP')).toBeInTheDocument()
   })
@@ -56,7 +57,7 @@ describe('MatchResultsGrid', () => {
         metrics={TEST_METRICS}
       />,
     )
-    expect(screen.getAllByText('—')).toHaveLength(6)
+    expect(screen.getAllByText('—')).toHaveLength(8)
     await userEvent.click(screen.getByRole('button', { name: 'Puntuar' }))
     expect(onEdit).toHaveBeenCalledOnce()
   })

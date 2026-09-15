@@ -98,6 +98,16 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
             <div
               key={slot.slot}
               data-testid="ideal-seven-slot"
+              data-ideal-reveal="true"
+              data-motion-delay={
+                slot.slot === 0
+                  ? 0
+                  : slot.slot < 3
+                    ? 55
+                    : slot.slot < 6
+                      ? 110
+                      : 165
+              }
               className="absolute"
               style={{
                 left: `${slot.x}%`,

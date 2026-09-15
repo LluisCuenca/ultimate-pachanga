@@ -217,6 +217,20 @@ export function PlayerCard({
   return (
     <Link
       to={linkTo}
+      viewTransition
+      onClick={(event) => {
+        if (
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return
+        const card =
+          event.currentTarget.querySelector<HTMLElement>('.player-face')
+        if (card) card.style.viewTransitionName = 'player-focus'
+      }}
       className="player-card-link block h-full min-w-0 rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
       aria-label={`Ver ficha de ${player.displayName}`}
     >
