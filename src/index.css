@@ -778,6 +778,10 @@
   min-height: var(--player-row-height);
   border-bottom: 1px solid var(--border);
 }
+.squad-list .leaderboard-row {
+  min-height: 2.15rem;
+  padding-block: 0.2rem;
+}
 .ranking-panel {
   min-width: 0;
   border: 1px solid var(--border);

@@ -859,7 +859,7 @@ export function MatchDetailPage() {
                         ({group.members.length})
                       </span>
                     </h3>
-                    <ul className="flex flex-col gap-0">
+                    <ul className="squad-list flex flex-col gap-0">
                       {group.members.map((member) => (
                         <li
                           key={member.playerId}
