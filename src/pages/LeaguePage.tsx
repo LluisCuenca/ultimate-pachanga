@@ -30,6 +30,15 @@ import type { MatchRow, PlayerCardData } from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
 
+const AWARD_EMOJI: Record<string, string> = {
+  'jugador revelación': '🥇',
+  revelación: '🥇',
+  mvp: '⭐',
+  puskas: '⚽',
+  puskás: '⚽',
+  zamora: '🧤',
+}
+
 function LeaderboardCard({
   title,
   icon: Icon,
@@ -282,7 +291,7 @@ export function LeaguePage() {
               <LeaderboardCard
                 key={attribute.code}
                 headingAs="h3"
-                title={attribute.label}
+                title={`${AWARD_EMOJI[attribute.label.trim().toLowerCase()] ?? '🏅'} ${attribute.label}`}
                 icon={Award}
                 players={holders}
                 renderValue={(player) => (
