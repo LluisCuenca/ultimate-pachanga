@@ -68,6 +68,7 @@ export function MatchResultsGrid({
                     path={row.avatarPath}
                     className="size-9"
                   />
+                  <span className="sr-only">{row.displayName}</span>
                 </Link>
                 {row.action}
               </th>
