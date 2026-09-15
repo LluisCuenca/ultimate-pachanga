@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 import { formatScore } from '@/lib/formatting'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { ScoreStrip } from '@/components/ScoreStrip'
-import { Award } from 'lucide-react'
+import { Crown, Gem, Medal, Shield } from 'lucide-react'
 import {
   Popover,
   PopoverContent,
@@ -33,6 +33,13 @@ const CARD_FACE: Record<
   silver: 'legend',
   purple: 'purple',
 }
+
+const CARD_ICON = {
+  silver: Medal,
+  purple: Gem,
+  black: Crown,
+  blue: Shield,
+} as const
 
 const DISTINCTIONS: Record<IdealSevenCardStyle, string> = {
   silver: 'Leyenda · Mayor valoración del siete ideal',
@@ -152,6 +159,13 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
                     <span className="block truncate font-bold">
                       {entry.player.displayName}
                     </span>
+                    <span className="ideal-selection-distinction">
+                      {(() => {
+                        const Icon = CARD_ICON[entry.cardStyle]
+                        return <Icon className="size-3.5" aria-hidden="true" />
+                      })()}
+                      {DISTINCTIONS[entry.cardStyle].split(' · ')[0]}
+                    </span>
                   </span>
                   <span className="numeric text-xl font-black text-tier-gold">
                     {entry.displayRating}
@@ -168,7 +182,10 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
                     className="ideal-distinction"
                     aria-label={`Distinción de ${entry.player.displayName}`}
                   >
-                    <Award className="size-4" aria-hidden="true" />
+                    {(() => {
+                      const Icon = CARD_ICON[entry.cardStyle]
+                      return <Icon className="size-4" aria-hidden="true" />
+                    })()}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="text-sm">

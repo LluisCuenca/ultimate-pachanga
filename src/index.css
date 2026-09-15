@@ -1132,6 +1132,17 @@
   border-left: 3px solid var(--card-edge);
   border-radius: 0.75rem;
 }
+.ideal-selection-distinction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+  color: var(--tier-gold);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
 .ideal-selection li:hover {
   background: var(--muted);
 }
