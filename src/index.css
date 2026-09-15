@@ -1082,18 +1082,16 @@
 }
 .ideal-summary span,
 .ideal-summary small {
-  font-size: 0.8125rem;
+  font-size: 1rem;
   color: var(--muted-foreground);
 }
 .ideal-summary .ideal-summary-value span {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--foreground);
+  color: var(--muted-foreground);
 }
 .ideal-summary strong {
-  font-size: 1.875rem;
+  font-size: 1.25rem;
   letter-spacing: -0.04em;
-  font-weight: 900;
+  font-weight: 800;
 }
 .ideal-summary .ideal-summary-value {
   grid-column: 1 / -1;
@@ -1101,7 +1099,7 @@
   background: linear-gradient(110deg, var(--tier-gold-face), var(--card));
 }
 .ideal-summary-value strong span {
-  font-size: 2.75rem;
+  font-size: 1.25rem;
   color: var(--tier-gold);
 }
 .ideal-pitch-card[data-ideal-card='silver'] .player-face {

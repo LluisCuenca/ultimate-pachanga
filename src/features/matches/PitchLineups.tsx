@@ -296,24 +296,22 @@ export function PitchLineups({
     <div ref={containerRef} className="flex flex-col gap-4">
       {interactive ? (
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">Alineaciones</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {balanceAction}
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                disabled={saving}
-                aria-pressed={editing}
-                onClick={() => {
-                  swapping.clearSelection()
-                  setEditing(!editing)
-                }}
-              >
-                {editing ? 'Terminar edición' : 'Editar alineación'}
-              </Button>
-            </div>
+          <h2 className="text-lg font-bold">Alineaciones</h2>
+          <div className="grid w-full grid-cols-2 gap-2">
+            {balanceAction}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              disabled={saving}
+              aria-pressed={editing}
+              onClick={() => {
+                swapping.clearSelection()
+                setEditing(!editing)
+              }}
+            >
+              {editing ? 'Terminar edición' : 'Editar alineación'}
+            </Button>
           </div>
           <p
             role={saving ? 'status' : undefined}
