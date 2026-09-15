@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
 import {
   CartesianGrid,
@@ -78,6 +79,10 @@ export function EvolutionChart({
   formatValue,
   onRemove,
 }: EvolutionChartProps) {
+  const [focused, setFocused] = useState<string | null>(null)
+  const activeFocus = series.some((entry) => entry.playerId === focused)
+    ? focused
+    : null
   const chartRows = toChartRows(rows, series)
 
   return (
@@ -167,7 +172,10 @@ export function EvolutionChart({
                 name={entry.name}
                 stroke={entry.color}
                 strokeDasharray={entry.dash}
-                strokeWidth={2}
+                strokeWidth={activeFocus === entry.playerId ? 3 : 2}
+                strokeOpacity={
+                  activeFocus && activeFocus !== entry.playerId ? 0.2 : 1
+                }
                 dot={false}
                 activeDot={{ r: 4 }}
                 // A missed jornada carries the previous value, so the only gaps
@@ -189,12 +197,17 @@ export function EvolutionChart({
           const latest = toLatestValue(rows, entry.playerId)
 
           return (
-            <li key={entry.playerId}>
+            <li key={entry.playerId} className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => onRemove(entry.playerId)}
+                onClick={() =>
+                  setFocused(
+                    activeFocus === entry.playerId ? null : entry.playerId,
+                  )
+                }
+                aria-pressed={activeFocus === entry.playerId}
                 data-testid={`evolution-legend-${entry.playerId}`}
-                title={`Quitar ${entry.name}`}
+                title={`Destacar ${entry.name}`}
                 className="leaderboard-row flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
               >
                 <svg
@@ -219,8 +232,14 @@ export function EvolutionChart({
                 <span className="numeric text-muted-foreground">
                   {latest === null ? '—' : formatValue(latest)}
                 </span>
-                <X className="size-3 opacity-60" aria-hidden="true" />
-                <span className="sr-only">Quitar de la gráfica</span>
+              </button>
+              <button
+                type="button"
+                className="graph-remove"
+                aria-label={`Quitar ${entry.name} de la gráfica`}
+                onClick={() => onRemove(entry.playerId)}
+              >
+                <X className="size-4" aria-hidden="true" />
               </button>
             </li>
           )

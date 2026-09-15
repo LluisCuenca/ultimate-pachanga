@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { screen, within } from '@testing-library/react'
 import { PlayerHistory } from './PlayerHistory'
@@ -19,7 +20,7 @@ const entry: PlayerMatchHistoryEntry = {
 }
 
 describe('PlayerHistory', () => {
-  it('links the actual match, abbreviates its title and keeps every score visible', () => {
+  it('links the actual match, abbreviates its title and keeps every score visible', async () => {
     renderWithProviders(
       <PlayerHistory history={[entry]} metrics={TEST_METRICS} />,
     )
@@ -31,7 +32,10 @@ describe('PlayerHistory', () => {
     expect(within(row).getByText('7')).toBeInTheDocument()
     expect(within(row).getAllByText('8')).toHaveLength(2)
     expect(within(row).getByText('2')).toBeInTheDocument()
-    expect(within(row).getByText('MVP')).toBeInTheDocument()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Ver atributos: MVP' }),
+    )
+    expect(screen.getByText('MVP')).toBeInTheDocument()
     expect(screen.queryByText('2026-08-01')).not.toBeInTheDocument()
     for (const label of ['A', 'D', 'T', 'F', 'G'])
       expect(screen.getByText(label)).toBeInTheDocument()

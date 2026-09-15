@@ -1,3 +1,4 @@
+import { ErrorState } from '@/components/ErrorState'
 import { Navigate, Outlet, useLocation } from 'react-router'
 import { Loader2 } from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
@@ -46,15 +47,38 @@ export function ProtectedRoute() {
  * so both are checked, and both send you to the same place to finish joining.
  */
 export function LeagueMemberRoute() {
-  const { data: membership, isPending: isMembershipPending } = useMembership()
-  const { data: playerId, isPending: isPlayerPending } = useMyPlayerId()
+  const {
+    data: membership,
+    isPending: isMembershipPending,
+    error: membershipError,
+    refetch: refetchMembership,
+  } = useMembership()
+  const {
+    data: playerId,
+    isPending: isPlayerPending,
+    error: playerError,
+    refetch: refetchPlayer,
+  } = useMyPlayerId()
 
   if (isMembershipPending) return <FullPageSpinner label="Cargando tu liga" />
+
+  if (membershipError && !membership)
+    return (
+      <ErrorState
+        error={membershipError}
+        onRetry={() => void refetchMembership()}
+      />
+    )
 
   if (!membership) return <Navigate to="/onboarding" replace />
 
   // Only reachable once membership resolved, which is what enables the query.
   if (isPlayerPending) return <FullPageSpinner label="Cargando tu jugador" />
+
+  if (playerError && !playerId)
+    return (
+      <ErrorState error={playerError} onRetry={() => void refetchPlayer()} />
+    )
 
   if (!playerId) return <Navigate to="/onboarding" replace />
 
@@ -68,9 +92,12 @@ export function LeagueMemberRoute() {
  * guard gets you a page whose every mutation fails.
  */
 export function AdminRoute() {
-  const { data: membership, isPending } = useMembership()
+  const { data: membership, isPending, error, refetch } = useMembership()
 
   if (isPending) return <FullPageSpinner label="Comprobando permisos" />
+
+  if (error && !membership)
+    return <ErrorState error={error} onRetry={() => void refetch()} />
 
   if (membership?.role !== 'admin') {
     return <Navigate to="/league" replace />

@@ -26,12 +26,12 @@ export function MatchResultsGrid({
     <div className="match-score-grid">
       <table aria-label="Puntuaciones de los jugadores">
         <colgroup>
-          <col style={{ width: '34%' }} />
+          <col style={{ width: '39%' }} />
           {metrics.map((metric) => (
             <col key={metric.code} />
           ))}
           <col />
-          <col style={{ width: '16%' }} />
+          <col style={{ width: '17%' }} />
         </colgroup>
         <thead>
           <tr>

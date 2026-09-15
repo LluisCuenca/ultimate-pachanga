@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { usePageState } from '@/hooks/usePageState'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Trophy, TrendingUp, Target, Flame, Shield, Award } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -154,7 +155,7 @@ export function StatsPage() {
   const { data: membership } = useMembership()
   const { data: metrics = [] } = useLeagueMetrics()
   const { data: attributes = [] } = useLeagueAttributes()
-  const [tab, setTab] = useState('general')
+  const [tab, setTab] = usePageState('stats-tab', 'general')
 
   const {
     data: players,
@@ -198,7 +199,7 @@ export function StatsPage() {
     )
   }
 
-  if (error) {
+  if (error && !players) {
     return (
       <div className="flex flex-col gap-5">
         <h1 className="page-heading text-2xl font-bold">Estadísticas</h1>

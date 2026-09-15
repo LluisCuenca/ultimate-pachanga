@@ -23,7 +23,7 @@ const row: MatchResultGridRow = {
   },
 }
 describe('MatchResultsGrid', () => {
-  it('aligns every metric under its column, retains the final score and links the real player', () => {
+  it('aligns every metric under its column, retains the final score and links the real player', async () => {
     renderWithProviders(
       <MatchResultsGrid rows={[row]} metrics={TEST_METRICS} />,
     )
@@ -37,7 +37,10 @@ describe('MatchResultsGrid', () => {
       '/players/p1',
     )
     expect(table.getByText('Base 7,5')).toBeInTheDocument()
-    expect(table.getByText('MVP')).toBeInTheDocument()
+    await userEvent.click(
+      table.getByRole('button', { name: 'Ver atributos: MVP' }),
+    )
+    expect(screen.getByText('MVP')).toBeInTheDocument()
   })
   it('keeps score editing available and shows dashes for unscored players', async () => {
     const onEdit = vi.fn()

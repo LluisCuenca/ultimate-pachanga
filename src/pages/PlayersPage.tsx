@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { usePageState } from '@/hooks/usePageState'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Search, UserRound } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -56,10 +57,16 @@ export function PlayersPage() {
   const { data: metrics = [] } = useLeagueMetrics()
   const isAdmin = useIsAdmin()
 
-  const [search, setSearch] = useState('')
-  const [position, setPosition] = useState<string>(ALL_POSITIONS)
-  const [sortBy, setSortBy] = useState<SortKey>('rating')
-  const [showInactive, setShowInactive] = useState(false)
+  const [search, setSearch] = usePageState('players-search', '')
+  const [position, setPosition] = usePageState<string>(
+    'players-position',
+    ALL_POSITIONS,
+  )
+  const [sortBy, setSortBy] = usePageState<SortKey>('players-sort', 'rating')
+  const [showInactive, setShowInactive] = usePageState(
+    'players-inactive',
+    false,
+  )
 
   const {
     data: players,
@@ -179,7 +186,7 @@ export function PlayersPage() {
 
       {isPending ? (
         <PlayerCardGridSkeleton />
-      ) : error ? (
+      ) : error && !players ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : visiblePlayers.length === 0 ? (
         <EmptyState

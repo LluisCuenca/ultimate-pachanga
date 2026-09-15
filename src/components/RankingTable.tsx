@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { PlayerIdentity } from '@/components/PlayerRow'
 import {
   Table,
   TableBody,
@@ -8,8 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getAvatarUrl } from '@/lib/supabase'
-import { toInitials } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
 import type { PlayerCardData } from '@/types/domain'
 
@@ -52,10 +50,11 @@ export function RankingTable({
         </TableHeader>
         <TableBody>
           {players.map((player, index) => {
-            const avatarUrl = getAvatarUrl(player.avatarPath)
-
             return (
-              <TableRow key={player.id} className="leaderboard-row">
+              <TableRow
+                key={player.id}
+                className="leaderboard-row ranking-player-row"
+              >
                 <TableCell
                   className={cn(
                     'numeric text-right font-bold',
@@ -67,28 +66,9 @@ export function RankingTable({
                 <TableCell>
                   <Link
                     to={`/players/${player.id}`}
-                    className="flex min-w-0 items-center gap-3 hover:underline"
+                    className="ranking-player-link"
                   >
-                    <Avatar className="size-9 shrink-0">
-                      {avatarUrl ? (
-                        <AvatarImage
-                          src={avatarUrl}
-                          alt=""
-                          className="object-cover"
-                          loading="lazy"
-                        />
-                      ) : null}
-                      <AvatarFallback className="text-[0.625rem]">
-                        {toInitials(
-                          player.firstName,
-                          player.lastName,
-                          player.displayName,
-                        )}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="truncate font-medium">
-                      {player.displayName}
-                    </span>
+                    <PlayerIdentity player={player} />
                   </Link>
                 </TableCell>
                 {contextLabel && renderContext ? (

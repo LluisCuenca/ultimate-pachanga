@@ -1,3 +1,4 @@
+import { useAvatarRevision, versionedAvatar } from '@/lib/avatarRevision'
 import { Link } from 'react-router'
 import { ArrowDown, ArrowUp, Flame, Snowflake } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -158,7 +159,8 @@ export function PlayerCard({
 }: PlayerCardProps) {
   const tier = toCardTier(player.cardRating)
   const face = faceOverride ?? tier
-  const avatarUrl = getAvatarUrl(player.avatarPath)
+  const revision = useAvatarRevision(player.avatarPath)
+  const avatarUrl = versionedAvatar(getAvatarUrl(player.avatarPath), revision)
 
   const initials = toInitials(
     player.firstName,
@@ -238,23 +240,9 @@ interface FaceProps {
  * the right so match cards keep their status signals in one corner.
  */
 function CompactFace({ player, face, avatarUrl, initials, rating }: FaceProps) {
-  const fullName = formatFullName(player.firstName, player.lastName)
-
   return (
     <>
-      <ConfidenceDonut
-        value={player.confidencePct}
-        className={cn(
-          'absolute top-[4cqi] right-[5cqi]',
-          COMPACT_SIZES.confidence,
-        )}
-      />
-      <FormStateIcon
-        state={player.formState}
-        className={cn('absolute top-[17cqi] right-[5cqi]', COMPACT_SIZES.form)}
-      />
-
-      <div className="flex flex-col items-start gap-[1cqi] px-[6cqi] pt-[4cqi] leading-none">
+      <div className="player-rating-band flex flex-col items-start gap-[1cqi] px-[6cqi] pt-[4cqi] leading-none">
         <span
           className={cn(
             'numeric font-black',
@@ -264,18 +252,10 @@ function CompactFace({ player, face, avatarUrl, initials, rating }: FaceProps) {
         >
           {rating}
         </span>
-        <span
-          className={cn(
-            'font-bold tracking-wide opacity-80',
-            COMPACT_SIZES.position,
-          )}
-        >
-          {player.preferredPosition}
-        </span>
       </div>
 
       {/* Centred in whatever the two bands leave, and never taller than that. */}
-      <div className="flex min-h-0 flex-1 items-center justify-center py-[3cqi]">
+      <div className="player-photo-band flex min-h-0 flex-1 items-center justify-center py-[3cqi]">
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
@@ -286,7 +266,7 @@ function CompactFace({ player, face, avatarUrl, initials, rating }: FaceProps) {
 
       <div
         className={cn(
-          'border-t px-[5cqi] py-[3cqi] text-center leading-tight',
+          'player-name-band border-t px-[5cqi] py-[3cqi] text-center leading-tight',
           CARD_RULES[face],
         )}
       >
@@ -296,16 +276,6 @@ function CompactFace({ player, face, avatarUrl, initials, rating }: FaceProps) {
         >
           {player.displayName}
         </h3>
-        {/* Only when the alias is not already the name, which is the case for
-            every player who never chose one. */}
-        {fullName && fullName !== player.displayName ? (
-          <p
-            className={cn('truncate opacity-70', COMPACT_SIZES.fullName)}
-            title={fullName}
-          >
-            {fullName}
-          </p>
-        ) : null}
       </div>
     </>
   )
@@ -346,7 +316,7 @@ function FullFace({
         <FormStateIcon state={player.formState} className="size-4" />
       </div>
 
-      <div className="flex flex-1 items-center justify-center px-3 pt-3 pb-1">
+      <div className="player-photo-band flex flex-1 items-center justify-center px-3 pt-3 pb-1">
         <PlayerPhoto
           avatarUrl={avatarUrl}
           initials={initials}
@@ -356,7 +326,12 @@ function FullFace({
       </div>
 
       {/* The name band, ruled off the way a card prints it. */}
-      <div className={cn('border-t px-3 py-1.5 text-center', CARD_RULES[face])}>
+      <div
+        className={cn(
+          'player-name-band border-t px-3 py-1.5 text-center',
+          CARD_RULES[face],
+        )}
+      >
         <h3 className="truncate text-sm font-bold" title={player.displayName}>
           {player.displayName}
         </h3>
@@ -369,7 +344,7 @@ function FullFace({
 
       <div
         className={cn(
-          'grid grid-cols-4 gap-1 border-t px-2 py-2',
+          'player-metrics-band grid grid-cols-4 gap-1 border-t px-2 py-2',
           CARD_RULES[face],
         )}
       >
@@ -384,7 +359,7 @@ function FullFace({
 
       <div
         className={cn(
-          'flex items-center justify-between border-t px-3 py-2 text-[0.6875rem]',
+          'player-value-band flex items-center justify-between border-t px-3 py-2 text-[0.6875rem]',
           CARD_RULES[face],
         )}
       >

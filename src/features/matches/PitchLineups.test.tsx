@@ -1,7 +1,12 @@
+import { StrictMode, useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { screen, within } from '@testing-library/react'
+import { act, fireEvent, screen, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { PitchLineups, type LineupEntry } from '@/features/matches/PitchLineups'
+import {
+  PitchLineups,
+  type LineupChange,
+  type LineupEntry,
+} from '@/features/matches/PitchLineups'
 import { renderWithProviders } from '@/test/render'
 import { buildPlayerCard, TEST_METRICS } from '@/test/factories'
 import type { TeamSide } from '@/types/domain'
@@ -56,8 +61,11 @@ const ENTRIES: LineupEntry[] = [
 
 function renderLineups(
   overrides: Partial<Parameters<typeof PitchLineups>[0]> = {},
+  enterEditing = true,
 ) {
-  const onLineupChange = vi.fn()
+  const onLineupChange = vi.fn<(changes: LineupChange[]) => Promise<void>>(
+    () => new Promise<void>(() => {}),
+  )
   const onFormationChange = vi.fn()
 
   renderWithProviders(
@@ -77,6 +85,8 @@ function renderLineups(
     />,
   )
 
+  if (enterEditing && overrides.interactive !== false)
+    fireEvent.click(screen.getByRole('button', { name: 'Editar alineación' }))
   return { onLineupChange, onFormationChange }
 }
 
@@ -525,4 +535,120 @@ describe('PitchLineups', () => {
       expect(screen.queryByText(/Arrastra un jugador/)).not.toBeInTheDocument()
     })
   })
+})
+
+describe('lineup save lifecycle', () => {
+  it('allows scrolling through a read-only pitch until editing is requested', async () => {
+    renderLineups({}, false)
+    expect(
+      screen.queryByRole('button', { name: /^Defensa Uno,/ }),
+    ).not.toBeInTheDocument()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Editar alineación' }),
+    )
+    expect(
+      screen.getByRole('button', { name: /^Defensa Uno,/ }),
+    ).toBeInTheDocument()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Terminar edición' }),
+    )
+    expect(
+      screen.queryByRole('button', { name: /^Defensa Uno,/ }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('locks a pending save and restores the server arrangement after rejection', async () => {
+    let reject!: (reason: Error) => void
+    const pending = new Promise<void>((_, fail) => {
+      reject = fail
+    })
+    const save = vi.fn(() => pending)
+    renderLineups({ onLineupChange: save })
+    await userEvent.click(screen.getByRole('button', { name: /^Defensa Uno,/ }))
+    await userEvent.click(screen.getByRole('button', { name: /^Defensa Dos,/ }))
+    const slot = () =>
+      screen
+        .getAllByTestId('pitch-slot')
+        .find((element) => element.dataset.slotKey === 'home:1')!
+    expect(within(slot()).getByText('Defensa Dos')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Terminar edición' }),
+    ).toBeDisabled()
+    expect(
+      screen.queryByRole('button', { name: /^Defensa Uno,/ }),
+    ).not.toBeInTheDocument()
+    await act(async () => {
+      reject(new Error('Offline'))
+    })
+    await waitFor(() =>
+      expect(within(slot()).getByText('Defensa Uno')).toBeInTheDocument(),
+    )
+    expect(
+      screen.getByRole('button', { name: 'Terminar edición' }),
+    ).toBeEnabled()
+    expect(save).toHaveBeenCalledOnce()
+  })
+})
+
+it('settles a successful save and accepts subsequent server positions in StrictMode', async () => {
+  const save = vi.fn()
+  let finish!: () => void
+  const pending = new Promise<void>((resolve) => {
+    finish = resolve
+  })
+  function Harness() {
+    const [entries, setEntries] = useState(ENTRIES)
+    return (
+      <>
+        <button onClick={() => setEntries([...ENTRIES])}>
+          Recibir actualización
+        </button>
+        <PitchLineups
+          entries={entries}
+          metrics={TEST_METRICS}
+          homeTeamName="Local"
+          awayTeamName="Visitante"
+          homeFormation="2-3-1"
+          awayFormation="2-3-1"
+          interactive
+          canChangeFormation={false}
+          onFormationChange={() => {}}
+          valuation="live"
+          onLineupChange={async (changes) => {
+            save(changes)
+            await pending
+            setEntries((current) =>
+              current.map((entry) => ({
+                ...entry,
+                ...changes.find((change) => change.playerId === entry.playerId),
+              })),
+            )
+          }}
+        />
+      </>
+    )
+  }
+  renderWithProviders(
+    <StrictMode>
+      <Harness />
+    </StrictMode>,
+  )
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Editar alineación' }),
+  )
+  await userEvent.click(screen.getByRole('button', { name: /^Defensa Uno,/ }))
+  await userEvent.click(screen.getByRole('button', { name: /^Defensa Dos,/ }))
+  expect(save).toHaveBeenCalledOnce()
+  await act(async () => {
+    finish()
+  })
+  const slot = () =>
+    screen
+      .getAllByTestId('pitch-slot')
+      .find((element) => element.dataset.slotKey === 'home:1')!
+  expect(within(slot()).getByText('Defensa Dos')).toBeInTheDocument()
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Recibir actualización' }),
+  )
+  expect(within(slot()).getByText('Defensa Uno')).toBeInTheDocument()
 })

@@ -89,7 +89,7 @@ interface PitchLineupsProps {
   canChangeFormation: boolean
   onFormationChange: (side: 'home' | 'away', formation: Formation) => void
   /** Called with only the players whose side or slot actually changed. */
-  onLineupChange: (changes: LineupChange[]) => void
+  onLineupChange: (changes: LineupChange[]) => void | Promise<unknown>
   /**
    * Whether the values being summed are the ones frozen at kickoff or today's.
    *
@@ -113,6 +113,10 @@ export function PitchLineups({
   valuation,
 }: PitchLineupsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const saveLock = useRef(false)
+  const canInteract = interactive && editing && !saving
 
   // The arrangement is applied optimistically so a drag feels instant, then
   // reconciled from the server once the write lands.
@@ -211,7 +215,8 @@ export function PitchLineups({
   }, [])
 
   const handleSwap = useCallback(
-    (fromKey: string, toKey: string) => {
+    async (fromKey: string, toKey: string) => {
+      if (saveLock.current) return
       const next = new Map(placement)
       const fromPlayer = next.get(fromKey) ?? null
       const toPlayer = next.get(toKey) ?? null
@@ -232,15 +237,25 @@ export function PitchLineups({
       place(fromKey, toPlayer)
       place(toKey, fromPlayer)
 
+      saveLock.current = true
+      setSaving(true)
       setPendingPlacement(next)
-      onLineupChange(toChanges(next, entries))
+      try {
+        await onLineupChange(toChanges(next, entries))
+      } catch {
+        // The caller reports the failure. Restore the last server placement.
+      } finally {
+        setPendingPlacement(undefined)
+        setSaving(false)
+        saveLock.current = false
+      }
     },
     [placement, entries, onLineupChange],
   )
 
   const swapping = useSlotSwapping({
     onSwap: handleSwap,
-    enabled: interactive,
+    enabled: canInteract,
     resolveKeyAt,
   })
 
@@ -274,6 +289,32 @@ export function PitchLineups({
   return (
     <div ref={containerRef} className="flex flex-col gap-4">
       {interactive ? (
+        <div className="flex items-center justify-between gap-3">
+          <p
+            role={saving ? 'status' : undefined}
+            className="text-sm text-muted-foreground"
+          >
+            {saving
+              ? 'Guardando alineación…'
+              : editing
+                ? 'Selecciona dos jugadores para intercambiar.'
+                : 'Alineación prevista'}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={saving}
+            aria-pressed={editing}
+            onClick={() => {
+              swapping.clearSelection()
+              setEditing(!editing)
+            }}
+          >
+            {editing ? 'Terminar edición' : 'Editar alineación'}
+          </Button>
+        </div>
+      ) : null}
+      {canInteract ? (
         // While something is selected this replaces the instructions with what
         // to do next. Tapping twice is the whole interaction, and saying so at
         // the moment it matters beats a tip nobody reads up front.
@@ -334,7 +375,7 @@ export function PitchLineups({
                   />
                 </div>
 
-                {canChangeFormation ? (
+                {canChangeFormation && editing && !saving ? (
                   <Select
                     value={formation}
                     onValueChange={(value) =>
@@ -374,7 +415,7 @@ export function PitchLineups({
                 selectedKey={swapping.selectedKey}
                 draggingKey={swapping.drag.key}
                 overKey={swapping.drag.overKey}
-                interactive={interactive}
+                interactive={canInteract}
                 getHandlers={swapping.getHandlers}
               />
             </div>
@@ -404,24 +445,24 @@ export function PitchLineups({
               return (
                 <li key={player.id} data-slot-key={key}>
                   <div
-                    role={interactive ? 'button' : undefined}
-                    tabIndex={interactive ? 0 : undefined}
+                    role={canInteract ? 'button' : undefined}
+                    tabIndex={canInteract ? 0 : undefined}
                     aria-label={
                       interactive
                         ? `${player.displayName}, en el banquillo. Pulsa para seleccionar e intercambiar.`
                         : `${player.displayName}, en el banquillo`
                     }
-                    aria-pressed={interactive ? isSelected : undefined}
+                    aria-pressed={canInteract ? isSelected : undefined}
                     className={cn(
                       'rounded-lg outline-none',
-                      interactive && 'cursor-grab touch-none select-none',
-                      interactive &&
+                      canInteract && 'cursor-grab touch-none select-none',
+                      canInteract &&
                         'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                       isSelected && 'ring-2 ring-primary ring-offset-2',
                       isDragging && 'opacity-30',
                       isOver && 'ring-2 ring-tier-gold ring-offset-1',
                     )}
-                    {...(interactive ? swapping.getHandlers(key) : {})}
+                    {...(canInteract ? swapping.getHandlers(key) : {})}
                   >
                     <PlayerCard player={player} metrics={metrics} compact />
                   </div>

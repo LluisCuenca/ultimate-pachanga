@@ -27,10 +27,10 @@ describe('MatchArchive league scope', () => {
       screen.getByRole('button', { name: 'Buscar jornadas' }),
     )
     expect(
-      screen.getByRole('option', { name: /Jornada propia/ }),
+      screen.getByRole('link', { name: /Jornada propia/ }),
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole('option', { name: /Otra liga/ }),
+      screen.queryByRole('link', { name: /Otra liga/ }),
     ).not.toBeInTheDocument()
   })
 })

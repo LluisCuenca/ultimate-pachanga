@@ -126,7 +126,7 @@ describe('RankingTable', () => {
   it('falls back to initials when a player has no photograph', () => {
     renderTable()
 
-    expect(screen.getByText('CH')).toBeInTheDocument()
-    expect(screen.getByText('JG')).toBeInTheDocument()
+    expect(screen.getByText('C')).toBeInTheDocument()
+    expect(screen.getByText('J')).toBeInTheDocument()
   })
 })

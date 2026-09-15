@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { Route, Routes } from 'react-router'
@@ -76,4 +77,44 @@ describe('LeagueMemberRoute', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
     expect(screen.queryByText('Elige tu jugador')).not.toBeInTheDocument()
   })
+})
+
+it('retries a failed membership read without sending a member to onboarding', async () => {
+  const refetch = vi.fn()
+  useMembership.mockReturnValue({
+    data: undefined,
+    isPending: false,
+    error: new Error('Offline'),
+    refetch,
+  })
+  useMyPlayerId.mockReturnValue({ data: undefined, isPending: true })
+  renderGuard()
+  expect(screen.getByRole('alert')).toBeInTheDocument()
+  expect(screen.queryByText('Elige tu jugador')).not.toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
+  expect(refetch).toHaveBeenCalledOnce()
+})
+it('keeps the last valid membership on a background refresh failure', () => {
+  useMembership.mockReturnValue({
+    data: MEMBERSHIP,
+    isPending: false,
+    error: new Error('Offline'),
+  })
+  useMyPlayerId.mockReturnValue({ data: 'player-1', isPending: false })
+  renderGuard()
+  expect(screen.getByText('La liga')).toBeInTheDocument()
+})
+it('retries a failed player read rather than claiming that no player exists', async () => {
+  const refetch = vi.fn()
+  useMembership.mockReturnValue({ data: MEMBERSHIP, isPending: false })
+  useMyPlayerId.mockReturnValue({
+    data: undefined,
+    isPending: false,
+    error: new Error('Offline'),
+    refetch,
+  })
+  renderGuard()
+  expect(screen.queryByText('Elige tu jugador')).not.toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
+  expect(refetch).toHaveBeenCalledOnce()
 })

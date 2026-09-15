@@ -1,6 +1,7 @@
+import { BackButton } from '@/components/BackButton'
 import { Link, useParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, History } from 'lucide-react'
+import { History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -83,7 +84,7 @@ export function PlayerDetailPage() {
 
   // A failed read and a missing player are different answers: one is worth
   // retrying and one is worth going back from.
-  if (error) {
+  if (error && !player) {
     return <ErrorState error={error} onRetry={() => void refetch()} />
   }
 
@@ -108,12 +109,7 @@ export function PlayerDetailPage() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/players">
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Jugadores
-          </Link>
-        </Button>
+        <BackButton fallback="/players" label="Volver" />
       </div>
 
       <h1 className="page-heading text-2xl font-bold">{player.displayName}</h1>

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import { Loader2 } from 'lucide-react'
+import { PageScroll } from '@/app/PageScroll'
 import { AppLayout } from '@/app/AppLayout'
 import { AdminRoute, LeagueMemberRoute, ProtectedRoute } from '@/app/guards'
 import { LoginPage } from '@/pages/LoginPage'
@@ -153,9 +154,12 @@ const routes = [
   { path: '*', element: <NotFoundPage /> },
 ]
 
-const router = createBrowserRouter(routes, {
-  basename: import.meta.env.BASE_URL.replace(/\/$/, ''),
-})
+const router = createBrowserRouter(
+  [{ element: <PageScroll />, children: routes }],
+  {
+    basename: import.meta.env.BASE_URL.replace(/\/$/, ''),
+  },
+)
 
 export function AppRouter() {
   return (

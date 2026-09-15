@@ -40,9 +40,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 30_000,
-      // The data is a friends' league, not a trading floor; refetching on every
-      // window focus is noise.
-      refetchOnWindowFocus: false,
+      // Refresh stale data when returning to the app; fresh data stays cached.
+      refetchOnWindowFocus: true,
       retry: 1,
     },
   },
@@ -54,7 +53,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <TooltipProvider delayDuration={200}>
           {children}
-          <Toaster position="top-center" richColors />
+          <Toaster position="top-center" />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

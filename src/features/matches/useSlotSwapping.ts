@@ -67,6 +67,7 @@ export function useSlotSwapping({
     moved: boolean
   } | null>(null)
 
+  const suppressClick = useRef(false)
   const clearSelection = useCallback(() => setSelectedKey(null), [])
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export function useSlotSwapping({
       if (!press) return
 
       if (press.moved) {
+        suppressClick.current = true
         const target = resolveKeyAt(event.clientX, event.clientY)
         if (target && target !== press.key) onSwap(press.key, target)
         setDrag(NO_DRAG)
@@ -125,13 +127,9 @@ export function useSlotSwapping({
   }, [enabled, onSwap, resolveKeyAt])
 
   function toggleSelection(key: string) {
-    setSelectedKey((current) => {
-      if (current === null) return key
-      if (current === key) return null
-
-      onSwap(current, key)
-      return null
-    })
+    const current = selectedKey
+    setSelectedKey(current === null ? key : null)
+    if (current !== null && current !== key) onSwap(current, key)
   }
 
   const getHandlers = useCallback(
@@ -141,6 +139,7 @@ export function useSlotSwapping({
         // Only a primary press starts a drag; a right-click should not.
         if (event.button !== 0) return
 
+        suppressClick.current = false
         pressRef.current = {
           key,
           startX: event.clientX,
@@ -152,7 +151,10 @@ export function useSlotSwapping({
       onClick: (event: React.MouseEvent) => {
         if (!enabled) return
         // The click that concludes a drag must not also count as a selection.
-        if (drag.key) return
+        if (suppressClick.current) {
+          suppressClick.current = false
+          return
+        }
         event.preventDefault()
         toggleSelection(key)
       },
@@ -172,7 +174,7 @@ export function useSlotSwapping({
     // toggleSelection is recreated each render but only reads setState and the
     // current onSwap, both of which are in this dependency list.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [enabled, onSwap, drag.key],
+    [enabled, onSwap, selectedKey],
   )
 
   return {

@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { IdealSevenPage } from '@/pages/IdealSevenPage'
@@ -114,18 +115,19 @@ describe('IdealSevenPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Los elegidos' }),
     ).toBeInTheDocument()
+    await userEvent.click(
+      screen.getAllByRole('button', { name: /Distinción de/ })[0],
+    )
     expect(screen.getAllByText('90').length).toBeGreaterThan(0)
     expect(screen.getAllByText('80').length).toBeGreaterThan(0)
     expect(screen.getAllByText('70').length).toBeGreaterThan(0)
     expect(screen.getAllByText('60').length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/100% de confianza/).length).toBeGreaterThan(0)
     expect(screen.getByText(/más valor de mercado/)).toBeInTheDocument()
     expect(screen.getByText('Quién opta')).toBeInTheDocument()
     expect(screen.getByText('Portería')).toBeInTheDocument()
     expect(screen.getByText('Defensa')).toBeInTheDocument()
     expect(screen.getByText('Medio')).toBeInTheDocument()
     expect(screen.getByText('Ataque')).toBeInTheDocument()
-    expect(screen.getAllByText('GK').length).toBeGreaterThan(0)
     expect(screen.getAllByText('CDM').length).toBeGreaterThan(0)
     expect(screen.getAllByText('CAM').length).toBeGreaterThan(0)
     expect(

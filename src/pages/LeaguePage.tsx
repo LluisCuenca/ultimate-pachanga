@@ -8,8 +8,7 @@ import {
   Trophy,
   Users,
 } from 'lucide-react'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { getAvatarUrl } from '@/lib/supabase'
+import { PlayerRow } from '@/components/PlayerRow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -55,26 +54,12 @@ function LeaderboardCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         {players.map((player, index) => (
-          <Link
+          <PlayerRow
             key={player.id}
-            to={`/players/${player.id}`}
-            className="leaderboard-row flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent/50"
-          >
-            <span className="numeric w-4 text-sm text-muted-foreground">
-              {index + 1}
-            </span>
-            <Avatar className="size-9 shrink-0">
-              <AvatarImage
-                src={getAvatarUrl(player.avatarPath) ?? undefined}
-                alt=""
-              />
-              <AvatarFallback>{player.displayName.slice(0, 2)}</AvatarFallback>
-            </Avatar>
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">
-              {player.displayName}
-            </span>
-            {renderValue(player)}
-          </Link>
+            player={player}
+            rank={index + 1}
+            value={renderValue(player)}
+          />
         ))}
       </CardContent>
     </Card>
@@ -123,7 +108,12 @@ export function LeaguePage() {
     queryFn: () => fetchPlayerCards(membership!.leagueId),
   })
 
-  const { data: matches, isPending: areMatchesPending } = useQuery({
+  const {
+    data: matches,
+    isPending: areMatchesPending,
+    error: matchesError,
+    refetch: refetchMatches,
+  } = useQuery({
     queryKey: matchKeys.list(membership?.leagueId ?? ''),
     enabled: Boolean(membership),
     queryFn: () => fetchMatches(membership!.leagueId),
@@ -195,7 +185,12 @@ export function LeaguePage() {
         ) : null}
       </div>
 
-      {areMatchesPending ? (
+      {matchesError && !matches ? (
+        <ErrorState
+          error={matchesError}
+          onRetry={() => void refetchMatches()}
+        />
+      ) : areMatchesPending ? (
         <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton className="h-40 rounded-xl" />
           <Skeleton className="h-40 rounded-xl" />
@@ -211,7 +206,7 @@ export function LeaguePage() {
             </section>
           ) : null}
           {nextMatch ? (
-            <section className="order-first flex flex-col gap-2">
+            <section className="league-next-match order-first flex flex-col gap-2">
               <h2 className="text-sm font-semibold tracking-wide text-primary uppercase">
                 Próximo partido
               </h2>
@@ -230,7 +225,7 @@ export function LeaguePage() {
           <Skeleton className="h-56 rounded-xl" />
           <Skeleton className="h-56 rounded-xl" />
         </div>
-      ) : playersError ? (
+      ) : playersError && !players ? (
         <ErrorState
           error={playersError}
           onRetry={() => void refetchPlayers()}

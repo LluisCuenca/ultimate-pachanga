@@ -2,6 +2,12 @@ import { Link } from 'react-router'
 import { formatScore } from '@/lib/formatting'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { ScoreStrip } from '@/components/ScoreStrip'
+import { Award } from 'lucide-react'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { PlayerCard } from '@/components/PlayerCard'
 import { MarketValue } from '@/components/MarketValue'
 import {
@@ -26,6 +32,13 @@ const CARD_FACE: Record<
   black: 'black',
   silver: 'legend',
   purple: 'purple',
+}
+
+const DISTINCTIONS: Record<IdealSevenCardStyle, string> = {
+  silver: 'Leyenda · Mayor valoración del siete ideal',
+  purple: 'Champán · Más premios MVP entre los restantes',
+  black: 'Élite · Mayor valor de mercado entre los restantes',
+  blue: 'Marfil · Seleccionado para el siete ideal',
 }
 
 interface IdealSevenPitchProps {
@@ -134,13 +147,31 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
                   </span>
                 </div>
                 <div className="ideal-selection-data">
+                  <MarketValue value={entry.player.marketValueGbp} />
+                </div>
+              </Link>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="ideal-distinction"
+                    aria-label={`Distinción de ${entry.player.displayName}`}
+                  >
+                    <Award className="size-4" aria-hidden="true" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="text-sm">
+                  {DISTINCTIONS[entry.cardStyle]}
+                  <p className="mt-3 font-semibold">
+                    Su mejor partido · {formatScore(entry.bestFinalScore)}{' '}
+                    puntos
+                  </p>
                   <ScoreStrip
                     metrics={metrics}
                     values={entry.bestMetricCardStats}
                   />
-                  <MarketValue value={entry.player.marketValueGbp} />
-                </div>
-              </Link>
+                </PopoverContent>
+              </Popover>
             </li>
           ))}
         </ol>

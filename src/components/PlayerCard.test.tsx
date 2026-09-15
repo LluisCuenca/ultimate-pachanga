@@ -179,10 +179,8 @@ describe('PlayerCard', () => {
 
       expect(screen.getByText('96')).toBeInTheDocument()
       expect(screen.getByText('Cas')).toBeInTheDocument()
-      expect(screen.getByText('David Castelló')).toBeInTheDocument()
-      expect(screen.getByText('CM')).toBeInTheDocument()
       expect(screen.getByText('DC')).toBeInTheDocument()
-      expect(screen.getByLabelText('Confianza 100%')).toBeInTheDocument()
+      expect(screen.queryByLabelText('Confianza 100%')).not.toBeInTheDocument()
     })
 
     // Seven of these share one pitch; the metric grid and market value are

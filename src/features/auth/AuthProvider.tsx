@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { AuthContext, type AuthContextValue } from './AuthContext'
+import { clearPageState } from '@/hooks/usePageState'
 import { supabase } from '@/lib/supabase'
 
 /**
@@ -28,7 +29,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Fires on sign-in, sign-out and token refresh, including in other tabs.
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, nextSession) => {
+      (event, nextSession) => {
+        if (event === 'SIGNED_OUT') clearPageState()
         setSession(nextSession)
       },
     )

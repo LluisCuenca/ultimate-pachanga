@@ -1,3 +1,4 @@
+import { BackButton } from '@/components/BackButton'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { MatchResultsGrid } from '@/components/MatchResultsGrid'
 import {
@@ -8,15 +9,7 @@ import {
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  ArrowLeft,
-  Info,
-  Download,
-  Pencil,
-  Upload,
-  UserPlus,
-  Users,
-} from 'lucide-react'
+import { Info, Download, Pencil, Upload, UserPlus, Users } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -138,13 +131,23 @@ export function MatchDetailPage() {
     queryFn: () => fetchMatch(matchId),
   })
 
-  const { data: squad = [], isPending: isSquadPending } = useQuery({
+  const {
+    data: squad = [],
+    isPending: isSquadPending,
+    error: squadError,
+    refetch: refetchSquad,
+  } = useQuery({
     queryKey: matchKeys.squad(matchId),
     enabled: Boolean(matchId),
     queryFn: () => fetchSquad(matchId),
   })
 
-  const { data: scores = [] } = useQuery({
+  const {
+    data: scores = [],
+    isPending: isScoresPending,
+    error: scoresError,
+    refetch: refetchScores,
+  } = useQuery({
     queryKey: matchKeys.scores(matchId),
     enabled: Boolean(matchId),
     queryFn: () => fetchMatchScores(matchId),
@@ -152,7 +155,12 @@ export function MatchDetailPage() {
 
   // Needed by every viewer now, not just administrators: the pitch renders
   // player cards, which come from this view rather than from the squad query.
-  const { data: players = [] } = useQuery({
+  const {
+    data: players = [],
+    isPending: isPlayersPending,
+    error: playersError,
+    refetch: refetchPlayers,
+  } = useQuery({
     queryKey: playerKeys.cards(membership?.leagueId ?? ''),
     enabled: Boolean(membership),
     queryFn: () => fetchPlayerCards(membership!.leagueId),
@@ -237,11 +245,24 @@ export function MatchDetailPage() {
    */
   const isUpcoming = isUpcomingMatch(match?.status)
   const canArrangeLineup = isAdmin || isUpcoming
-  const canManageSquad = isAdmin && isUpcoming
+  const canManageSquad =
+    isAdmin &&
+    isUpcoming &&
+    !isSquadPending &&
+    !isPlayersPending &&
+    !isScoresPending &&
+    !squadError &&
+    !playersError &&
+    !scoresError
   const isAlreadyCalledUp = squad.some(
     (member) => member.playerId === myPlayerId,
   )
-  const canJoin = isUpcoming && Boolean(myPlayerId) && !isAlreadyCalledUp
+  const canJoin =
+    isUpcoming &&
+    Boolean(myPlayerId) &&
+    !isAlreadyCalledUp &&
+    !isSquadPending &&
+    !squadError
 
   /**
    * A row of the results table.
@@ -526,8 +547,16 @@ export function MatchDetailPage() {
   )
 
   const resultsPanel =
-    resultRows.length > 0 ? (
-      <Card>
+    scoresError && scores.length === 0 ? (
+      <ErrorState
+        title="No se pudieron cargar los resultados"
+        error={scoresError}
+        onRetry={() => void refetchScores()}
+      />
+    ) : isScoresPending || isPlayersPending ? (
+      <Skeleton className="h-64 rounded-xl" />
+    ) : resultRows.length > 0 ? (
+      <Card className={!isUpcoming ? 'match-results-panel' : undefined}>
         <CardHeader>
           <CardTitle>
             <h2 id="match-results">Resultados</h2>
@@ -566,17 +595,7 @@ export function MatchDetailPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <Button
-        asChild
-        variant="ghost"
-        size="sm"
-        className="desktop-page-heading w-fit"
-      >
-        <Link to="/matches">
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          Partidos
-        </Link>
-      </Button>
+      <BackButton fallback="/matches" label="Volver" />
 
       <MatchHero match={match} />
 
@@ -600,7 +619,11 @@ export function MatchDetailPage() {
             {/* Once a match has been played its squad is closed to everybody, so
               there is nothing behind this button but a rejected write. */}
             {canManageSquad ? (
-              <Button variant="outline" onClick={openSquadSelector}>
+              <Button
+                variant="outline"
+                onClick={openSquadSelector}
+                disabled={persistLineup.isPending}
+              >
                 <Users className="size-4" aria-hidden="true" />
                 Convocatoria
               </Button>
@@ -611,7 +634,13 @@ export function MatchDetailPage() {
             </Button>
             <Button
               onClick={() => setIsUploadOpen(true)}
-              disabled={squad.length === 0}
+              disabled={
+                squad.length === 0 ||
+                isSquadPending ||
+                isScoresPending ||
+                Boolean(squadError) ||
+                Boolean(scoresError)
+              }
             >
               <Upload className="size-4" aria-hidden="true" />
               {match.status === 'scored'
@@ -713,14 +742,33 @@ export function MatchDetailPage() {
           {isUpcoming ? (
             <BalanceTeamsButton
               isAdmin={isAdmin}
-              hasEnoughPlayers={squad.length >= 2}
-              isPending={balance.isPending}
+              hasEnoughPlayers={
+                squad.length >= 2 &&
+                !isPlayersPending &&
+                !playersError &&
+                !squadError
+              }
+              isPending={
+                balance.isPending ||
+                persistLineup.isPending ||
+                persistFormation.isPending
+              }
               onBalance={() => balance.mutate()}
             />
           ) : null}
         </CardHeader>
         <CardContent>
-          {isSquadPending ? (
+          {squadError && squad.length === 0 ? (
+            <ErrorState
+              error={squadError}
+              onRetry={() => void refetchSquad()}
+            />
+          ) : playersError && players.length === 0 ? (
+            <ErrorState
+              error={playersError}
+              onRetry={() => void refetchPlayers()}
+            />
+          ) : isSquadPending || isPlayersPending ? (
             <div className="grid gap-4 sm:grid-cols-2">
               <Skeleton className="aspect-[1000/1250] rounded-xl" />
               <Skeleton className="aspect-[1000/1250] rounded-xl" />
@@ -744,12 +792,20 @@ export function MatchDetailPage() {
               awayTeamName={match.away_team_name}
               homeFormation={match.home_formation}
               awayFormation={match.away_formation}
-              interactive={canArrangeLineup}
-              canChangeFormation={isAdmin}
+              interactive={
+                canArrangeLineup &&
+                !persistFormation.isPending &&
+                !balance.isPending
+              }
+              canChangeFormation={
+                isAdmin &&
+                !persistLineup.isPending &&
+                !persistFormation.isPending
+              }
               onFormationChange={(side, formation) =>
                 persistFormation.mutate({ side, formation })
               }
-              onLineupChange={(changes) => persistLineup.mutate(changes)}
+              onLineupChange={(changes) => persistLineup.mutateAsync(changes)}
               valuation={valuation}
             />
           )}
@@ -763,7 +819,17 @@ export function MatchDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {isSquadPending ? (
+          {squadError && squad.length === 0 ? (
+            <ErrorState
+              error={squadError}
+              onRetry={() => void refetchSquad()}
+            />
+          ) : playersError && players.length === 0 ? (
+            <ErrorState
+              error={playersError}
+              onRetry={() => void refetchPlayers()}
+            />
+          ) : isSquadPending || isPlayersPending ? (
             <Skeleton className="h-24" />
           ) : squad.length === 0 ? (
             <EmptyState

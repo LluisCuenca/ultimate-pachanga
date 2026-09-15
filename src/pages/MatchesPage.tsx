@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { usePageState } from '@/hooks/usePageState'
 import { MatchArchive } from '@/components/MatchArchive'
 import { Link } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
@@ -46,7 +46,7 @@ export function MatchesPage() {
     error: leagueError,
     refetch: refetchLeague,
   } = useLeague()
-  const [shown, setShown] = useState(12)
+  const [shown, setShown] = usePageState('matches-shown', 12)
 
   const {
     data: matches,
@@ -90,7 +90,7 @@ export function MatchesPage() {
             <Skeleton key={index} className="h-32 rounded-xl" />
           ))}
         </div>
-      ) : error ? (
+      ) : error && !matches ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : (matches ?? []).length === 0 ? (
         <EmptyState

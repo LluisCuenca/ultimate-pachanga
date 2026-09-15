@@ -57,13 +57,12 @@ describe('MatchesPage archive', () => {
     await user.selectOptions(screen.getByLabelText('1. Año'), '2025')
     await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
-      screen.getByRole('option', { name: /Jornada 1 ·/ }),
+      screen.getByRole('link', { name: 'Ver Jornada 1' }),
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole('option', { name: /Jornada 18 ·/ }),
+      screen.queryByRole('link', { name: 'Ver Jornada 18' }),
     ).not.toBeInTheDocument()
     expect(screen.getByText('Jornada 19')).toBeInTheDocument()
-    await user.selectOptions(screen.getByLabelText('3. Jornada'), 'past-1')
     expect(screen.getByRole('link', { name: 'Ver Jornada 1' })).toHaveAttribute(
       'href',
       '/matches/past-1',
@@ -78,10 +77,10 @@ describe('MatchesPage archive', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
-      screen.getByRole('option', { name: /Jornada 18 ·/ }),
+      screen.getByRole('link', { name: 'Ver Jornada 18' }),
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole('option', { name: /Jornada 1 ·/ }),
+      screen.queryByRole('link', { name: 'Ver Jornada 1' }),
     ).not.toBeInTheDocument()
   })
   it('keeps all played matches below the archive, paginates and explains no search results', async () => {

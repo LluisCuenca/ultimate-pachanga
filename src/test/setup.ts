@@ -4,6 +4,7 @@ import { afterEach, vi } from 'vitest'
 
 afterEach(() => {
   cleanup()
+  sessionStorage.clear()
 })
 
 // jsdom implements neither of these, and Radix primitives (Select, Popover,

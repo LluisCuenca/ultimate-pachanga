@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { usePageState } from '@/hooks/usePageState'
 import { Link } from 'react-router'
 import { CalendarDays, Search, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,10 +14,9 @@ export function MatchArchive({
   matches: readonly MatchRow[]
   league?: { id: string; title: string }
 }) {
-  const [year, setYear] = useState('all')
-  const [query, setQuery] = useState('')
-  const [searched, setSearched] = useState(false)
-  const [matchId, setMatchId] = useState('')
+  const [year, setYear] = usePageState('archive-year', 'all')
+  const [query, setQuery] = usePageState('archive-query', '')
+  const [searched, setSearched] = usePageState('archive-searched', false)
   const scoped = matches.filter((match) => match.league_id === league?.id)
   const years = [
     ...new Set(scoped.map((match) => new Date(match.played_at).getFullYear())),
@@ -32,9 +31,7 @@ export function MatchArchive({
   )
   function resetSearch() {
     setSearched(false)
-    setMatchId('')
   }
-  const selected = filtered.find((match) => match.id === matchId)
   return (
     <section
       className="ranking-panel match-archive"
@@ -48,7 +45,6 @@ export function MatchArchive({
         onSubmit={(event) => {
           event.preventDefault()
           setSearched(true)
-          setMatchId('')
         }}
       >
         <div className="archive-selectors">
@@ -71,16 +67,10 @@ export function MatchArchive({
             </select>
           </div>
           <div className="archive-field">
-            <Label htmlFor="archive-league">2. Liga</Label>
-            <select
-              id="archive-league"
-              value={league?.id ?? ''}
-              disabled={!league}
-            >
-              <option value={league?.id ?? ''}>
-                {league?.title ?? 'Cargando liga…'}
-              </option>
-            </select>
+            <span className="text-sm font-medium">2. Liga</span>
+            <p className="archive-league-label">
+              {league?.title ?? 'Cargando liga…'}
+            </p>
           </div>
         </div>
         <div className="archive-field">
@@ -114,32 +104,35 @@ export function MatchArchive({
               : 'No hay partidos que coincidan'}
           </p>
           {filtered.length ? (
-            <>
-              <div className="archive-field">
-                <Label htmlFor="archive-match">3. Jornada</Label>
-                <select
-                  id="archive-match"
-                  value={matchId}
-                  onChange={(event) => setMatchId(event.target.value)}
-                >
-                  <option value="">Elige un partido</option>
-                  {filtered.map((match) => (
-                    <option key={match.id} value={match.id}>
-                      {match.title} ·{' '}
-                      {new Date(match.played_at).toLocaleDateString('es-ES')}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {selected ? (
-                <Button asChild variant="outline">
-                  <Link to={`/matches/${selected.id}`}>
-                    Ver {selected.title}
-                    <ArrowRight aria-hidden="true" />
-                  </Link>
-                </Button>
-              ) : null}
-            </>
+            <div>
+              <h3 className="mb-2 text-sm font-semibold">
+                3. Elige una jornada
+              </h3>
+              <ul className="archive-match-list">
+                {filtered.map((match) => (
+                  <li key={match.id}>
+                    <Link
+                      to={`/matches/${match.id}`}
+                      aria-label={`Ver ${match.title}`}
+                    >
+                      <span>
+                        <strong>{match.title}</strong>
+                        <span className="block text-sm text-muted-foreground">
+                          {new Date(match.played_at).toLocaleDateString(
+                            'es-ES',
+                          )}{' '}
+                          · {match.home_team_name} / {match.away_team_name}
+                        </span>
+                      </span>
+                      <ArrowRight
+                        className="size-4 shrink-0"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground">
               Prueba otro año o cambia la búsqueda.

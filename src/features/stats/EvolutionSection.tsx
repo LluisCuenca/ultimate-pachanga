@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { usePageState } from '@/hooks/usePageState'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { LineChart } from 'lucide-react'
 import {
@@ -8,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ErrorState } from '@/components/ErrorState'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/EmptyState'
 import { EvolutionChart } from '@/features/stats/EvolutionChart'
@@ -39,7 +41,7 @@ const SERIES_COLORS = [
 ]
 
 const MAXIMUM_SERIES = SERIES_COLORS.length
-const DEFAULT_SERIES = 7
+const DEFAULT_SERIES = 3
 
 /** The rating is bounded at 45 and 99; the axis gives it a little air. */
 const RATING_DOMAIN: [number, number] = [40, 100]
@@ -77,7 +79,7 @@ interface EvolutionSectionProps {
 /**
  * How the squad's numbers moved over the season.
  *
- * Opens on the seven most valuable players, because a chart of the whole league
+ * Opens on the three most valuable players, because a chart of the whole league
  * is a hairball and the expensive players are the ones a reader recognises.
  */
 export function EvolutionSection({
@@ -86,15 +88,25 @@ export function EvolutionSection({
   metrics,
 }: EvolutionSectionProps) {
   const rankedPlayers = useMemo(() => byMarketValue(players), [players])
-  const [seriesCode, setSeriesCode] = useState(RATING_SERIES_CODE)
-
-  const [selection, setSelection] = useState<SeriesSlot[]>(() =>
-    byMarketValue(players)
-      .slice(0, DEFAULT_SERIES)
-      .map((player, slot) => ({ playerId: player.id, slot })),
+  const [seriesCode, setSeriesCode] = usePageState(
+    'evolution-metric',
+    RATING_SERIES_CODE,
   )
 
-  const { data: timeline, isPending } = useQuery({
+  const [selection, setSelection] = usePageState<SeriesSlot[]>(
+    'evolution-selection',
+    () =>
+      byMarketValue(players)
+        .slice(0, DEFAULT_SERIES)
+        .map((player, slot) => ({ playerId: player.id, slot })),
+  )
+
+  const {
+    data: timeline,
+    isPending,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: statsKeys.timeline(leagueId),
     queryFn: () => fetchScoreTimeline(leagueId),
   })
@@ -164,6 +176,9 @@ export function EvolutionSection({
   }
 
   if (isPending) return <Skeleton className="h-96 rounded-xl" />
+
+  if (error && !timeline)
+    return <ErrorState error={error} onRetry={() => void refetch()} />
 
   if (rows.length === 0) {
     return (

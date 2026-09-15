@@ -53,12 +53,12 @@ export function PlayerHistory({
                   {formatScore(entry.finalScore)}
                 </strong>
               </div>
-              <ScoreExtras
-                base={entry.baseScore}
-                victory={entry.victory}
-                attributes={entry.attributes}
-              />
             </Link>
+            <ScoreExtras
+              base={entry.baseScore}
+              victory={entry.victory}
+              attributes={entry.attributes}
+            />
           </li>
         ))}
       </ol>

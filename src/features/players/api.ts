@@ -1,5 +1,6 @@
 import { supabase, PLAYER_AVATARS_BUCKET } from '@/lib/supabase'
-import { toImageExtension } from '@/lib/images'
+import { refreshAvatar } from '@/lib/avatarRevision'
+import { preparePhoto, toImageExtension } from '@/lib/images'
 import {
   toPlayerCardData,
   type PlayerCardData,
@@ -273,6 +274,7 @@ async function uploadAvatarObject(
     .upload(path, file, { upsert: true, contentType: file.type })
 
   if (error) throw error
+  refreshAvatar(path)
   return path
 }
 
@@ -282,6 +284,7 @@ export async function uploadPlayerAvatar(
   playerId: string,
   file: File,
 ): Promise<string> {
+  file = await preparePhoto(file)
   const extension = toImageExtension(file)
   const path = await uploadAvatarObject(leagueId, playerId, file, extension)
 
@@ -307,6 +310,7 @@ export async function uploadOwnPlayerAvatar(
   playerId: string,
   file: File,
 ): Promise<string> {
+  file = await preparePhoto(file)
   const extension = toImageExtension(file)
   await uploadAvatarObject(leagueId, playerId, file, extension)
 

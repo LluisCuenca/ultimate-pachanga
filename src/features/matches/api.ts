@@ -1,5 +1,5 @@
 import { supabase, MATCH_PHOTOS_BUCKET } from '@/lib/supabase'
-import { toImageExtension } from '@/lib/images'
+import { preparePhoto, toImageExtension } from '@/lib/images'
 import type { Formation, SquadSize } from '@/lib/formations'
 import type { Json } from '@/types/database'
 import type {
@@ -224,6 +224,8 @@ export async function uploadMatchPhoto(
   matchId: string,
   file: File,
 ): Promise<string> {
+  toImageExtension(file)
+  file = await preparePhoto(file, 1920)
   const extension = toImageExtension(file)
   const path = `${leagueId}/${matchId}.${extension}`
 

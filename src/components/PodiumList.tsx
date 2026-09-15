@@ -1,8 +1,5 @@
-import { Link } from 'react-router'
+import { PlayerRow } from '@/components/PlayerRow'
 import { Medal } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getAvatarUrl } from '@/lib/supabase'
-import { toInitials } from '@/lib/formatting'
 import { cn } from '@/lib/utils'
 import type { PlayerCardData } from '@/types/domain'
 
@@ -57,51 +54,15 @@ export function PodiumList({
 
   return (
     <ol className="flex flex-col divide-y divide-border/50">
-      {players.map((player, position) => {
-        const avatarUrl = getAvatarUrl(player.avatarPath)
-
-        return (
-          <li
-            key={player.id}
-            data-testid={`podium-row-${position}`}
-            className="leaderboard-row flex items-center gap-3 rounded-md px-2 py-1.5"
-          >
-            <PodiumRank position={position} />
-
-            <Link
-              to={`/players/${player.id}`}
-              className="flex min-w-0 flex-1 items-center gap-3 hover:underline"
-            >
-              <Avatar className="size-9 shrink-0">
-                {avatarUrl ? (
-                  <AvatarImage
-                    src={avatarUrl}
-                    alt=""
-                    className="object-cover"
-                    loading="lazy"
-                  />
-                ) : null}
-                <AvatarFallback className="text-[0.625rem]">
-                  {toInitials(
-                    player.firstName,
-                    player.lastName,
-                    player.displayName,
-                  )}
-                </AvatarFallback>
-              </Avatar>
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-medium">
-                  {player.displayName}
-                </span>
-              </span>
-            </Link>
-
-            <span className="numeric shrink-0 text-sm font-bold">
-              {renderValue(player)}
-            </span>
-          </li>
-        )
-      })}
+      {players.map((player, position) => (
+        <li key={player.id} data-testid={`podium-row-${position}`}>
+          <PlayerRow
+            player={player}
+            rank={<PodiumRank position={position} />}
+            value={renderValue(player)}
+          />
+        </li>
+      ))}
     </ol>
   )
 }
