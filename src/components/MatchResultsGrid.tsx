@@ -36,7 +36,7 @@ export function MatchResultsGrid({
         </colgroup>
         <thead>
           <tr>
-            <th scope="col">Foto</th>
+            <th scope="col">Jugador</th>
             {metrics.map((metric) => (
               <th scope="col" key={metric.code}>
                 <abbr title={metric.label}>{metricInitial(metric)}</abbr>
