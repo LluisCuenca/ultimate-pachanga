@@ -135,14 +135,12 @@ export function LeaguePage() {
     .sort((left, right) => right.marketValueGbp - left.marketValueGbp)
     .slice(0, LEADERBOARD_SIZE)
 
-  // Ranked by the rate that is on show, not by the raw total — a board that
-  // sorts by one number and prints another is a bug waiting to be reported.
-  // Matches played breaks ties, so a perfect record over more games wins.
+  // “Más victoriosos” means the absolute number of victories. Matches played
+  // breaks ties so the longer record appears first when totals are equal.
   const topByVictories = [...rankedPlayers]
     .sort(
       (left, right) =>
-        right.totalVictories / right.matchesPlayed -
-          left.totalVictories / left.matchesPlayed ||
+        right.totalVictories - left.totalVictories ||
         right.matchesPlayed - left.matchesPlayed,
     )
     .slice(0, LEADERBOARD_SIZE)
