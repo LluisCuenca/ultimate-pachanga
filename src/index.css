@@ -803,7 +803,7 @@
   padding: 1.5rem;
 }
 .ideal-promo-content > div:first-child {
-  text-align: center;
+  text-align: left;
 }
 .ideal-promo h2 {
   display: flex;

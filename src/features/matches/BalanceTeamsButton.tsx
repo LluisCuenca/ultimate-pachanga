@@ -50,6 +50,7 @@ export function BalanceTeamsButton({
             type="button"
             variant={blockedReason ? 'outline' : 'default'}
             size="sm"
+            className="w-full"
             disabled={Boolean(blockedReason) || isPending}
             onClick={onBalance}
             data-testid="balance-teams"

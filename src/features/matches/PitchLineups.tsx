@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { MousePointerClick } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -90,6 +91,7 @@ interface PitchLineupsProps {
   onFormationChange: (side: 'home' | 'away', formation: Formation) => void
   /** Called with only the players whose side or slot actually changed. */
   onLineupChange: (changes: LineupChange[]) => void | Promise<unknown>
+  balanceAction?: ReactNode
   /**
    * Whether the values being summed are the ones frozen at kickoff or today's.
    *
@@ -110,6 +112,7 @@ export function PitchLineups({
   canChangeFormation,
   onFormationChange,
   onLineupChange,
+  balanceAction,
   valuation,
 }: PitchLineupsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -292,7 +295,26 @@ export function PitchLineups({
   return (
     <div ref={containerRef} className="flex flex-col gap-4">
       {interactive ? (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold">Alineaciones</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {balanceAction}
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                disabled={saving}
+                aria-pressed={editing}
+                onClick={() => {
+                  swapping.clearSelection()
+                  setEditing(!editing)
+                }}
+              >
+                {editing ? 'Terminar edición' : 'Editar alineación'}
+              </Button>
+            </div>
+          </div>
           <p
             role={saving ? 'status' : undefined}
             aria-live="polite"
@@ -306,18 +328,6 @@ export function PitchLineups({
                   : 'Selecciona dos jugadores para intercambiar.'
                 : ''}
           </p>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={saving}
-            aria-pressed={editing}
-            onClick={() => {
-              swapping.clearSelection()
-              setEditing(!editing)
-            }}
-          >
-            {editing ? 'Terminar edición' : 'Editar alineación'}
-          </Button>
         </div>
       ) : null}
       {canInteract ? (

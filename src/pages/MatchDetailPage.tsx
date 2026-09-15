@@ -738,23 +738,6 @@ export function MatchDetailPage() {
               ) : null}
             </div>
           </CardTitle>
-          {isUpcoming ? (
-            <BalanceTeamsButton
-              isAdmin={isAdmin}
-              hasEnoughPlayers={
-                squad.length >= 2 &&
-                !isPlayersPending &&
-                !playersError &&
-                !squadError
-              }
-              isPending={
-                balance.isPending ||
-                persistLineup.isPending ||
-                persistFormation.isPending
-              }
-              onBalance={() => balance.mutate()}
-            />
-          ) : null}
         </CardHeader>
         <CardContent>
           {squadError && squad.length === 0 ? (
@@ -805,6 +788,25 @@ export function MatchDetailPage() {
                 persistFormation.mutate({ side, formation })
               }
               onLineupChange={(changes) => persistLineup.mutateAsync(changes)}
+              balanceAction={
+                isUpcoming ? (
+                  <BalanceTeamsButton
+                    isAdmin={isAdmin}
+                    hasEnoughPlayers={
+                      squad.length >= 2 &&
+                      !isPlayersPending &&
+                      !playersError &&
+                      !squadError
+                    }
+                    isPending={
+                      balance.isPending ||
+                      persistLineup.isPending ||
+                      persistFormation.isPending
+                    }
+                    onBalance={() => balance.mutate()}
+                  />
+                ) : undefined
+              }
               valuation={valuation}
             />
           )}
@@ -842,7 +844,7 @@ export function MatchDetailPage() {
               className="border-0 py-6"
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               {[
                 { title: match.home_team_name, members: homeSquad },
                 { title: match.away_team_name, members: awaySquad },
@@ -851,13 +853,13 @@ export function MatchDetailPage() {
                 .filter((group) => group.members.length > 0)
                 .map((group) => (
                   <div key={group.title}>
-                    <h3 className="mb-2 text-sm font-semibold">
+                    <h3 className="mb-1 border-b border-border/70 pb-1 text-sm font-bold text-primary">
                       {group.title}{' '}
                       <span className="numeric font-normal text-muted-foreground">
                         ({group.members.length})
                       </span>
                     </h3>
-                    <ul className="flex flex-col gap-1">
+                    <ul className="flex flex-col gap-0">
                       {group.members.map((member) => (
                         <li
                           key={member.playerId}
