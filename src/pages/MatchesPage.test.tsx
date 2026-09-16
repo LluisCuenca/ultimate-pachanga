@@ -92,15 +92,16 @@ describe('MatchesPage archive', () => {
       ),
     )
     renderWithProviders(<MatchesPage />)
-    await screen.findByText('Jornada 15')
-    expect(screen.getAllByRole('link')).toHaveLength(12)
+    await screen.findAllByText('Jornada 15')
+    expect(screen.getByText('Último partido')).toBeInTheDocument()
+    expect(screen.getAllByRole('link')).toHaveLength(13)
     await user.click(screen.getByRole('button', { name: /Ver más partidos/ }))
-    expect(screen.getAllByRole('link')).toHaveLength(15)
+    expect(screen.getAllByRole('link')).toHaveLength(16)
     await user.type(screen.getByLabelText('Buscar jornada'), 'inexistente')
     await user.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
     expect(
       screen.getByText('No hay partidos que coincidan'),
     ).toBeInTheDocument()
-    expect(screen.getAllByRole('link')).toHaveLength(15)
+    expect(screen.getAllByRole('link')).toHaveLength(16)
   })
 })

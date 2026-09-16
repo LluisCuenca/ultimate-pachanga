@@ -100,18 +100,30 @@ export function MatchesPage() {
         />
       ) : (
         <>
-          <MatchSection
-            title="Próximo partido"
-            matches={upcoming.slice(0, 1)}
-          />
-          {leagueError ? (
-            <ErrorState
-              error={leagueError}
-              onRetry={() => void refetchLeague()}
-            />
-          ) : (
-            <MatchArchive matches={past} league={league} />
-          )}
+          <div className="matches-desktop-overview">
+            <div className="matches-featured">
+              <MatchSection
+                title="Próximo partido"
+                matches={upcoming.slice(0, 1)}
+              />
+              {upcoming.length === 0 && past.length > 0 ? (
+                <div className="hidden lg:block">
+                  <MatchSection
+                    title="Último partido"
+                    matches={past.slice(0, 1)}
+                  />
+                </div>
+              ) : null}
+            </div>
+            {leagueError ? (
+              <ErrorState
+                error={leagueError}
+                onRetry={() => void refetchLeague()}
+              />
+            ) : (
+              <MatchArchive matches={past} league={league} />
+            )}
+          </div>
           <MatchSection
             title="Más próximos partidos"
             matches={upcoming.slice(1)}

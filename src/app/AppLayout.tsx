@@ -12,6 +12,8 @@ import {
   Menu,
 } from 'lucide-react'
 import { Brand } from '@/components/Brand'
+import { PlayerAvatar } from '@/components/PlayerAvatar'
+import { useMyPlayerId } from '@/features/players/useMyPlayer'
 import {
   Sheet,
   SheetTrigger,
@@ -89,6 +91,12 @@ const PAGE_TITLES: Record<string, string> = {
 }
 
 export function AppLayout() {
+  const { data: myPlayerId } = useMyPlayerId()
+  const { data: myPlayer } = useQuery({
+    queryKey: playerKeys.card(myPlayerId ?? ''),
+    enabled: Boolean(myPlayerId),
+    queryFn: () => fetchPlayerCard(myPlayerId!),
+  })
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname } = useLocation()
   useAppMotion(pathname)
@@ -122,19 +130,24 @@ export function AppLayout() {
         Saltar al contenido
       </a>
       <aside className="app-sidebar">
-        <Link to="/league" className="flex items-center gap-3">
+        <Link
+          to="/league"
+          className="sidebar-brand"
+          aria-label="Ultimate Pachangas — Liga"
+        >
           <Brand />
-          <div className="brand-wordmark">
-            <span>Ultimate</span>Pachangas
-          </div>
         </Link>
         <nav aria-label="Navegación principal" className="flex flex-col gap-2">
           <NavigationLinks items={NAVIGATION} />
         </nav>
         <div className="mt-auto">
-          <NavigationLinks
-            items={[{ to: '/profile', label: 'Mi perfil', icon: UserRound }]}
-          />
+          <NavLink to="/profile" className={navigationLinkClasses}>
+            <PlayerAvatar
+              name={myPlayer?.displayName ?? 'Mi perfil'}
+              path={myPlayer?.avatarPath}
+            />
+            Mi perfil
+          </NavLink>
         </div>
       </aside>
       <header className="app-topbar">

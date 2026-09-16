@@ -594,13 +594,18 @@
 .onboarding-layout > [data-slot='card'] {
   border-top: 2px solid var(--tier-gold);
 }
+.matches-desktop-overview,
+.matches-featured {
+  display: contents;
+}
 @media (min-width: 1024px) {
   .app-sidebar {
     display: flex;
     position: fixed;
     inset: 0 auto 0 0;
     z-index: 45;
-    width: 14rem;
+    width: 17rem;
+    overflow-y: auto;
     flex-direction: column;
     gap: 2rem;
     padding: 1.75rem 1rem;
@@ -608,14 +613,47 @@
     border-right: 1px solid var(--border);
   }
   .app-topbar {
-    margin-left: 14rem;
+    display: none;
+  }
+  .sidebar-brand {
+    display: block;
+    flex-shrink: 0;
+  }
+  .sidebar-brand .brand-crest {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .app-sidebar nav {
+    flex-shrink: 0;
+  }
+  .app-sidebar > div:last-child {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .matches-desktop-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .matches-featured {
+    display: block;
+    min-width: 0;
+  }
+  .matches-featured section > .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .matches-desktop-overview .archive-results {
+    max-height: 24rem;
+    overflow-y: auto;
   }
   .app-topbar-inner {
     padding-inline: 2rem;
   }
   .app-main {
-    margin-left: 14rem;
-    width: calc(100% - 14rem);
+    margin-left: 17rem;
+    width: calc(100% - 17rem);
     max-width: 90rem;
     padding: 2rem 2rem 3rem;
   }
