@@ -67,7 +67,7 @@ export function MatchArchive({
         <div className="archive-results">
           <p role="status" className="text-sm text-muted-foreground">
             {filtered.length
-              ? `${filtered.length} jornadas encontradas`
+              ? `${filtered.length} ${filtered.length === 1 ? 'jornada encontrada' : 'jornadas encontradas'}`
               : 'No hay partidos que coincidan'}
           </p>
           {filtered.length ? (

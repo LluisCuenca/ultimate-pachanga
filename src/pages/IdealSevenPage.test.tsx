@@ -87,11 +87,18 @@ const BEST_SCORES: BestPlayerScore[] = PLAYERS.map((entry) => ({
   metricScores: { attack: 9, defence: 8, tactics: 7, physical: 6 },
 }))
 
-function renderPage(players = PLAYERS) {
+function renderPage(
+  players = PLAYERS,
+  metricsState: Record<string, unknown> = {},
+) {
   useMembership.mockReturnValue({
     data: { leagueId: TEST_LEAGUE_ID, role: 'member' },
   })
-  useLeagueMetrics.mockReturnValue({ data: TEST_METRICS })
+  useLeagueMetrics.mockReturnValue({
+    data: TEST_METRICS,
+    refetch: vi.fn(),
+    ...metricsState,
+  })
   fetchPlayerCards.mockResolvedValue(players)
   fetchBestPlayerScores.mockResolvedValue(BEST_SCORES)
 
@@ -130,11 +137,13 @@ describe('IdealSevenPage', () => {
     expect(screen.getByText('Ataque')).toBeInTheDocument()
     expect(screen.getAllByText('CDM').length).toBeGreaterThan(0)
     expect(screen.getAllByText('CAM').length).toBeGreaterThan(0)
+    expect(screen.getByText(/Mayor valoración del 7 ideal/)).toBeInTheDocument()
     expect(
-      screen.getByText(/Leyenda: mejor valoración total/),
+      screen.getByText(/Más premios MVP entre los restantes/),
     ).toBeInTheDocument()
-    expect(screen.getByText(/MVP: más MVPs/)).toBeInTheDocument()
-    expect(screen.getByText(/Defensa: mejor defensa/)).toBeInTheDocument()
+    expect(
+      screen.getAllByText(/Mejor defensa entre los restantes/).length,
+    ).toBeGreaterThan(0)
     expect(
       screen.queryByRole('link', { name: 'Ver ficha de 99' }),
     ).not.toBeInTheDocument()
@@ -154,5 +163,26 @@ describe('IdealSevenPage', () => {
     expect(
       await screen.findByText('No hay 7 ideal todavía'),
     ).toBeInTheDocument()
+  })
+  it('shows metric failures as errors and retries instead of reporting an empty team', async () => {
+    const refetch = vi.fn()
+    renderPage(PLAYERS, {
+      data: undefined,
+      isPending: false,
+      error: new Error('Métricas no disponibles'),
+      refetch,
+    })
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Métricas no disponibles',
+    )
+    expect(screen.queryByText('No hay 7 ideal todavía')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
+    expect(refetch).toHaveBeenCalledOnce()
+  })
+
+  it('waits for metrics rather than presenting an empty team', () => {
+    renderPage(PLAYERS, { data: undefined, isPending: true })
+    expect(screen.queryByText('No hay 7 ideal todavía')).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })

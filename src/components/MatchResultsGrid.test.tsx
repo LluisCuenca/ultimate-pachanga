@@ -31,7 +31,17 @@ describe('MatchResultsGrid', () => {
     expect(table.getAllByRole('row')).toHaveLength(2)
     expect(
       table.getAllByRole('columnheader').map((cell) => cell.textContent),
-    ).toEqual(['Jugador', 'A', 'D', 'T', 'F', 'G', 'B', 'V', 'Final'])
+    ).toEqual([
+      'Jugador',
+      'AAtaque',
+      'DDefensa',
+      'TTáctica',
+      'FFísico',
+      'GGoles',
+      'BBase',
+      'VVictorias',
+      'Final',
+    ])
     expect(table.getAllByRole('row')[1].textContent).toContain('678927,519,5')
     expect(table.getByRole('link', { name: /Luis Iniesta/ })).toHaveAttribute(
       'href',

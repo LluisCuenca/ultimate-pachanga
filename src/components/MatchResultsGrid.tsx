@@ -5,6 +5,17 @@ import { compactScore, metricInitial } from '@/lib/scorePresentation'
 import type { LeagueMetricRow } from '@/types/domain'
 import type { MatchScoreEntry } from '@/features/matches/api'
 
+function ResultHeading({ label, short }: { label: string; short: string }) {
+  return (
+    <>
+      <abbr title={label} className="result-heading-short">
+        {short}
+      </abbr>
+      <span className="result-heading-full">{label}</span>
+    </>
+  )
+}
+
 export interface MatchResultGridRow {
   playerId: string
   displayName: string
@@ -25,7 +36,7 @@ export function MatchResultsGrid({
     <div className="match-score-grid">
       <table aria-label="Puntuaciones de los jugadores">
         <colgroup>
-          <col style={{ width: '14%' }} />
+          <col className="result-player-column" />
           {metrics.map((metric) => (
             <col key={metric.code} />
           ))}
@@ -39,17 +50,20 @@ export function MatchResultsGrid({
             <th scope="col">Jugador</th>
             {metrics.map((metric) => (
               <th scope="col" key={metric.code}>
-                <abbr title={metric.label}>{metricInitial(metric)}</abbr>
+                <ResultHeading
+                  label={metric.label}
+                  short={metricInitial(metric)}
+                />
               </th>
             ))}
             <th scope="col">
-              <abbr title="Goles">G</abbr>
+              <ResultHeading label="Goles" short="G" />
             </th>
             <th scope="col">
-              <abbr title="Base">B</abbr>
+              <ResultHeading label="Base" short="B" />
             </th>
             <th scope="col">
-              <abbr title="Victorias">V</abbr>
+              <ResultHeading label="Victorias" short="V" />
             </th>
             <th scope="col">Final</th>
           </tr>
@@ -68,7 +82,9 @@ export function MatchResultsGrid({
                     path={row.avatarPath}
                     className="size-9"
                   />
-                  <span className="sr-only">{row.displayName}</span>
+                  <span className="result-player-name sr-only lg:not-sr-only">
+                    {row.displayName}
+                  </span>
                 </Link>
                 {row.action}
               </th>

@@ -6,6 +6,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Award } from 'lucide-react'
+import { AwardIcon } from '@/components/AwardIcon'
 import { metricInitial, compactScore } from '@/lib/scorePresentation'
 import { formatScore, formatVictories } from '@/lib/formatting'
 import type { LeagueMetricRow } from '@/types/domain'
@@ -68,7 +69,10 @@ export function ScoreExtras({
             <p className="mb-2 font-bold">Atributos del partido</p>
             <ul className="space-y-2">
               {attributes.map((attribute, index) => (
-                <li key={index}>{attribute.label}</li>
+                <li key={index} className="flex items-center gap-2">
+                  <AwardIcon label={attribute.label} />
+                  {attribute.label}
+                </li>
               ))}
             </ul>
           </PopoverContent>
@@ -135,7 +139,10 @@ export function ScoreDetails({
         {attributes.length > 0 && (
           <ul className="mt-3 space-y-2">
             {attributes.map((attribute, index) => (
-              <li key={index}>{attribute.label}</li>
+              <li key={index} className="flex items-center gap-2">
+                <AwardIcon label={attribute.label} />
+                {attribute.label}
+              </li>
             ))}
           </ul>
         )}

@@ -12,31 +12,7 @@ import {
 } from '@/features/league/idealSeven'
 import { IdealSevenPitch } from '@/features/league/IdealSevenPitch'
 import { useLeagueMetrics, useMembership } from '@/features/league/useLeague'
-import { cn } from '@/lib/utils'
-
-const COLOR_LEGEND = [
-  {
-    label: 'Plata',
-    className: 'border-[var(--ideal-legend)] bg-card',
-    description: 'Leyenda: mejor valoración total del 7 ideal.',
-  },
-  {
-    label: 'Champán',
-    className: 'border-[var(--ideal-champagne)] bg-card',
-    description:
-      'MVP: más MVPs entre los que no son Leyenda. Empata la mejor valoración.',
-  },
-  {
-    label: 'Dorada',
-    className: 'border-[var(--ideal-elite)] bg-card',
-    description: 'Defensa: mejor defensa entre los que no son Leyenda ni MVP.',
-  },
-  {
-    label: 'Marfil',
-    className: 'border-[var(--ideal-ivory)] bg-card',
-    description: 'Resto de jugadores elegidos para el equipo.',
-  },
-]
+import { IDEAL_DISTINCTIONS } from '@/features/league/idealSevenPresentation'
 
 const LINE_ELIGIBILITY: {
   label: string
@@ -68,7 +44,12 @@ const LINE_ELIGIBILITY: {
 
 export function IdealSevenPage() {
   const { data: membership } = useMembership()
-  const { data: metrics = [] } = useLeagueMetrics()
+  const {
+    data: metrics = [],
+    isPending: areMetricsPending,
+    error: metricsError,
+    refetch: refetchMetrics,
+  } = useLeagueMetrics()
 
   const {
     data: players,
@@ -125,25 +106,28 @@ export function IdealSevenPage() {
   )
 
   const isPending =
-    arePlayersPending || (eligiblePlayerIds.length > 0 && areBestScoresPending)
-  const error = playersError ?? bestScoresError
+    arePlayersPending ||
+    areMetricsPending ||
+    (eligiblePlayerIds.length > 0 && areBestScoresPending)
+  const error = metricsError ?? playersError ?? bestScoresError
 
   return (
     <div className="flex flex-col gap-5">
       <h1 className="page-heading text-2xl font-bold">7 ideal</h1>
-      {isPending ? (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <Skeleton className="h-[32rem] rounded-xl" />
-          <Skeleton className="h-56 rounded-xl" />
-        </div>
-      ) : error ? (
+      {error ? (
         <ErrorState
           error={error}
           onRetry={() => {
             void refetchPlayers()
             void refetchBestScores()
+            void refetchMetrics()
           }}
         />
+      ) : isPending ? (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <Skeleton className="h-[32rem] rounded-xl" />
+          <Skeleton className="h-56 rounded-xl" />
+        </div>
       ) : !lineup ? (
         <EmptyState
           icon={Users}
@@ -229,13 +213,11 @@ export function IdealSevenPage() {
                     Distinciones
                   </h3>
                   <ul className="flex flex-col gap-2">
-                    {COLOR_LEGEND.map((item) => (
+                    {Object.values(IDEAL_DISTINCTIONS).map((item) => (
                       <li key={item.label} className="flex items-start gap-2">
-                        <span
-                          className={cn(
-                            'mt-0.5 size-4 shrink-0 rounded border',
-                            item.className,
-                          )}
+                        <item.icon
+                          className="mt-0.5 size-4 shrink-0"
+                          style={{ color: item.color }}
                           aria-hidden="true"
                         />
                         <span>

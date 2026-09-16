@@ -56,6 +56,7 @@ it('finds an exact round number across years without year or league selectors', 
     '5',
   )
   await userEvent.click(screen.getByRole('button', { name: 'Buscar jornadas' }))
+  expect(screen.getByRole('status')).toHaveTextContent('1 jornada encontrada')
   expect(screen.getByRole('link', { name: 'Ver Jornada 5' })).toHaveAttribute(
     'href',
     '/matches/five',

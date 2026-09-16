@@ -38,7 +38,7 @@ describe('BalanceTeamsButton', () => {
     const { onBalance, button } = renderButton({ isAdmin: false })
 
     expect(button).toBeVisible()
-    expect(button).toBeDisabled()
+    expect(button).toBeEnabled()
 
     await user.click(button)
     expect(onBalance).not.toHaveBeenCalled()
@@ -48,7 +48,7 @@ describe('BalanceTeamsButton', () => {
     const user = userEvent.setup()
     renderButton({ isAdmin: false })
 
-    await user.hover(screen.getByTestId('balance-teams').parentElement!)
+    await user.click(screen.getByTestId('balance-teams'))
 
     expect(
       await screen.findByText(
@@ -57,10 +57,13 @@ describe('BalanceTeamsButton', () => {
     ).toBeInTheDocument()
   })
 
-  it('waits for a squad worth splitting', () => {
-    const { button } = renderButton({ hasEnoughPlayers: false })
-
-    expect(button).toBeDisabled()
+  it('explains an insufficient squad without starting a balance', async () => {
+    const { button, onBalance } = renderButton({ hasEnoughPlayers: false })
+    await userEvent.click(button)
+    expect(
+      screen.getByText(/Convoca al menos dos jugadores/),
+    ).toBeInTheDocument()
+    expect(onBalance).not.toHaveBeenCalled()
   })
 
   it('is inert while the split is being written', () => {

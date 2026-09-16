@@ -1,3 +1,4 @@
+import { AwardIcon } from '@/components/AwardIcon'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { formatAttributePoints } from '@/lib/formatting'
@@ -42,6 +43,10 @@ export function AttributeBadge({
         className,
       )}
     >
+      <AwardIcon
+        label={label}
+        className={isPenalty ? 'text-current' : undefined}
+      />
       <span>{label}</span>
       {count !== undefined && count > 1 ? (
         <span className="numeric opacity-70">×{count}</span>

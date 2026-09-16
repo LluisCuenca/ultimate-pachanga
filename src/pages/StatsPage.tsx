@@ -1,7 +1,8 @@
 import { usePageState } from '@/hooks/usePageState'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Trophy, TrendingUp, Target, Flame, Shield, Award } from 'lucide-react'
+import { AwardIcon } from '@/components/AwardIcon'
+import { Trophy, TrendingUp, Target, Flame, Shield } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -253,7 +254,7 @@ export function StatsPage() {
                   className="ranking-panel flex flex-col gap-3"
                 >
                   <h2 className="flex items-center gap-2 text-base font-bold">
-                    <Award className="size-4 text-primary" aria-hidden="true" />
+                    <AwardIcon label={attribute.label} />
                     {attribute.label}
                   </h2>
                   {holders.length === 0 ? (

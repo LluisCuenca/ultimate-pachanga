@@ -1,27 +1,13 @@
 import { Lock, Scale } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-
-/**
- * "Equilibrar equipos": splits the convocatoria into two sides of equal market
- * value.
- *
- * Offered to everyone and enabled for administrators only. Showing it locked
- * rather than hiding it is the point — the button is how anyone finds out the
- * feature exists, and a tooltip saying whose call it is answers the question
- * before it is asked. Hiding it would just produce "can we not balance the
- * teams?" in the group chat.
- *
- * The arithmetic it triggers lives in src/lib/teamBalance.ts.
- */
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 interface BalanceTeamsButtonProps {
   isAdmin: boolean
-  /** False until there are at least two players to distribute. */
   hasEnoughPlayers: boolean
   isPending: boolean
   onBalance: () => void
@@ -39,36 +25,43 @@ export function BalanceTeamsButton({
       ? 'Convoca al menos dos jugadores para poder repartirlos.'
       : null
 
-  return (
-    <Tooltip>
-      {/* A disabled button emits no pointer events, so the tooltip hangs off a
-          wrapper that does. Focusable, or the explanation would be unreachable
-          by keyboard. */}
-      <TooltipTrigger asChild>
-        <span className="inline-flex" tabIndex={blockedReason ? 0 : -1}>
+  if (blockedReason)
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
           <Button
             type="button"
-            variant={blockedReason ? 'outline' : 'default'}
+            variant="outline"
             size="sm"
-            className="w-full"
-            disabled={Boolean(blockedReason) || isPending}
-            onClick={onBalance}
+            className="w-full text-muted-foreground"
             data-testid="balance-teams"
+            aria-label="Equilibrar equipos: ver requisitos"
+            disabled={isPending}
           >
-            {!isAdmin ? (
-              <Lock className="size-4" aria-hidden="true" />
-            ) : (
-              <Scale className="size-4" aria-hidden="true" />
-            )}
+            <Lock className="size-4" aria-hidden="true" />
             Equilibrar equipos
           </Button>
-        </span>
-      </TooltipTrigger>
+        </PopoverTrigger>
+        <PopoverContent className="text-sm">
+          <p className="mb-1 font-semibold">Equilibrar equipos</p>
+          <p>{blockedReason}</p>
+        </PopoverContent>
+      </Popover>
+    )
 
-      <TooltipContent>
-        {blockedReason ??
-          'Reparte a los convocados para que el valor de mercado de los dos equipos sea lo más parecido posible.'}
-      </TooltipContent>
-    </Tooltip>
+  return (
+    <Button
+      type="button"
+      variant="default"
+      size="sm"
+      className="w-full"
+      disabled={isPending}
+      aria-busy={isPending}
+      onClick={onBalance}
+      data-testid="balance-teams"
+    >
+      <Scale className="size-4" aria-hidden="true" />
+      {isPending ? 'Equilibrando…' : 'Equilibrar equipos'}
+    </Button>
   )
 }

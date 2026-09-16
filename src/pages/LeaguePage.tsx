@@ -3,15 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Award,
   CalendarDays,
-  CircleDot,
-  Medal,
-  Shield,
   Sparkles,
-  Star,
   TrendingUp,
   Trophy,
   Users,
 } from 'lucide-react'
+import { awardIcon } from '@/lib/awardPresentation'
 import { PlayerRow } from '@/components/PlayerRow'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,23 +31,16 @@ import type { MatchRow, PlayerCardData } from '@/types/domain'
 
 const LEADERBOARD_SIZE = 5
 
-const AWARD_ICONS: Record<string, typeof Award> = {
-  'jugador revelación': Medal,
-  revelación: Medal,
-  mvp: Star,
-  puskas: CircleDot,
-  puskás: CircleDot,
-  zamora: Shield,
-}
-
 function LeaderboardCard({
   title,
   icon: Icon,
   players,
   renderValue,
   headingAs: Heading = 'h2',
+  description,
 }: {
   title: string
+  description?: string
   headingAs?: 'h2' | 'h3'
   icon: typeof Trophy
   players: readonly PlayerCardData[]
@@ -63,6 +53,9 @@ function LeaderboardCard({
           <Icon className="size-4 text-primary" aria-hidden="true" />
           <Heading>{title}</Heading>
         </CardTitle>
+        {description && (
+          <p className="text-xs text-muted-foreground">{description}</p>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         {players.map((player, index) => (
@@ -267,16 +260,17 @@ export function LeaguePage() {
           />
           <LeaderboardCard
             title="Más victoriosos"
+            description="Victorias acumuladas · un empate suma 0,5."
             icon={Trophy}
             players={topByVictories}
             renderValue={(player) => (
-              <span className="numeric text-sm font-semibold">
-                {formatWinRate(player.totalVictories, player.matchesPlayed)}
-                {/* The rate alone would rank one lucky afternoon above a
-                    season of them. */}
-                <span className="ml-2 font-normal text-muted-foreground">
-                  {formatVictories(player.totalVictories)}/
-                  {player.matchesPlayed}
+              <span className="numeric flex flex-col items-end text-sm font-semibold">
+                <span className="text-tier-gold">
+                  {formatVictories(player.totalVictories)} vict.
+                </span>
+                <span className="text-xs font-normal text-muted-foreground">
+                  {formatWinRate(player.totalVictories, player.matchesPlayed)} ·{' '}
+                  {player.matchesPlayed} partidos
                 </span>
               </span>
             )}
@@ -296,9 +290,7 @@ export function LeaguePage() {
                 key={attribute.code}
                 headingAs="h3"
                 title={attribute.label}
-                icon={
-                  AWARD_ICONS[attribute.label.trim().toLowerCase()] ?? Award
-                }
+                icon={awardIcon(attribute.label)}
                 players={holders}
                 renderValue={(player) => (
                   <span className="numeric font-bold text-tier-gold">

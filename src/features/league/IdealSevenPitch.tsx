@@ -2,7 +2,8 @@ import { Link } from 'react-router'
 import { formatScore } from '@/lib/formatting'
 import { PlayerAvatar } from '@/components/PlayerAvatar'
 import { ScoreStrip } from '@/components/ScoreStrip'
-import { Crown, Gem, Medal, Shield } from 'lucide-react'
+import { Info } from 'lucide-react'
+import { IDEAL_DISTINCTIONS } from './idealSevenPresentation'
 import {
   Popover,
   PopoverContent,
@@ -17,36 +18,11 @@ import {
 } from '@/lib/formations'
 import type { LeagueMetricRow } from '@/types/domain'
 import type {
-  IdealSevenCardStyle,
   IdealSevenLineup,
   IdealSevenPlayer,
 } from '@/features/league/idealSeven'
 
 const FORMATION = '2-3-1'
-
-const CARD_FACE: Record<
-  IdealSevenCardStyle,
-  'blue' | 'black' | 'legend' | 'purple'
-> = {
-  blue: 'blue',
-  black: 'black',
-  silver: 'legend',
-  purple: 'purple',
-}
-
-const CARD_ICON = {
-  silver: Medal,
-  purple: Gem,
-  black: Crown,
-  blue: Shield,
-} as const
-
-const DISTINCTIONS: Record<IdealSevenCardStyle, string> = {
-  silver: 'Leyenda · Mayor valoración del siete ideal',
-  purple: 'Champán · Más premios MVP entre los restantes',
-  black: 'Élite · Mayor valor de mercado entre los restantes',
-  blue: 'Marfil · Seleccionado para el siete ideal',
-}
 
 interface IdealSevenPitchProps {
   lineup: IdealSevenLineup
@@ -130,7 +106,7 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
                 compact
                 linkTo={`/players/${entry.player.id}`}
                 ratingOverride={entry.displayRating}
-                faceOverride={CARD_FACE[entry.cardStyle]}
+                faceOverride={IDEAL_DISTINCTIONS[entry.cardStyle].face}
               />
               <span className="sr-only">
                 {entry.player.displayName}, {describeSlot(FORMATION, slot.slot)}
@@ -144,7 +120,10 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
         <h2 className="mb-3 text-lg font-bold">Los elegidos</h2>
         <ol className="ideal-selection">
           {selected.map((entry) => (
-            <li key={entry.player.id} data-face={CARD_FACE[entry.cardStyle]}>
+            <li
+              key={entry.player.id}
+              data-face={IDEAL_DISTINCTIONS[entry.cardStyle].face}
+            >
               <Link
                 to={`/players/${entry.player.id}`}
                 className="ideal-selection-link block p-3"
@@ -161,10 +140,10 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
                     </span>
                     <span className="ideal-selection-distinction">
                       {(() => {
-                        const Icon = CARD_ICON[entry.cardStyle]
+                        const Icon = IDEAL_DISTINCTIONS[entry.cardStyle].icon
                         return <Icon className="size-3.5" aria-hidden="true" />
                       })()}
-                      {DISTINCTIONS[entry.cardStyle].split(' · ')[0]}
+                      {IDEAL_DISTINCTIONS[entry.cardStyle].label}
                     </span>
                   </span>
                   <span className="numeric text-xl font-black text-tier-gold">
@@ -182,14 +161,14 @@ export function IdealSevenPitch({ lineup, metrics }: IdealSevenPitchProps) {
                     className="ideal-distinction"
                     aria-label={`Distinción de ${entry.player.displayName}`}
                   >
-                    {(() => {
-                      const Icon = CARD_ICON[entry.cardStyle]
-                      return <Icon className="size-4" aria-hidden="true" />
-                    })()}
+                    <Info className="size-4" aria-hidden="true" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="text-sm">
-                  {DISTINCTIONS[entry.cardStyle]}
+                  <strong>{IDEAL_DISTINCTIONS[entry.cardStyle].label}</strong>
+                  <p className="mt-1">
+                    {IDEAL_DISTINCTIONS[entry.cardStyle].description}
+                  </p>
                   <p className="mt-3 font-semibold">
                     Su mejor partido · {formatScore(entry.bestFinalScore)}{' '}
                     puntos
