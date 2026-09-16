@@ -294,10 +294,17 @@ export function PitchLineups({
 
   return (
     <div ref={containerRef} className="flex flex-col gap-4">
+      <h2 id="match-lineups" className="text-lg font-bold">
+        Alineaciones
+      </h2>
       {interactive ? (
         <div className="flex flex-col gap-2">
-          <h2 className="text-lg font-bold">Alineaciones</h2>
-          <div className="grid w-full grid-cols-2 gap-2">
+          <div
+            className={cn(
+              'grid w-full gap-2',
+              balanceAction ? 'grid-cols-2' : 'grid-cols-1',
+            )}
+          >
             {balanceAction}
             <Button
               variant="outline"
@@ -316,7 +323,7 @@ export function PitchLineups({
           <p
             role={saving ? 'status' : undefined}
             aria-live="polite"
-            className="text-sm text-muted-foreground"
+            className="text-sm text-muted-foreground empty:hidden"
           >
             {saving
               ? 'Guardando alineación…'

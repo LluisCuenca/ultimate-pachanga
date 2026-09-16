@@ -1426,10 +1426,10 @@
     font-size: 1.25rem;
   }
   .ideal-summary-value strong span {
-    font-size: 1.875rem;
+    font-size: inherit;
   }
   .ideal-summary span {
-    font-size: 0.75rem;
+    font-size: inherit;
   }
   .ideal-selection {
     grid-template-columns: 1fr;
