@@ -17,23 +17,23 @@ import { cn } from '@/lib/utils'
 const COLOR_LEGEND = [
   {
     label: 'Plata',
-    className: 'border-tier-silver bg-card',
+    className: 'border-[var(--ideal-legend)] bg-card',
     description: 'Leyenda: mejor valoración total del 7 ideal.',
   },
   {
     label: 'Champán',
-    className: 'border-chart-7 bg-card',
+    className: 'border-[var(--ideal-champagne)] bg-card',
     description:
       'MVP: más MVPs entre los que no son Leyenda. Empata la mejor valoración.',
   },
   {
     label: 'Dorada',
-    className: 'border-tier-gold bg-card',
+    className: 'border-[var(--ideal-elite)] bg-card',
     description: 'Defensa: mejor defensa entre los que no son Leyenda ni MVP.',
   },
   {
     label: 'Marfil',
-    className: 'border-chart-4 bg-card',
+    className: 'border-[var(--ideal-ivory)] bg-card',
     description: 'Resto de jugadores elegidos para el equipo.',
   },
 ]
@@ -151,7 +151,7 @@ export function IdealSevenPage() {
           description="Hacen falta jugadores puntuados suficientes para portería, defensa, medio y ataque, todos con 100% de confianza."
         />
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="ideal-seven-theme flex flex-col gap-5">
           <IdealSevenPitch lineup={lineup} metrics={metrics} />
           <Card className="ideal-explanation">
             <details>

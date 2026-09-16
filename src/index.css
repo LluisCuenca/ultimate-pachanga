@@ -1102,25 +1102,32 @@
   font-size: 1.25rem;
   color: var(--tier-gold);
 }
-.ideal-pitch-card[data-ideal-card='silver'] .player-face {
-  box-shadow:
-    0 0 0 2px #d8dee8,
-    0 0 20px #d8dee866;
+.ideal-seven-theme {
+  --ideal-legend: #ff505b;
+  --ideal-champagne: #ff963e;
+  --ideal-elite: #f0bd4a;
+  --ideal-ivory: #f0ece0;
 }
-.ideal-pitch-card[data-ideal-card='purple'] .player-face {
-  box-shadow:
-    0 0 0 2px #dfa6c8,
-    0 0 20px #dfa6c866;
+.ideal-seven-theme [data-face='legend'] {
+  --card-edge: var(--ideal-legend);
 }
-.ideal-pitch-card[data-ideal-card='black'] .player-face {
-  box-shadow:
-    0 0 0 2px #f0bd4a,
-    0 0 20px #f0bd4a66;
+.ideal-seven-theme [data-face='purple'] {
+  --card-edge: var(--ideal-champagne);
 }
-.ideal-pitch-card[data-ideal-card='blue'] .player-face {
+.ideal-seven-theme [data-face='black'] {
+  --card-edge: var(--ideal-elite);
+}
+.ideal-seven-theme [data-face='blue'] {
+  --card-edge: var(--ideal-ivory);
+}
+.ideal-pitch-card .player-face {
   box-shadow:
-    0 0 0 2px #f0ece0,
-    0 0 20px #f0ece066;
+    0 0 0 2px var(--card-edge),
+    0 0 20px color-mix(in srgb, var(--card-edge) 40%, transparent);
+}
+.ideal-seven-theme .ideal-selection-distinction,
+.ideal-seven-theme .ideal-distinction {
+  color: var(--card-edge);
 }
 .ideal-selection {
   display: grid;
@@ -1777,8 +1784,8 @@
   font-size: 0.75rem;
 }
 .match-score-main .score-player-link [data-slot='avatar'] {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex-shrink: 0;
 }
 button,
