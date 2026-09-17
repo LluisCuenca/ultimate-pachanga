@@ -71,6 +71,11 @@
   --color-attribute-positive: var(--attribute-positive);
   --color-attribute-negative: var(--attribute-negative);
 
+  --color-signal-up: var(--signal-up);
+  --color-signal-down: var(--signal-down);
+  --color-signal-hot: var(--signal-hot);
+  --color-signal-cold: var(--signal-cold);
+  --color-signal-warning: var(--signal-warning);
   --color-pitch: var(--pitch);
 
   --radius-sm: calc(var(--radius) * 0.6);
@@ -157,26 +162,26 @@
   --card-foreground: #f5f5f3;
   --popover: #22252a;
   --popover-foreground: #f5f5f3;
-  --primary: var(--tier-gold);
-  --primary-foreground: #19170f;
+  --primary: #78b4ff;
+  --primary-foreground: #101923;
   --secondary: #292c32;
   --secondary-foreground: #f5f5f3;
   --muted: #24272c;
   --muted-foreground: #adb1ba;
-  --accent: #323037;
+  --accent: #223249;
   --accent-foreground: #f5f5f3;
-  --destructive: var(--tier-gold);
+  --destructive: #ff858c;
   --border: #35383f;
   --input: #454951;
-  --ring: #edc66c;
-  --chart-1: #edc66c;
-  --chart-2: #d1d5dd;
-  --chart-3: #c7a45b;
-  --chart-4: #f4e2b2;
-  --chart-5: #b4bac4;
-  --chart-6: #a58b55;
-  --chart-7: #e4d3ad;
-  --chart-8: #d1d5dd;
+  --ring: var(--primary);
+  --chart-1: #78b4ff;
+  --chart-2: #ffad66;
+  --chart-3: #68dbab;
+  --chart-4: #efd66f;
+  --chart-5: #f499c1;
+  --chart-6: #8ce0e8;
+  --chart-7: #bca3ff;
+  --chart-8: #ff858c;
   --sidebar: #121316;
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
@@ -198,12 +203,17 @@
   --tier-silver-face-deep: #191b1f;
   --tier-bronze-face: #322922;
   --tier-bronze-face-deep: #191b1f;
-  --attribute-positive: var(--tier-gold);
-  --attribute-negative: var(--tier-silver);
+  --attribute-positive: #68dbab;
+  --attribute-negative: #ff858c;
 }
 
 :root {
   --radius: 0.875rem;
+  --signal-up: #68dbab;
+  --signal-down: #ff858c;
+  --signal-hot: #ffad66;
+  --signal-cold: #8ce0e8;
+  --signal-warning: #efd66f;
   --space-unit: 0.25rem;
   --type-label: 0.75rem;
   --type-body: 0.875rem;
@@ -267,8 +277,8 @@
     outline-offset: 4px;
   }
   ::selection {
-    background: var(--tier-gold);
-    color: var(--background);
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 }
 
@@ -302,7 +312,7 @@
   padding-inline: 1rem;
 }
 [data-slot='tabs-trigger'][data-state='active'] {
-  color: var(--tier-gold);
+  color: var(--primary);
   background: var(--secondary);
 }
 [data-slot='table'] {
@@ -424,16 +434,16 @@
   min-height: 2.875rem;
 }
 .nav-link[aria-current='page'] {
-  color: var(--tier-gold);
-  background: color-mix(in srgb, var(--tier-gold), transparent 92%);
-  box-shadow: inset 3px 0 var(--tier-gold);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary), transparent 92%);
+  box-shadow: inset 3px 0 var(--primary);
 }
 .skip-link {
   position: fixed;
   top: -5rem;
   left: 1rem;
   z-index: 100;
-  background: var(--tier-gold);
+  background: var(--primary);
   color: var(--background);
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -522,7 +532,7 @@
   padding-bottom: 1.25rem;
 }
 .section-kicker {
-  color: var(--tier-gold);
+  color: var(--foreground);
   font-size: 0.6875rem;
   font-weight: 750;
   text-transform: uppercase;
@@ -557,7 +567,7 @@
   height: 5rem;
 }
 .match-card h3 {
-  color: var(--tier-gold);
+  color: var(--foreground);
 }
 .match-card-body {
   gap: 0.75rem;
@@ -713,8 +723,8 @@
   font-weight: 650;
 }
 .fixture-chip:hover {
-  border-color: var(--tier-gold);
-  color: var(--tier-gold);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 .player-summary-stat {
   border-bottom: 1px solid var(--border);
@@ -725,7 +735,7 @@
   overflow-wrap: anywhere;
 }
 .player-summary-stat:first-child dd {
-  color: var(--tier-gold);
+  color: var(--foreground);
 }
 .match-hero {
   border: 1px solid var(--border);
@@ -735,7 +745,7 @@
   gap: 1rem;
 }
 .match-hero h1 {
-  color: var(--tier-gold);
+  color: var(--foreground);
 }
 .player-face[data-face='blue'] {
   background: linear-gradient(var(--special-blue), var(--card));
@@ -823,7 +833,7 @@
 .ranking-panel {
   min-width: 0;
   border: 1px solid var(--border);
-  border-top-color: var(--tier-gold-dim);
+  border-top-color: var(--border);
   border-radius: var(--radius-xl);
   background: var(--card);
   padding: 1rem;
@@ -835,7 +845,7 @@
 }
 .ideal-promo {
   position: relative;
-  background: linear-gradient(115deg, var(--tier-gold-face), var(--card) 65%);
+  background: linear-gradient(115deg, var(--accent), var(--card) 70%);
 }
 .ideal-promo-content {
   display: grid;
@@ -1040,8 +1050,8 @@
   font-size: 1.25rem;
   font-weight: 900;
   line-height: 1.1;
-  color: var(--tier-gold);
-  background: color-mix(in srgb, var(--tier-gold), transparent 90%);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary), transparent 90%);
   border-radius: 0.625rem;
   font-variant-numeric: tabular-nums;
 }
@@ -1125,8 +1135,8 @@
 }
 .ideal-summary .ideal-summary-value {
   grid-column: 1 / -1;
-  border-color: var(--tier-gold-dim);
-  background: linear-gradient(110deg, var(--tier-gold-face), var(--card));
+  border-color: var(--border);
+  background: linear-gradient(110deg, var(--accent), var(--card));
 }
 .ideal-seven-theme {
   --ideal-legend: #ff505b;
@@ -1717,8 +1727,8 @@
   }
   .match-results-panel,
   .league-next-match .match-card {
-    border-color: var(--tier-gold-dim);
-    box-shadow: inset 0 2px var(--tier-gold);
+    border-color: var(--border);
+    box-shadow: inset 0 2px var(--primary);
   }
 }
 
@@ -1737,15 +1747,15 @@
   max-height: calc(100dvh - 1rem);
   overflow-y: auto;
   border-radius: 0 0 1.5rem 1.5rem;
-  border-bottom-color: var(--tier-gold);
+  border-bottom-color: var(--primary);
 }
 .mobile-navigation-sheet .nav-link {
   min-height: 3rem;
   font-size: 1rem;
 }
 .mobile-navigation-sheet .nav-link[aria-current='page'] {
-  box-shadow: inset 3px 0 var(--tier-gold);
-  color: var(--tier-gold);
+  box-shadow: inset 3px 0 var(--primary);
+  color: var(--primary);
 }
 .player-detail-card:not([data-compact]) > .player-name-band {
   height: auto;
@@ -1761,7 +1771,7 @@
 .player-face:not([data-compact]) > .player-value-band > span:first-child {
   font-size: 1.125rem;
   font-weight: 850;
-  color: var(--tier-gold);
+  color: var(--card-edge);
 }
 .player-detail-card:not([data-compact])
   > .player-value-band

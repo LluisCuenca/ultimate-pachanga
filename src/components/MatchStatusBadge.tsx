@@ -10,7 +10,7 @@ import type { MatchStatus } from '@/types/domain'
 const STATUS_CLASSES: Record<MatchStatus, string> = {
   draft: 'bg-muted text-muted-foreground',
   scheduled: 'bg-primary/15 text-primary border-primary/30',
-  played: 'bg-tier-silver/20 text-tier-silver border-tier-silver/40',
+  played: 'bg-signal-warning/15 text-signal-warning border-signal-warning/30',
   scored:
     'bg-attribute-positive/15 text-attribute-positive border-attribute-positive/30',
   cancelled: 'bg-muted text-muted-foreground border-border',

@@ -396,7 +396,7 @@ function ConfidenceDonut({
         aria-hidden="true"
         className="block size-full rounded-full"
         style={{
-          background: `conic-gradient(var(--tier-silver) ${bounded}%, var(--background) 0)`,
+          background: `conic-gradient(var(${bounded >= 100 ? '--signal-up' : bounded >= 50 ? '--signal-warning' : '--signal-down'}) ${bounded}%, var(--background) 0)`,
         }}
       />
     </span>
@@ -418,7 +418,7 @@ function FormStateIcon({
     return (
       <Flame
         aria-label="En racha"
-        className={cn(iconClassName, 'text-tier-gold')}
+        className={cn(iconClassName, 'text-signal-hot')}
       />
     )
   }
@@ -426,7 +426,7 @@ function FormStateIcon({
     return (
       <Snowflake
         aria-label="Enfriándose"
-        className={cn(iconClassName, 'text-tier-silver')}
+        className={cn(iconClassName, 'text-signal-cold')}
       />
     )
   }
@@ -434,7 +434,7 @@ function FormStateIcon({
     return (
       <ArrowDown
         aria-label="Por debajo de su media"
-        className={cn(iconClassName, 'text-tier-silver')}
+        className={cn(iconClassName, 'text-signal-down')}
       />
     )
   }
@@ -442,7 +442,7 @@ function FormStateIcon({
   return (
     <ArrowUp
       aria-label="Por encima de su media"
-      className={cn(iconClassName, 'text-tier-gold')}
+      className={cn(iconClassName, 'text-signal-up')}
     />
   )
 }
