@@ -44,10 +44,10 @@ type CardFace = CardTier | 'blue' | 'black' | 'legend' | 'purple'
 
 const CARD_FACES: Record<CardFace, string> = {
   ...TIER_FACES,
-  blue: 'from-sky-400 to-blue-950 text-white',
+  blue: 'from-tier-silver-face to-tier-silver-face-deep text-foreground',
   black: 'from-zinc-500 via-zinc-950 to-black text-white',
   legend: 'from-white via-zinc-100 to-zinc-400 text-zinc-950',
-  purple: 'from-fuchsia-500 to-violet-950 text-white',
+  purple: 'from-tier-gold-face to-tier-gold-face-deep text-foreground',
 }
 
 /** The bright metal edge that gives the card its contour. */
@@ -59,10 +59,10 @@ const TIER_EDGES: Record<CardTier, string> = {
 
 const CARD_EDGES: Record<CardFace, string> = {
   ...TIER_EDGES,
-  blue: 'border-sky-300/70',
+  blue: 'border-tier-silver/70',
   black: 'border-zinc-100/80',
   legend: 'border-white/95',
-  purple: 'border-fuchsia-200/80',
+  purple: 'border-primary/80',
 }
 
 const TIER_ACCENTS: Record<CardTier, string> = {
@@ -73,10 +73,10 @@ const TIER_ACCENTS: Record<CardTier, string> = {
 
 const CARD_ACCENTS: Record<CardFace, string> = {
   ...TIER_ACCENTS,
-  blue: 'text-sky-50',
+  blue: 'text-foreground',
   black: 'text-zinc-50',
   legend: 'text-zinc-950',
-  purple: 'text-fuchsia-50',
+  purple: 'text-foreground',
 }
 
 /** Hairlines separating the card's bands, in the tier's own metal. */
@@ -88,10 +88,10 @@ const TIER_RULES: Record<CardTier, string> = {
 
 const CARD_RULES: Record<CardFace, string> = {
   ...TIER_RULES,
-  blue: 'border-sky-100/35',
+  blue: 'border-tier-silver/35',
   black: 'border-white/20',
   legend: 'border-zinc-600/25',
-  purple: 'border-fuchsia-100/35',
+  purple: 'border-primary/35',
 }
 
 /**

@@ -67,7 +67,7 @@ function toLatestValue(
 /**
  * The evolution of a chosen measure across the season's jornadas.
  *
- * Gold and neutral lines also use stable dash patterns. Each series is named
+ * Red and neutral lines also use stable dash patterns. Each series is named
  * and carries its latest figure, so hue is never the only way to identify it. It doubles as the
  * remove control, which is where a reader looks when a line is in the way.
  */

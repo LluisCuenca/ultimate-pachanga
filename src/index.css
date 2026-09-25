@@ -8,8 +8,7 @@
 /* ---------------------------------------------------------------------------
    Ultimate Pachangas design tokens.
 
-   Dark is the default interface (<html class="dark">); the light palette is
-   kept so the app stays legible if the class is ever removed.
+   Black surfaces and a single red accent in mobile and desktop views.
    --------------------------------------------------------------------------- */
 
 @theme inline {
@@ -87,102 +86,39 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(0.99 0.003 150);
-  --foreground: oklch(0.16 0.012 155);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.012 155);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.012 155);
-  --primary: oklch(0.5 0.15 148);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.008 150);
-  --secondary-foreground: oklch(0.21 0.015 155);
-  --muted: oklch(0.96 0.008 150);
-  --muted-foreground: oklch(0.5 0.015 155);
-  --accent: oklch(0.94 0.03 148);
-  --accent-foreground: oklch(0.21 0.015 155);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.008 150);
-  --input: oklch(0.9 0.008 150);
-  --ring: oklch(0.5 0.15 148);
-  /* Chart series, in slot order.
-
-     Eight hues rather than five, because the evolution chart plots up to eight
-     players at once, and in a fixed order rather than cycled: the order is what
-     makes adjacent series distinguishable under protanopia and deuteranopia.
-     Kept as hex — these are the exact values a colour-vision validator was run
-     against, and rewriting them in oklch would lose that audit trail.
-
-     Three of the light steps (aqua, yellow, magenta) sit below 3:1 against a
-     white surface, so every chart that uses them labels its series in the
-     legend rather than relying on the colour alone. */
-  --chart-1: #2a78d6;
-  --chart-2: #eb6834;
-  --chart-3: #1baf7a;
-  --chart-4: #eda100;
-  --chart-5: #e87ba4;
-  --chart-6: #008300;
-  --chart-7: #4a3aa7;
-  --chart-8: #e34948;
-  --radius: 0.625rem;
-  --sidebar: oklch(0.98 0.005 150);
-  --sidebar-foreground: oklch(0.16 0.012 155);
-  --sidebar-primary: oklch(0.5 0.15 148);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.94 0.03 148);
-  --sidebar-accent-foreground: oklch(0.21 0.015 155);
-  --sidebar-border: oklch(0.9 0.008 150);
-  --sidebar-ring: oklch(0.5 0.15 148);
-
-  --pitch: oklch(0.45 0.13 148);
-  --tier-gold: oklch(0.82 0.15 88);
-  --tier-gold-dim: oklch(0.6 0.12 78);
-  --tier-silver: oklch(0.8 0.012 250);
-  --tier-silver-dim: oklch(0.58 0.012 250);
-  --tier-bronze: oklch(0.66 0.11 55);
-  --tier-bronze-dim: oklch(0.46 0.09 48);
-
-  /* Light theme keeps the metal bright, so the face is a pale tint and the
-     text on it stays dark. */
-  --tier-gold-face: oklch(0.93 0.07 90);
-  --tier-gold-face-deep: oklch(0.83 0.11 82);
-  --tier-silver-face: oklch(0.94 0.008 250);
-  --tier-silver-face-deep: oklch(0.85 0.012 250);
-  --tier-bronze-face: oklch(0.9 0.05 58);
-  --tier-bronze-face-deep: oklch(0.78 0.09 50);
-  --attribute-positive: oklch(0.55 0.15 148);
-  --attribute-negative: oklch(0.55 0.19 25);
-}
-
+/* One fixed dark brand palette, shared by every surface and native control.
+   Tier identifiers retain their scoring meaning; their presentation is red/neutral. */
+:root,
 .dark {
-  --background: #0c0d0f;
-  --foreground: #f5f5f3;
-  --card: #191b1f;
-  --card-foreground: #f5f5f3;
-  --popover: #22252a;
-  --popover-foreground: #f5f5f3;
-  --primary: #78b4ff;
-  --primary-foreground: #101923;
-  --secondary: #292c32;
-  --secondary-foreground: #f5f5f3;
-  --muted: #24272c;
-  --muted-foreground: #adb1ba;
-  --accent: #223249;
-  --accent-foreground: #f5f5f3;
-  --destructive: #ff858c;
-  --border: #35383f;
-  --input: #454951;
+  color-scheme: dark;
+  --background: #080808;
+  --foreground: #f5f5f5;
+  --card: #181818;
+  --card-foreground: var(--foreground);
+  --popover: #222222;
+  --popover-foreground: var(--foreground);
+  --primary: #ff4b55;
+  --primary-foreground: #180809;
+  --secondary: #292929;
+  --secondary-foreground: var(--foreground);
+  --muted: #242424;
+  --muted-foreground: #b5b5b5;
+  --accent: #35191c;
+  --accent-foreground: var(--foreground);
+  --destructive: #ff858b;
+  --border: #363636;
+  --input: #484848;
   --ring: var(--primary);
-  --chart-1: #78b4ff;
-  --chart-2: #ffad66;
-  --chart-3: #68dbab;
-  --chart-4: #efd66f;
-  --chart-5: #f499c1;
-  --chart-6: #8ce0e8;
-  --chart-7: #bca3ff;
-  --chart-8: #ff858c;
-  --sidebar: #121316;
+  /* Red and neutral series also carry unique dash patterns and named legends. */
+  --chart-1: var(--primary);
+  --chart-2: #f5f5f5;
+  --chart-3: #aaaaaa;
+  --chart-4: #ff9399;
+  --chart-5: #cccccc;
+  --chart-6: #e8747c;
+  --chart-7: #888888;
+  --chart-8: #ffc4c8;
+  --sidebar: #101010;
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
@@ -190,30 +126,30 @@
   --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
-  --pitch: #223d35;
-  --tier-gold: #edc66c;
-  --tier-gold-dim: #96763b;
-  --tier-silver: #d1d5dd;
-  --tier-silver-dim: #767e8b;
-  --tier-bronze: #d7a880;
-  --tier-bronze-dim: #8f6249;
-  --tier-gold-face: #302b22;
-  --tier-gold-face-deep: #191b1f;
-  --tier-silver-face: #2b3038;
-  --tier-silver-face-deep: #191b1f;
-  --tier-bronze-face: #322922;
-  --tier-bronze-face-deep: #191b1f;
-  --attribute-positive: #68dbab;
-  --attribute-negative: #ff858c;
+  --pitch: #252525;
+  --tier-gold: var(--primary);
+  --tier-gold-dim: #a5353e;
+  --tier-silver: #dedede;
+  --tier-silver-dim: #808080;
+  --tier-bronze: #b8b8b8;
+  --tier-bronze-dim: #666666;
+  --tier-gold-face: #351b1e;
+  --tier-gold-face-deep: var(--card);
+  --tier-silver-face: #2e2e2e;
+  --tier-silver-face-deep: var(--card);
+  --tier-bronze-face: #242424;
+  --tier-bronze-face-deep: var(--card);
+  --attribute-positive: var(--foreground);
+  --attribute-negative: var(--destructive);
 }
 
 :root {
   --radius: 0.875rem;
-  --signal-up: #68dbab;
-  --signal-down: #ff858c;
-  --signal-hot: #ffad66;
-  --signal-cold: #8ce0e8;
-  --signal-warning: #efd66f;
+  --signal-up: var(--foreground);
+  --signal-down: var(--destructive);
+  --signal-hot: var(--primary);
+  --signal-cold: var(--muted-foreground);
+  --signal-warning: var(--primary);
   --space-unit: 0.25rem;
   --type-label: 0.75rem;
   --type-body: 0.875rem;
@@ -475,8 +411,9 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(0deg, #0c0d0ff2, #0c0d0f50),
+    linear-gradient(0deg, #080808f2, #08080850),
     url('/pitch.webp') center 55% / cover;
+  filter: grayscale(1);
   opacity: 0.7;
 }
 .auth-story > * {
@@ -596,7 +533,7 @@
   background: var(--card);
 }
 .pitch-surface > img {
-  filter: saturate(0.45) brightness(0.65);
+  filter: grayscale(1) brightness(0.65);
 }
 .onboarding-layout {
   padding-block: max(2rem, env(safe-area-inset-top));
@@ -692,12 +629,6 @@
   }
 }
 
-:root {
-  --special-blue: #233e5c;
-  --special-purple: #443056;
-  --special-black: #22252a;
-  --special-legend: #d1d5dd;
-}
 .fixture-strip {
   display: flex;
   gap: 0.5rem;
@@ -746,23 +677,6 @@
 }
 .match-hero h1 {
   color: var(--foreground);
-}
-.player-face[data-face='blue'] {
-  background: linear-gradient(var(--special-blue), var(--card));
-  border-color: var(--chart-4);
-}
-.player-face[data-face='purple'] {
-  background: linear-gradient(var(--special-purple), var(--card));
-  border-color: var(--chart-7);
-}
-.player-face[data-face='black'] {
-  background: linear-gradient(var(--special-black), var(--background));
-  border-color: var(--tier-gold);
-}
-.player-face[data-face='legend'] {
-  background: var(--special-legend);
-  color: var(--background);
-  border-color: var(--foreground);
 }
 @media (max-width: 639px) {
   .ranking-table [data-slot='table-cell'] {
@@ -1139,10 +1053,10 @@
   background: linear-gradient(110deg, var(--accent), var(--card));
 }
 .ideal-seven-theme {
-  --ideal-legend: #ff505b;
-  --ideal-champagne: #ff963e;
-  --ideal-elite: #f0bd4a;
-  --ideal-ivory: #f0ece0;
+  --ideal-legend: var(--primary);
+  --ideal-champagne: #ff9399;
+  --ideal-elite: #b5b5b5;
+  --ideal-ivory: var(--foreground);
 }
 .ideal-seven-theme [data-face='legend'] {
   --card-edge: var(--ideal-legend);
