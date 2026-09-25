@@ -197,7 +197,10 @@ export function EvolutionChart({
           const latest = toLatestValue(rows, entry.playerId)
 
           return (
-            <li key={entry.playerId} className="flex items-center gap-1">
+            <li
+              key={entry.playerId}
+              className="flex min-w-0 items-center gap-1"
+            >
               <button
                 type="button"
                 onClick={() =>
@@ -208,7 +211,7 @@ export function EvolutionChart({
                 aria-pressed={activeFocus === entry.playerId}
                 data-testid={`evolution-legend-${entry.playerId}`}
                 title={`Destacar ${entry.name}`}
-                className="leaderboard-row flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                className="leaderboard-row flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
               >
                 <svg
                   className="evolution-pattern"
