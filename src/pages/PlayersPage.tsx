@@ -123,7 +123,7 @@ export function PlayersPage() {
               id="player-search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar por nombre, apodo o código"
+              placeholder="Buscar por nombre o apodo"
               className="pl-9"
             />
           </div>

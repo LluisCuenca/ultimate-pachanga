@@ -232,8 +232,7 @@ export function StatsPage() {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        {/* Scrolls sideways on a phone rather than wrapping into a tall block. */}
-        <TabsList className="flex w-full justify-start overflow-x-auto">
+        <TabsList className="stats-tabs w-full">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="palmares">Palmarés</TabsTrigger>
           <TabsTrigger value="evolution">Evolución</TabsTrigger>

@@ -251,6 +251,14 @@
   color: var(--primary);
   background: var(--secondary);
 }
+.stats-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.app-main .stats-tabs [data-slot='tabs-trigger'] {
+  min-width: 0;
+  padding-inline: 0.25rem;
+}
 [data-slot='table'] {
   font-variant-numeric: tabular-nums;
 }
@@ -285,6 +293,7 @@
   left: -11.5%;
   top: -10.7%;
   object-fit: fill;
+  mix-blend-mode: screen;
 }
 .brand-wordmark {
   font-size: 0.8rem;
@@ -1131,7 +1140,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .ideal-summary {
-    grid-template-columns: 1fr 1fr 2fr;
+    grid-template-columns: 2fr 1fr 1fr;
   }
   .ideal-summary .ideal-summary-value {
     grid-column: auto;
@@ -1446,9 +1455,6 @@
   }
   .desktop-brand-title {
     display: block;
-  }
-  .ideal-summary .ideal-summary-value {
-    order: 3;
   }
   .ideal-selection-data {
     display: flex;
